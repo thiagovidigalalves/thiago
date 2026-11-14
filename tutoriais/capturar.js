@@ -10,6 +10,7 @@
  *   TUTORIAL_URL    endereço do sistema (padrão: https://melhorsistema.thiagoinformatica.com.br)
  *   TUTORIAL_EMAIL  e-mail de um usuário de DEMONSTRAÇÃO (nunca use empresa de cliente real)
  *   TUTORIAL_SENHA  senha desse usuário
+ *   (ou login de funcionário: TUTORIAL_EMPRESA = código/CNPJ da empresa demo, TUTORIAL_USUARIO e TUTORIAL_SENHA)
  *
  * Segurança: o robô NUNCA clica em botões que gravam ou apagam dados
  * (Salvar, Excluir, Finalizar, Emitir, Enviar...). Esses botões só recebem a bolinha.
@@ -24,7 +25,9 @@ const PASTA_ROTEIROS = path.join(__dirname, 'roteiros');
 const PASTA_IMG = path.join(RAIZ, 'ajuda', 'img');
 const SESSAO = path.join(__dirname, '.sessao.json');
 const URL_BASE = (process.env.TUTORIAL_URL || 'https://melhorsistema.thiagoinformatica.com.br').replace(/\/$/, '');
-const BOTOES_PERIGOSOS = /salvar|gravar|excluir|apagar|remover|finalizar|emitir|enviar|confirmar|cancelar venda|estornar|inutilizar|pagar|baixar|transmitir/i;
+const BOTOES_PERIGOSOS = /salvar|gravar|cadastrar|excluir|apagar|remover|inativar|finalizar|emitir|emiss[aã]o|enviar|confirmar|cancelar venda|estornar|inutilizar|pagar|baixar|transmitir|faturar|lan[cç]ar|faltam r\$/i;
+// Dentro de uma janela (dialog), estes também gravam dados:
+const BOTOES_PERIGOSOS_JANELA = /abrir caixa|fechar caixa|continuar|ok$|sim$/i;
 
 function carregarRoteiros(filtro) {
   return fs.readdirSync(PASTA_ROTEIROS)
@@ -36,11 +39,19 @@ function carregarRoteiros(filtro) {
 
 /** Localiza um elemento a partir do seletor do roteiro (texto ou seletor Playwright). */
 function achar(page, alvo) {
-  if (typeof alvo === 'object' && alvo.papel) return page.getByRole(alvo.papel, { name: alvo.nome, exact: !!alvo.exato }).first();
-  if (typeof alvo === 'object' && alvo.rotulo) return page.getByLabel(alvo.rotulo, { exact: !!alvo.exato }).first();
-  if (typeof alvo === 'object' && alvo.placeholder) return page.getByPlaceholder(alvo.placeholder).first();
-  if (typeof alvo === 'object' && alvo.texto) return page.getByText(alvo.texto, { exact: !!alvo.exato }).first();
-  return page.locator(alvo).first();
+  if (typeof alvo === 'string') return page.locator(alvo).first();
+  // `dentro: 'dialog'` procura só dentro da janela aberta (evita achar o botão de trás).
+  const base = alvo.dentro === 'dialog' ? page.getByRole('dialog').last() : page;
+  if (alvo.papel) return base.getByRole(alvo.papel, { name: alvo.nome, exact: !!alvo.exato }).first();
+  if (alvo.rotulo) return base.getByLabel(alvo.rotulo, { exact: !!alvo.exato }).first();
+  if (alvo.placeholder) return base.getByPlaceholder(alvo.placeholder, { exact: !!alvo.exato }).first();
+  if (alvo.texto) return base.getByText(alvo.texto, { exact: !!alvo.exato }).first();
+  if (alvo.titulo) return base.locator(`[title="${alvo.titulo}"]`).first();
+  // `campo`: rótulo que não está ligado ao campo (<Label> sem htmlFor) -> pega o primeiro campo depois dele.
+  if (alvo.campo) return base.locator('label', { hasText: alvo.campo }).first()
+    .locator('xpath=following::*[self::input or self::textarea or self::select or @role="combobox"][1]');
+  if (alvo.css) return base.locator(alvo.css).first();
+  throw new Error('alvo inválido: ' + JSON.stringify(alvo));
 }
 
 /** Desenha bolinhas numeradas + contorno sobre os elementos. */
@@ -99,7 +110,8 @@ async function executar(page, acao, roteiro) {
   const el = achar(page, acao.alvo);
   if (acao.clicar !== undefined || acao.tipo === 'clicar') {
     const texto = (await el.innerText().catch(() => '')) + ' ' + (await el.getAttribute('aria-label').catch(() => '') || '');
-    if (BOTOES_PERIGOSOS.test(texto) && !roteiro.gravaDados) {
+    const naJanela = await el.evaluate(e => !!e.closest('[role="dialog"],[role="alertdialog"]')).catch(() => false);
+    if ((BOTOES_PERIGOSOS.test(texto) || (naJanela && BOTOES_PERIGOSOS_JANELA.test(texto.trim()))) && !roteiro.gravaDados) {
       console.log(`   (segurança) não cliquei em "${texto.trim()}" — só marquei.`);
       return;
     }
@@ -117,8 +129,16 @@ async function entrar(context, page) {
   await page.goto(URL_BASE + '/', { waitUntil: 'load' }).catch(() => {});
   await page.waitForTimeout(2500);
   if (!/\/login/.test(page.url())) return true; // sessão salva ainda vale
-  if (!email || !senha) return false;
-  await page.getByPlaceholder('seu@email.com').fill(email);
+  const empresa = process.env.TUTORIAL_EMPRESA, usuario = process.env.TUTORIAL_USUARIO;
+  if (empresa && usuario && senha) {
+    // Login de funcionário: código/CNPJ da empresa + usuário + senha (não precisa de e-mail).
+    await page.goto(URL_BASE + '/entrar-funcionario', { waitUntil: 'load' });
+    await page.waitForTimeout(2000);
+    await page.getByPlaceholder('EMP_... ou 00.000.000/0001-00').fill(empresa);
+    await page.getByPlaceholder('ex.: joao.silva').fill(usuario);
+  } else if (email && senha) {
+    await page.getByPlaceholder('seu@email.com').fill(email);
+  } else return false;
   await page.locator('input[type="password"]').first().fill(senha);
   await page.getByRole('button', { name: 'Entrar', exact: true }).click();
   await page.waitForURL(u => !/\/login/.test(String(u)), { timeout: 30000 }).catch(() => {});
@@ -149,7 +169,7 @@ async function entrar(context, page) {
     console.log(`\n▶ ${r.titulo}`);
     if (r.precisaLogin !== false) {
       if (logado === null) logado = await entrar(context, page);
-      if (!logado) { console.log('   pulado: precisa de login (defina TUTORIAL_EMAIL e TUTORIAL_SENHA).'); relatorio.push({ id: r.id, ok: false, motivo: 'sem login' }); continue; }
+      if (!logado) { console.log('   pulado: precisa de login (defina TUTORIAL_EMAIL e TUTORIAL_SENHA, ou TUTORIAL_EMPRESA, TUTORIAL_USUARIO e TUTORIAL_SENHA).'); relatorio.push({ id: r.id, ok: false, motivo: 'sem login' }); continue; }
     }
     const pasta = path.join(PASTA_IMG, r.id);
     fs.mkdirSync(pasta, { recursive: true });

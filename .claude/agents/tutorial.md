@@ -55,7 +55,7 @@ module.exports = {
 };
 ```
 
-Tipos de `alvo`: `{ papel: 'button'|'link'|'tab'|'textbox', nome, exato }`, `{ rotulo: 'Nome' }`,
+Tipos de `alvo`: `{ papel: 'button'|'link'|'tab'|'heading', nome (texto ou /regex/), exato }`, `{ rotulo: 'Nome' }` (só se o label for ligado ao campo), `{ campo: 'Nome' }` (label sem ligação: pega o campo logo depois), `{ titulo: 'Editar' }` (botão só com ícone), `{ css }`; qualquer um aceita `dentro: 'dialog'`,
 `{ placeholder: 'Buscar...' }`, `{ texto: 'Algum texto' }` ou um seletor CSS (string).
 Tipos de ação: `{ tipo: 'clicar', alvo }`, `{ tipo: 'preencher', alvo, valor }`, `{ tipo: 'tecla', tecla: 'F2' }`.
 Vários itens em `marcar` viram bolinhas 2a, 2b, 2c...

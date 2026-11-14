@@ -11,6 +11,8 @@ Abra `ajuda/index.html` no navegador para ver a central.
    ```bash
    export TUTORIAL_EMAIL="usuario-demo@..."   # usuário da empresa de DEMONSTRAÇÃO
    export TUTORIAL_SENHA="..."
+   # ou, com usuário de funcionário da empresa demo:
+   # export TUTORIAL_EMPRESA="EMP_..." TUTORIAL_USUARIO="tutorial" TUTORIAL_SENHA="..."
    node tutoriais/capturar.js            # todos
    node tutoriais/capturar.js clientes   # só um
    ```

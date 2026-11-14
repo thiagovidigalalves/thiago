@@ -82,7 +82,7 @@ main{min-width:0}
 #zoom{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;padding:16px;z-index:10;cursor:zoom-out}
 #zoom img{max-width:100%;max-height:100%;border-radius:8px}
 .vazio{color:var(--suave)}
-@media (max-width:860px){.layout{grid-template-columns:1fr}nav{position:static;max-height:none}.passo{padding:14px}.tutorial h2{font-size:23px}}
+@media (max-width:860px){.layout{grid-template-columns:1fr;padding:16px}nav{position:static;max-height:none}body.lendo nav{display:none}.passo{padding:14px}.tutorial h2{font-size:23px}}
 @media print{header,nav,.nav-tut,.voltar{display:none}.layout{display:block}.passo{break-inside:avoid}}
 </style>
 </head>
@@ -115,6 +115,7 @@ function cartoes(lista){
     '<a class="cartao" href="#'+t.id+'"><small>'+esc(t.grupo)+'</small><b>'+esc(t.titulo)+'</b><span>'+esc(t.resumo)+'</span><br><em>'+t.passos.length+' passos →</em></a>').join('')+'</div>';
 }
 function inicio(filtro){
+  document.body.classList.remove('lendo');
   menu('');
   const q = norm(filtro||'').split(/\\s+/).filter(Boolean);
   const lista = q.length ? TUTORIAIS.filter(t => { const txt = norm([t.titulo,t.resumo,t.grupo,...t.passos.map(p=>p.titulo+' '+p.texto)].join(' ')); return q.every(w=>txt.includes(w)); }) : TUTORIAIS;
@@ -122,6 +123,7 @@ function inicio(filtro){
     : grupos.map(g => '<h2>'+esc(g)+'</h2>'+cartoes(TUTORIAIS.filter(t=>t.grupo===g))).join('')) + '</section>';
 }
 function tutorial(t){
+  document.body.classList.add('lendo');
   menu(t.id);
   const i = TUTORIAIS.indexOf(t), ant = TUTORIAIS[i-1], prox = TUTORIAIS[i+1];
   $('#conteudo').innerHTML = '<article class="tutorial">'
