@@ -10,6 +10,7 @@ module.exports = {
       titulo: 'O menu fica do lado esquerdo',
       texto: 'Todas as telas do sistema estão no menu azul à esquerda, separadas por assunto: Comercial, Cadastros, Estoque, Financeiro, Fiscal, Relatórios e Configurações.',
       marcar: [{ alvo: 'aside nav', legenda: 'Menu do sistema' }],
+      telaInteira: true,
     },
     {
       titulo: 'Clique num grupo para abrir',

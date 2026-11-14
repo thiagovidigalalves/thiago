@@ -74,7 +74,9 @@ async function marcar(page, marcas) {
       box.style.cssText = `position:fixed;left:${c.x - pad}px;top:${c.y - pad}px;width:${c.width + pad * 2}px;height:${c.height + pad * 2}px;border:3px solid #ef4444;border-radius:10px;box-shadow:0 0 0 4px rgba(239,68,68,.25);`;
       camada.appendChild(box);
       const r = 17;
-      let cx = c.x - pad - r + 4, cy = c.y - pad - r + 4;
+      // Bolinha à esquerda do contorno (não cobre texto); sem espaço, vai no canto de cima.
+      let cx = c.x - pad - r * 2 - 10, cy = c.y + c.height / 2 - r;
+      if (cx < 4) { cx = c.x - pad - r + 4; cy = c.y - pad - r + 4; }
       cx = Math.max(4, cx); cy = Math.max(4, cy);
       const bola = document.createElement('div');
       bola.textContent = c.numero;
@@ -99,6 +101,24 @@ async function marcar(page, marcas) {
     }
     document.body.appendChild(camada);
   }, caixas);
+  return caixas;
+}
+
+/**
+ * Recorta o print em volta das marcações (aproxima a imagem para o cliente enxergar melhor),
+ * mantendo pelo menos 960x540 da tela para dar contexto. `telaInteira: true` no passo desliga.
+ */
+function recorte(caixas, passo, tela) {
+  if (!caixas.length || passo.telaInteira) return undefined;
+  const M = 60, MIN_W = 960, MIN_H = 540;
+  let x1 = Math.min(...caixas.map(c => c.x)) - M - 50, y1 = Math.min(...caixas.map(c => c.y)) - M;
+  let x2 = Math.max(...caixas.map(c => c.x + c.width)) + M + 280, y2 = Math.max(...caixas.map(c => c.y + c.height)) + M; // +280: legendas à direita
+  let w = Math.max(x2 - x1, MIN_W), h = Math.max(y2 - y1, MIN_H);
+  if (w / h > 16 / 9) h = w * 9 / 16; else w = h * 16 / 9;   // mantém o formato 16:9
+  w = Math.min(w, tela.width); h = Math.min(h, tela.height);
+  const cx = (x1 + x2) / 2, cy = (y1 + y2) / 2;
+  const x = Math.max(0, Math.min(cx - w / 2, tela.width - w)), y = Math.max(0, Math.min(cy - h / 2, tela.height - h));
+  return { x, y, width: w, height: h };
 }
 
 async function limparMarcas(page) {
@@ -181,9 +201,9 @@ async function entrar(context, page) {
         if (p.ir) { await page.goto(URL_BASE + p.ir, { waitUntil: 'load' }).catch(() => {}); await page.waitForTimeout(p.espera || 2500); }
         for (const a of p.antes || []) await executar(page, a, r);
         const marcas = (p.marcar || []).map((m, j) => ({ ...m, numero: p.marcar.length > 1 ? `${n}${String.fromCharCode(97 + j)}` : n }));
-        if (marcas.length) await marcar(page, marcas);
+        const caixas = marcas.length ? await marcar(page, marcas) : [];
         await page.waitForTimeout(300);
-        await page.screenshot({ path: path.join(pasta, `passo-${n}.png`) });
+        await page.screenshot({ path: path.join(pasta, `passo-${n}.png`), clip: recorte(caixas, p, page.viewportSize()) });
         await limparMarcas(page);
         console.log(`   ✔ passo ${n}: ${p.titulo}`);
         for (const a of p.depois || []) await executar(page, a, r);
