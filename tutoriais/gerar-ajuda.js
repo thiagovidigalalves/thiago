@@ -6,6 +6,7 @@
  * (ex.: /ajuda/#clientes) ou aberta direto no navegador.
  */
 const fs = require('fs');
+const { execFileSync } = require('child_process');
 const path = require('path');
 
 const RAIZ = path.resolve(__dirname, '..');
@@ -16,10 +17,15 @@ const roteiros = fs.readdirSync(PASTA_ROTEIROS).filter(f => f.endsWith('.js'))
   .map(f => require(path.join(PASTA_ROTEIROS, f)))
   .sort((a, b) => (a.ordem || 99) - (b.ordem || 99));
 
+// Cópias leves (WebP) para o celular; se o Python/Pillow não existir, usa os PNG originais.
+let web = false;
+try { execFileSync('python3', [path.join(__dirname, 'otimizar.py')], { stdio: 'inherit' }); web = true; } catch { console.log('Sem Python/Pillow: usando os PNG originais.'); }
+
 const dados = roteiros.map(r => ({
   id: r.id, grupo: r.grupo || 'Outros', titulo: r.titulo, resumo: r.resumo || '', antes: r.antesDeComecar || '',
   passos: r.passos.map((p, i) => {
-    const img = `img/${r.id}/passo-${i + 1}.png`;
+    const png = `img/${r.id}/passo-${i + 1}.png`, webp = `img-web/${r.id}/passo-${i + 1}.webp`;
+    const img = web && fs.existsSync(path.join(RAIZ, 'ajuda', webp)) ? webp : png;
     return { titulo: p.titulo, texto: p.texto || '', dica: p.dica || '', atencao: p.atencao || '',
       img: !p.semPrint && fs.existsSync(path.join(RAIZ, 'ajuda', img)) ? img : '', semPrint: !!p.semPrint };
   }),
@@ -33,6 +39,9 @@ const html = `<!doctype html>
 <title>Central de Ajuda</title>
 <style>
 :root{--azul:#0b1a4a;--azul2:#1d3a8a;--vermelho:#ef4444;--fundo:#f4f6fb;--card:#fff;--texto:#1f2937;--suave:#6b7280;--borda:#e5e7eb;--dica:#ecfdf5;--dica-b:#10b981;--aten:#fff7ed;--aten-b:#f97316}
+:root{--nav-hover:#eef2ff;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--fundo:#0f172a;--card:#1e293b;--texto:#e5e7eb;--suave:#94a3b8;--borda:#334155;--dica:#052e2b;--aten:#3b2412;--nav-hover:#273449;color-scheme:dark}:root:not([data-theme="light"]) .antes{background:#172554}:root:not([data-theme="light"]) .indice a,:root:not([data-theme="light"]) .voltar,:root:not([data-theme="light"]) .cartao em{color:#93c5fd}}
+:root[data-theme="dark"]{--fundo:#0f172a;--card:#1e293b;--texto:#e5e7eb;--suave:#94a3b8;--borda:#334155;--dica:#052e2b;--aten:#3b2412;--nav-hover:#273449;color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--fundo);color:var(--texto);font-size:17px;line-height:1.55}
 a{color:inherit}
@@ -46,7 +55,7 @@ nav{position:sticky;top:16px;align-self:start;background:var(--card);border:1px 
 nav h3{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--suave);margin:14px 8px 6px}
 nav h3:first-child{margin-top:4px}
 nav a{display:block;text-decoration:none;padding:8px 10px;border-radius:9px;font-size:15px}
-nav a:hover{background:#eef2ff}
+nav a:hover{background:var(--nav-hover)}
 nav a.ativo{background:var(--azul);color:#fff;font-weight:600}
 main{min-width:0}
 .inicio h2{margin-top:0}
