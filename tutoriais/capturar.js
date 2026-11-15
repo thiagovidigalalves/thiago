@@ -141,16 +141,18 @@ function recorte(caixas, passo, tela) {
 async function desfocarDados(page) {
   if (process.env.TUTORIAL_DESFOCAR === '0') return;
   await page.evaluate(() => {
-    const SENSIVEL = /R\$\s?-?[\d.]+,\d{2}|\d{3}\.\d{3}\.\d{3}-\d{2}|\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}|\(?\d{2}\)?\s?9?\d{4}-?\d{4}|[\w.+-]+@[\w-]+\.[\w.]+|\b[A-Z]{3}-?\d[A-Z0-9]\d{2}\b/;
+    const SENSIVEL = /#\d{3,}|\d+\s+\S+\(\S+\)\s+encontrad|Todo dia \d+|R\$\s?-?[\d.]+,\d{2}|\d{3}\.\d{3}\.\d{3}-\d{2}|\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}|\(?\d{2}\)?\s?9?\d{4}-?\d{4}|[\w.+-]+@[\w-]+\.[\w.]+|\b[A-Z]{3}-?\d[A-Z0-9]\d{2}\b/;
     const marcados = [...document.querySelectorAll('[data-tutorial-alvo]')];
     const protegido = el => el.closest('#__tutorial_marcas') || marcados.some(m => m === el || m.contains(el) || el.contains(m));
     const borrar = el => { if (!protegido(el) && !el.closest('aside')) el.setAttribute('data-tutorial-blur', ''); };
     document.querySelectorAll('tbody td, [role="row"] [role="cell"], [role="dialog"] li').forEach(borrar);
+    // Gráficos (revelam o tamanho do faturamento): qualquer svg/canvas grande.
+    document.querySelectorAll('svg, canvas').forEach(g => { const r = g.getBoundingClientRect(); if (r.width > 150 && r.height > 80) borrar(g); });
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     for (let n; (n = walker.nextNode());) if (SENSIVEL.test(n.textContent) && n.parentElement) borrar(n.parentElement);
     const st = document.createElement('style');
     st.id = '__tutorial_blur';
-    st.textContent = '[data-tutorial-blur]{filter:blur(5px)!important}';
+    st.textContent = '[data-tutorial-blur]{filter:blur(9px)!important}';
     document.head.appendChild(st);
   });
 }
