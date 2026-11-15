@@ -63,10 +63,12 @@ async function marcar(page, marcas) {
     await el.scrollIntoViewIfNeeded().catch(() => {});
     await el.evaluate(e => e.setAttribute('data-tutorial-alvo', '')).catch(() => {});
     const b = await el.boundingBox();
-    if (b) caixas.push({ ...b, numero: m.numero, legenda: m.legenda || '' });
+    const janela = await el.evaluate(e => { const d = e.closest('[role="dialog"]'); if (!d) return null; const r = d.getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height }; }).catch(() => null);
+    if (b) caixas.push({ ...b, numero: m.numero, legenda: m.legenda || '', janela });
   }
   await page.evaluate(caixas => {
     const camada = document.createElement('div');
+    window.__bolas = [];
     camada.id = '__tutorial_marcas';
     camada.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:2147483647;';
     for (const c of caixas) {
@@ -75,10 +77,13 @@ async function marcar(page, marcas) {
       box.style.cssText = `position:fixed;left:${c.x - pad}px;top:${c.y - pad}px;width:${c.width + pad * 2}px;height:${c.height + pad * 2}px;border:3px solid #ef4444;border-radius:10px;box-shadow:0 0 0 4px rgba(239,68,68,.25);`;
       camada.appendChild(box);
       const r = 17;
-      // Bolinha à esquerda do contorno (não cobre texto); sem espaço, vai no canto de cima.
-      let cx = c.x - pad - r * 2 - 10, cy = c.y + c.height / 2 - r;
-      if (cx < 4) { cx = c.x - pad - r + 4; cy = c.y - pad - r + 4; }
-      cx = Math.max(4, cx); cy = Math.max(4, cy);
+      // Bolinha no canto de cima à direita (os rótulos ficam à esquerda, então não cobre texto).
+      let cx = c.x + c.width + pad - r - 2, cy = c.y - pad - r;
+      cx = Math.min(Math.max(4, cx), innerWidth - r * 2 - 4); cy = Math.max(4, cy);
+      // Se encostar numa bolinha já desenhada, vai para o canto esquerdo da caixa.
+      const encosta = (x, y) => (window.__bolas || []).some(b => Math.abs(b[0] - x) < r * 2 + 4 && Math.abs(b[1] - y) < r * 2 + 4);
+      if (encosta(cx, cy)) { cx = Math.max(4, c.x - pad - r); cy = Math.max(4, c.y - pad - r); }
+      (window.__bolas = window.__bolas || []).push([cx, cy]);
       const bola = document.createElement('div');
       bola.textContent = c.numero;
       bola.style.cssText = `position:fixed;left:${cx}px;top:${cy}px;width:${r * 2}px;height:${r * 2}px;border-radius:50%;background:#ef4444;color:#fff;font:700 18px/34px Arial,sans-serif;text-align:center;border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.35);`;
@@ -90,14 +95,17 @@ async function marcar(page, marcas) {
         camada.appendChild(tag);
         document.body.appendChild(camada);
         const w = tag.offsetWidth, h = tag.offsetHeight;
-        const direita = c.x + c.width + pad + 14;
-        const esquerda = c.x - pad - 14 - w;
-        let left, top = c.y + c.height / 2 - h / 2;
-        if (direita + w < innerWidth - 4) left = direita;            // ao lado direito
-        else if (esquerda > 4) left = esquerda;                       // ao lado esquerdo
-        else { left = Math.max(4, c.x - pad); top = c.y + c.height + pad + 8; } // embaixo
+        // Tenta: direita, embaixo, em cima, esquerda — o primeiro lugar que não cobre outra marcação.
+        const bate = (l, t) => caixas.some(o => o !== c && l < o.x + o.width + 10 && l + w > o.x - 10 && t < o.y + o.height + 10 && t + h > o.y - 10);
+        const opcoes = [
+          [c.x + c.width + pad + 14, c.y + c.height / 2 - h / 2],
+          [c.x - pad, c.y + c.height + pad + 10],
+          [c.x - pad, c.y - pad - h - 10],
+          [c.x - pad - 14 - w, c.y + c.height / 2 - h / 2],
+        ].filter(([l, t]) => l > 4 && l + w < innerWidth - 4 && t > 4 && t + h < innerHeight - 4);
+        const [left, top] = opcoes.find(([l, t]) => !bate(l, t)) || opcoes[0] || [c.x - pad, c.y + c.height + pad + 10];
         tag.style.left = left + 'px';
-        tag.style.top = Math.max(4, Math.min(top, innerHeight - h - 4)) + 'px';
+        tag.style.top = top + 'px';
       }
     }
     document.body.appendChild(camada);
@@ -111,9 +119,12 @@ async function marcar(page, marcas) {
  */
 function recorte(caixas, passo, tela) {
   if (!caixas.length || passo.telaInteira) return undefined;
-  const M = 60, MIN_W = 960, MIN_H = 540;
+  const M = 60, MIN_W = 1100, MIN_H = 619;
   let x1 = Math.min(...caixas.map(c => c.x)) - M - 50, y1 = Math.min(...caixas.map(c => c.y)) - M;
   let x2 = Math.max(...caixas.map(c => c.x + c.width)) + M + (caixas.some(c => c.legenda) ? 280 : 0), y2 = Math.max(...caixas.map(c => c.y + c.height)) + M; // +280: legendas à direita
+  // Dentro de uma janela: mostra a janela inteira (se couber na tela), para o cliente se localizar.
+  const jan = caixas.find(c => c.janela)?.janela;
+  if (jan && jan.height <= tela.height) { x1 = Math.min(x1, jan.x - 20); y1 = Math.min(y1, jan.y - 20); x2 = Math.max(x2, jan.x + jan.width + 20); y2 = Math.max(y2, jan.y + jan.height + 20); }
   let w = Math.max(x2 - x1, MIN_W), h = Math.max(y2 - y1, MIN_H);
   if (w / h > 16 / 9) h = w * 9 / 16; else w = h * 16 / 9;   // mantém o formato 16:9
   w = Math.min(w, tela.width); h = Math.min(h, tela.height);
@@ -172,11 +183,43 @@ async function executar(page, acao, roteiro) {
   await page.waitForTimeout(acao.espera || 900);
 }
 
+/** Super Admin vendo uma empresa: TUTORIAL_VER_EMPRESA=EMP_... acrescenta ?empresa= em cada página. */
+function comEmpresa(rota) {
+  const emp = process.env.TUTORIAL_VER_EMPRESA;
+  if (!emp) return rota;
+  return rota + (rota.includes('?') ? '&' : '?') + 'empresa=' + encodeURIComponent(emp);
+}
+
+/** Deixa a tela "limpa" para o print: espera carregar e esconde a faixa de Super Admin. */
+async function prepararTela(page) {
+  await page.waitForFunction(() => !document.querySelector('.animate-spin, [aria-busy="true"]'), null, { timeout: 15000 }).catch(() => {});
+  await page.evaluate(() => {
+    const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    for (let n; (n = w.nextNode());) {
+      if (!/Modo superadmin/i.test(n.textContent)) continue;
+      let el = n.parentElement;
+      while (el.parentElement && el.parentElement !== document.body && el.parentElement.getBoundingClientRect().height < 140) el = el.parentElement;
+      el.style.setProperty('display', 'none', 'important');
+    }
+  });
+  await page.waitForTimeout(200);
+}
+
 async function entrar(context, page) {
   const email = process.env.TUTORIAL_EMAIL, senha = process.env.TUTORIAL_SENHA;
   await page.goto(URL_BASE + '/', { waitUntil: 'load' }).catch(() => {});
   await page.waitForTimeout(2500);
   if (!/\/login/.test(page.url())) return true; // sessão salva ainda vale
+  // Link de acesso único (gerado pela plataforma Base44 para o dono do app). Vale ~60 segundos.
+  if (process.env.TUTORIAL_LINK) {
+    const link = new URL(process.env.TUTORIAL_LINK);
+    const destino = new URL(URL_BASE + '/' + link.search);
+    await page.goto(destino.toString(), { waitUntil: 'load' }).catch(() => {});
+    await page.waitForTimeout(6000);
+    if (/\/login/.test(page.url())) { console.log('O link de acesso não funcionou (pode ter expirado).'); return false; }
+    await context.storageState({ path: SESSAO });
+    return true;
+  }
   const empresa = process.env.TUTORIAL_EMPRESA, usuario = process.env.TUTORIAL_USUARIO;
   if (empresa && usuario && senha) {
     // Login de funcionário: código/CNPJ da empresa + usuário + senha (não precisa de e-mail).
@@ -226,8 +269,9 @@ async function entrar(context, page) {
       const p = r.passos[i];
       const n = i + 1;
       try {
-        if (p.ir) { await page.goto(URL_BASE + p.ir, { waitUntil: 'load' }).catch(() => {}); await page.waitForTimeout(p.espera || 2500); }
+        if (p.ir) { await page.goto(URL_BASE + comEmpresa(p.ir), { waitUntil: 'load' }).catch(() => {}); await page.waitForTimeout(p.espera || 2500); }
         for (const a of p.antes || []) await executar(page, a, r);
+        await prepararTela(page);
         const marcas = (p.marcar || []).map((m, j) => ({ ...m, numero: p.marcar.length > 1 ? `${n}${String.fromCharCode(97 + j)}` : n }));
         const caixas = marcas.length ? await marcar(page, marcas) : [];
         await desfocarDados(page);
