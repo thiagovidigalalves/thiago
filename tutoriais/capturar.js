@@ -138,23 +138,41 @@ function recorte(caixas, passo, tela) {
  * antes do print, para a central não mostrar dados de clientes. Ligado por padrão;
  * desligue com TUTORIAL_DESFOCAR=0 (só numa empresa 100% fictícia). Os campos marcados ficam nítidos.
  */
-async function desfocarDados(page) {
+async function desfocarDados(page, passo = {}) {
   if (process.env.TUTORIAL_DESFOCAR === '0') return;
-  await page.evaluate(() => {
+  let extras = [];
+  try { extras = JSON.parse(fs.readFileSync(path.join(__dirname, 'privacidade.json'), 'utf8')).textos || []; } catch {}
+  await page.evaluate(({ extras, tudo, campos }) => {
     const SENSIVEL = /#\d{3,}|\d+\s+\S+\(\S+\)\s+encontrad|Todo dia \d+|R\$\s?-?[\d.]+,\d{2}|\d{3}\.\d{3}\.\d{3}-\d{2}|\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}|\(?\d{2}\)?\s?9?\d{4}-?\d{4}|[\w.+-]+@[\w-]+\.[\w.]+|\b[A-Z]{3}-?\d[A-Z0-9]\d{2}\b/;
     const marcados = [...document.querySelectorAll('[data-tutorial-alvo]')];
-    const protegido = el => el.closest('#__tutorial_marcas') || marcados.some(m => m === el || m.contains(el) || el.contains(m));
+    // Protege o elemento marcado e quem o contém; o que está DENTRO dele ainda é desfocado se for dado sensível.
+    const protegido = el => el.closest('#__tutorial_marcas') || marcados.some(m => m === el || el.contains(m));
+    const protegidoForte = el => protegido(el) || marcados.some(m => m.contains(el));
     const borrar = el => { if (!protegido(el) && !el.closest('aside')) el.setAttribute('data-tutorial-blur', ''); };
-    document.querySelectorAll('tbody td, [role="row"] [role="cell"], [role="dialog"] li').forEach(borrar);
+    const borrarForte = el => { if (!protegidoForte(el) && !el.closest('aside')) el.setAttribute('data-tutorial-blur', ''); };
+    document.querySelectorAll('tbody td, [role="row"] [role="cell"], [role="dialog"] li').forEach(borrarForte);
+    // Campos preenchidos com dados reais (CNPJ, telefone, endereço...): o valor não é texto da página, então confere o input.
+    document.querySelectorAll('input, textarea').forEach(i => {
+      const v = String(i.value || '');
+      if (campos ? v.trim() : (SENSIVEL.test(v) || /\d{8,}/.test(v.replace(/\D/g, '')))) borrarForte(i);
+    });
+    // `desfocarTudo`: só o menu e o que está marcado ficam nítidos (ex.: Dashboard com números da empresa).
+    if (tudo) document.querySelectorAll('body *').forEach(e => { if (!e.children.length && e.textContent.trim()) borrarForte(e); });
     // Gráficos (revelam o tamanho do faturamento): qualquer svg/canvas grande.
     document.querySelectorAll('svg, canvas').forEach(g => { const r = g.getBoundingClientRect(); if (r.width > 150 && r.height > 80) borrar(g); });
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-    for (let n; (n = walker.nextNode());) if (SENSIVEL.test(n.textContent) && n.parentElement) borrar(n.parentElement);
+    const extra = t => extras.some(x => t.includes(x));
+    for (let n; (n = walker.nextNode());) {
+      const t = n.textContent;
+      if (!n.parentElement || n.parentElement.closest('#__tutorial_marcas')) continue;
+      if (extra(t)) n.parentElement.setAttribute('data-tutorial-blur', '');
+      else if (SENSIVEL.test(t)) borrar(n.parentElement);
+    }
     const st = document.createElement('style');
     st.id = '__tutorial_blur';
     st.textContent = '[data-tutorial-blur]{filter:blur(9px)!important}';
     document.head.appendChild(st);
-  });
+  }, { extras, tudo: !!passo.desfocarTudo, campos: !!passo.desfocarCampos });
 }
 
 async function limparMarcas(page) {
@@ -280,7 +298,7 @@ async function entrar(context, page) {
         if (p.semPrint) { console.log(`   – passo ${n}: ${p.titulo} (só texto)`); for (const a of p.depois || []) await executar(page, a, r); continue; }
         const marcas = (p.marcar || []).map((m, j) => ({ ...m, numero: p.marcar.length > 1 ? `${n}${String.fromCharCode(97 + j)}` : n }));
         const caixas = marcas.length ? await marcar(page, marcas) : [];
-        await desfocarDados(page);
+        await desfocarDados(page, p);
         await page.waitForTimeout(300);
         await page.screenshot({ path: path.join(pasta, `passo-${n}.png`), clip: recorte(caixas, p, page.viewportSize()) });
         await limparMarcas(page);

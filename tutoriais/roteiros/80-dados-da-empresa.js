@@ -7,11 +7,13 @@ module.exports = {
   passos: [
     {
       ir: '/configuracoes/geral',
+      desfocarCampos: true,
       titulo: 'Abra "Dados da Empresa"',
       texto: 'No menu, clique em Configurações › Dados da Empresa.',
       marcar: [{ alvo: { papel: 'heading', nome: 'Dados da Empresa' } }],
     },
     {
+      desfocarCampos: true,
       titulo: 'Busque pelo CNPJ',
       texto: 'Digite o CNPJ e clique em "Buscar CNPJ": razão social e endereço são preenchidos sozinhos.',
       marcar: [
@@ -20,11 +22,13 @@ module.exports = {
       ],
     },
     {
+      desfocarCampos: true,
       titulo: 'Coloque o logo',
       texto: 'Em "Logo da empresa", envie a imagem do seu logo. Ele aparece nos comprovantes, orçamentos e PDFs.',
       marcar: [{ alvo: { texto: 'Logo da empresa' } }],
     },
     {
+      desfocarCampos: true,
       titulo: 'Clique em "Salvar configurações"',
       texto: 'Confira telefone, WhatsApp e e-mail e clique em "Salvar configurações".',
       marcar: [{ alvo: { papel: 'button', nome: 'Salvar configurações' } }],
