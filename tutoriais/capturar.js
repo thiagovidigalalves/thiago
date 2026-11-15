@@ -154,7 +154,11 @@ async function desfocarDados(page, passo = {}) {
     // Campos preenchidos com dados reais (CNPJ, telefone, endereço...): o valor não é texto da página, então confere o input.
     document.querySelectorAll('input, textarea').forEach(i => {
       const v = String(i.value || '');
-      if (campos ? v.trim() : (SENSIVEL.test(v) || /\d{8,}/.test(v.replace(/\D/g, '')))) borrarForte(i);
+      // Valores fictícios digitados pelos próprios tutoriais continuam legíveis.
+      const DEMO = ['Maria da Silva', 'maria@minhaloja.com.br', 'Mouse sem fio', 'senha1234', 'contas'];
+      if (DEMO.includes(v.trim())) return;
+      // Dado real em campo: desfoca mesmo que seja o campo marcado (a bolinha e o contorno continuam nítidos).
+      if (campos ? v.trim() : (SENSIVEL.test(v) || /\d{8,}/.test(v.replace(/\D/g, '')))) i.setAttribute('data-tutorial-blur', '');
     });
     // `desfocarTudo`: só o menu e o que está marcado ficam nítidos (ex.: Dashboard com números da empresa).
     if (tudo) document.querySelectorAll('body *').forEach(e => { if (!e.children.length && e.textContent.trim()) borrarForte(e); });
