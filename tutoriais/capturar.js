@@ -61,6 +61,7 @@ async function marcar(page, marcas) {
     const el = achar(page, m.alvo);
     await el.waitFor({ state: 'visible', timeout: 15000 });
     await el.scrollIntoViewIfNeeded().catch(() => {});
+    await el.evaluate(e => e.setAttribute('data-tutorial-alvo', '')).catch(() => {});
     const b = await el.boundingBox();
     if (b) caixas.push({ ...b, numero: m.numero, legenda: m.legenda || '' });
   }
@@ -121,7 +122,34 @@ function recorte(caixas, passo, tela) {
   return { x, y, width: w, height: h };
 }
 
+/**
+ * Privacidade: desfoca dados reais (nomes nas tabelas, valores em R$, CPF/CNPJ, telefone, e-mail)
+ * antes do print, para a central não mostrar dados de clientes. Ligado por padrão;
+ * desligue com TUTORIAL_DESFOCAR=0 (só numa empresa 100% fictícia). Os campos marcados ficam nítidos.
+ */
+async function desfocarDados(page) {
+  if (process.env.TUTORIAL_DESFOCAR === '0') return;
+  await page.evaluate(() => {
+    const SENSIVEL = /R\$\s?-?[\d.]+,\d{2}|\d{3}\.\d{3}\.\d{3}-\d{2}|\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}|\(?\d{2}\)?\s?9?\d{4}-?\d{4}|[\w.+-]+@[\w-]+\.[\w.]+|\b[A-Z]{3}-?\d[A-Z0-9]\d{2}\b/;
+    const marcados = [...document.querySelectorAll('[data-tutorial-alvo]')];
+    const protegido = el => el.closest('#__tutorial_marcas') || marcados.some(m => m === el || m.contains(el) || el.contains(m));
+    const borrar = el => { if (!protegido(el) && !el.closest('aside')) el.setAttribute('data-tutorial-blur', ''); };
+    document.querySelectorAll('tbody td, [role="row"] [role="cell"], [role="dialog"] li').forEach(borrar);
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    for (let n; (n = walker.nextNode());) if (SENSIVEL.test(n.textContent) && n.parentElement) borrar(n.parentElement);
+    const st = document.createElement('style');
+    st.id = '__tutorial_blur';
+    st.textContent = '[data-tutorial-blur]{filter:blur(5px)!important}';
+    document.head.appendChild(st);
+  });
+}
+
 async function limparMarcas(page) {
+  await page.evaluate(() => {
+    document.getElementById('__tutorial_blur')?.remove();
+    document.querySelectorAll('[data-tutorial-blur]').forEach(e => e.removeAttribute('data-tutorial-blur'));
+    document.querySelectorAll('[data-tutorial-alvo]').forEach(e => e.removeAttribute('data-tutorial-alvo'));
+  });
   await page.evaluate(() => document.getElementById('__tutorial_marcas')?.remove());
 }
 
@@ -202,6 +230,7 @@ async function entrar(context, page) {
         for (const a of p.antes || []) await executar(page, a, r);
         const marcas = (p.marcar || []).map((m, j) => ({ ...m, numero: p.marcar.length > 1 ? `${n}${String.fromCharCode(97 + j)}` : n }));
         const caixas = marcas.length ? await marcar(page, marcas) : [];
+        await desfocarDados(page);
         await page.waitForTimeout(300);
         await page.screenshot({ path: path.join(pasta, `passo-${n}.png`), clip: recorte(caixas, p, page.viewportSize()) });
         await limparMarcas(page);

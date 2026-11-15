@@ -26,7 +26,10 @@ publicado em https://melhorsistema.thiagoinformatica.com.br). Você escreve tuto
 
 ## Regras de segurança
 
-- Nunca use login de empresa de cliente real. Só a empresa de demonstração.
+- Nunca use login de empresa de cliente. Só a empresa de demonstração ou a própria THIAGO INFORMATICA
+  (autorizada pelo dono; segmento assistência, então a OS mostra Equipamento/Técnico).
+- O robô desfoca sozinho nomes nas tabelas, valores em R$, CPF/CNPJ, telefone, e-mail e placa.
+  Nunca desligue (`TUTORIAL_DESFOCAR=0`) em empresa real. Confira nos prints se nada escapou.
 - O robô não clica em botões que gravam/apagam (Salvar, Excluir, Finalizar, Emitir...). Ele só marca.
   Só use `gravaDados: true` num roteiro se o usuário pedir e for na empresa de demonstração.
 - Os dados de exemplo digitados devem ser fictícios (ex.: "Maria da Silva", CPF de teste).
