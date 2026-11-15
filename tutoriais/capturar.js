@@ -25,7 +25,7 @@ const PASTA_ROTEIROS = path.join(__dirname, 'roteiros');
 const PASTA_IMG = path.join(RAIZ, 'ajuda', 'img');
 const SESSAO = path.join(__dirname, '.sessao.json');
 const URL_BASE = (process.env.TUTORIAL_URL || 'https://melhorsistema.thiagoinformatica.com.br').replace(/\/$/, '');
-const BOTOES_PERIGOSOS = /salvar|gravar|cadastrar|excluir|apagar|remover|inativar|finalizar|emitir|emiss[aã]o|enviar|confirmar|cancelar venda|cancelar nota|estornar|inutilizar|pagar|baixar|transmitir|faturar|lan[cç]ar|faltam r\$|gerar|manifestar|arquivar|importar|reabrir|estornar|aplicar margem|substitui|restaurar/i;
+const BOTOES_PERIGOSOS = /salvar|gravar|cadastrar|excluir|apagar|remover|inativar|finalizar|emitir|emiss[aã]o|enviar|confirmar|cancelar venda|cancelar nota|estornar|inutilizar|pagar|baixar|transmitir|faturar|lan[cç]ar|faltam r\$|gerar|manifestar|arquivar|importar|reabrir|estornar|aplicar margem|substitui|restaurar|conectar|cancelar fila|pausar|encerrar|definir padr|imprimir teste|devolver|transformar em venda/i;
 // Dentro de uma janela (dialog), estes também gravam dados:
 const BOTOES_PERIGOSOS_JANELA = /abrir caixa|fechar caixa|continuar|ok$|sim$/i;
 
