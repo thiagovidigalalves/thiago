@@ -112,7 +112,7 @@ function recorte(caixas, passo, tela) {
   if (!caixas.length || passo.telaInteira) return undefined;
   const M = 60, MIN_W = 960, MIN_H = 540;
   let x1 = Math.min(...caixas.map(c => c.x)) - M - 50, y1 = Math.min(...caixas.map(c => c.y)) - M;
-  let x2 = Math.max(...caixas.map(c => c.x + c.width)) + M + 280, y2 = Math.max(...caixas.map(c => c.y + c.height)) + M; // +280: legendas à direita
+  let x2 = Math.max(...caixas.map(c => c.x + c.width)) + M + (caixas.some(c => c.legenda) ? 280 : 0), y2 = Math.max(...caixas.map(c => c.y + c.height)) + M; // +280: legendas à direita
   let w = Math.max(x2 - x1, MIN_W), h = Math.max(y2 - y1, MIN_H);
   if (w / h > 16 / 9) h = w * 9 / 16; else w = h * 16 / 9;   // mantém o formato 16:9
   w = Math.min(w, tela.width); h = Math.min(h, tela.height);
