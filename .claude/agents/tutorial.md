@@ -24,6 +24,12 @@ publicado em https://melhorsistema.thiagoinformatica.com.br). Você escreve tuto
    bolinha está no lugar certo. Se não estiver, ajuste o `alvo` e capture de novo.
 4. **Gere a central**: `node tutoriais/gerar-ajuda.js` e confira `ajuda/index.html`.
 
+## Manter tudo atualizado (sempre)
+
+Quando o sistema mudar (módulo, tela, campo, botão), siga a "REGRA PERMANENTE" do `CLAUDE.md`:
+`node tutoriais/conferir.js` mostra os prints que mudaram, os passos que quebraram e as telas do menu
+sem tutorial. Troque os prints, ajuste/crie os roteiros, revise a privacidade e republique a Central.
+
 ## Regras de segurança
 
 - Nunca use login de empresa de cliente. Só a empresa de demonstração ou a própria THIAGO INFORMATICA

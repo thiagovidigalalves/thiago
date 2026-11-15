@@ -22,7 +22,8 @@ const { chromium } = require('playwright');
 
 const RAIZ = path.resolve(__dirname, '..');
 const PASTA_ROTEIROS = path.join(__dirname, 'roteiros');
-const PASTA_IMG = path.join(RAIZ, 'ajuda', 'img');
+// TUTORIAL_SAIDA: captura numa pasta separada (usado pelo conferir.js para comparar antes de trocar).
+const PASTA_IMG = process.env.TUTORIAL_SAIDA ? path.resolve(process.env.TUTORIAL_SAIDA) : path.join(RAIZ, 'ajuda', 'img');
 const SESSAO = path.join(__dirname, '.sessao.json');
 const URL_BASE = (process.env.TUTORIAL_URL || 'https://melhorsistema.thiagoinformatica.com.br').replace(/\/$/, '');
 const BOTOES_PERIGOSOS = /salvar|gravar|cadastrar|excluir|apagar|remover|inativar|finalizar|emitir|emiss[aã]o|enviar|confirmar|cancelar venda|cancelar nota|estornar|inutilizar|pagar|baixar|transmitir|faturar|lan[cç]ar|faltam r\$|gerar|manifestar|arquivar|importar|reabrir|estornar|aplicar margem|substitui|restaurar|conectar|cancelar fila|pausar|encerrar|definir padr|imprimir teste|devolver|transformar em venda/i;
@@ -324,7 +325,7 @@ async function entrar(context, page) {
     }
     relatorio.push({ id: r.id, ok: falhas === 0, falhas });
   }
-  fs.writeFileSync(path.join(__dirname, '.ultima-captura.json'), JSON.stringify(relatorio, null, 2));
+  fs.writeFileSync(path.join(process.env.TUTORIAL_SAIDA ? PASTA_IMG : __dirname, '.ultima-captura.json'), JSON.stringify(relatorio, null, 2));
   await browser.close();
   console.log('\nPronto. Agora rode: node tutoriais/gerar-ajuda.js');
 })();
