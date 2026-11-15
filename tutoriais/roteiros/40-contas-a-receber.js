@@ -15,7 +15,7 @@ module.exports = {
       titulo: 'Veja as contas em aberto',
       texto: 'Use as abas para ver as contas "Em aberto/atraso", as "Pagas" ou "Todas". Para achar um cliente, digite o nome no filtro.',
       marcar: [
-        { alvo: { papel: 'tab', nome: /Em aberto/ }, legenda: 'Abas' },
+        { alvo: { papel: 'button', nome: 'Em aberto/atraso', exato: true }, legenda: 'Abas' },
         { alvo: { placeholder: 'Nome do cliente' }, legenda: 'Buscar cliente' },
       ],
     },
@@ -38,7 +38,7 @@ module.exports = {
       ir: '/financeiro/contas-receber',
       titulo: 'O cliente pagou? Dê baixa',
       texto: 'Na linha da conta, clique em "Receber no caixa (PDV)" ou "Receber com Pix". Confira o valor e confirme.',
-      marcar: [{ alvo: { titulo: 'Receber no caixa (PDV)' } }],
+      semPrint: true,
       dica: 'O botão "Copiar mensagem de cobrança (WhatsApp)" já monta a mensagem para você mandar ao cliente.',
     },
   ],

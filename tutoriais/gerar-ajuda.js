@@ -21,7 +21,7 @@ const dados = roteiros.map(r => ({
   passos: r.passos.map((p, i) => {
     const img = `img/${r.id}/passo-${i + 1}.png`;
     return { titulo: p.titulo, texto: p.texto || '', dica: p.dica || '', atencao: p.atencao || '',
-      img: fs.existsSync(path.join(RAIZ, 'ajuda', img)) ? img : '' };
+      img: !p.semPrint && fs.existsSync(path.join(RAIZ, 'ajuda', img)) ? img : '', semPrint: !!p.semPrint };
   }),
 }));
 
@@ -133,7 +133,7 @@ function tutorial(t){
    + '<div class="indice"><b>Neste tutorial:</b><ol>'+t.passos.map((p,n)=>'<li><a href="#'+t.id+'/'+(n+1)+'">'+esc(p.titulo)+'</a></li>').join('')+'</ol></div>'
    + t.passos.map((p,n) => '<section class="passo" id="p'+(n+1)+'"><div class="passo-topo"><div class="num">'+(n+1)+'</div><div>'
       + '<h3>'+esc(p.titulo)+'</h3><p>'+esc(p.texto)+'</p></div></div>'
-      + (p.img ? '<img loading="lazy" src="'+p.img+'" alt="Passo '+(n+1)+': '+esc(p.titulo)+'">' : '<div class="sem-img">Imagem deste passo ainda não capturada.</div>')
+      + (p.img ? '<img loading="lazy" src="'+p.img+'" alt="Passo '+(n+1)+': '+esc(p.titulo)+'">' : p.semPrint ? '' : '<div class="sem-img">Imagem deste passo ainda não capturada.</div>')
       + (p.atencao ? '<div class="caixa aten">⚠️ <b>Atenção:</b> '+esc(p.atencao)+'</div>' : '')
       + (p.dica ? '<div class="caixa dica">💡 <b>Dica:</b> '+esc(p.dica)+'</div>' : '')
       + '</section>').join('')
@@ -158,5 +158,5 @@ rota();
 
 fs.mkdirSync(path.dirname(SAIDA), { recursive: true });
 fs.writeFileSync(SAIDA, html);
-const total = dados.reduce((s, t) => s + t.passos.length, 0), comImg = dados.reduce((s, t) => s + t.passos.filter(p => p.img).length, 0);
+const total = dados.reduce((s, t) => s + t.passos.filter(p => !p.semPrint).length, 0), comImg = dados.reduce((s, t) => s + t.passos.filter(p => p.img).length, 0);
 console.log(`Central de Ajuda gerada: ${path.relative(RAIZ, SAIDA)} — ${dados.length} tutoriais, ${comImg}/${total} passos com imagem.`);

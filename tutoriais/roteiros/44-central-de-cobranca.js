@@ -24,7 +24,7 @@ module.exports = {
     {
       titulo: 'Clique em "Enviar cobrança"',
       texto: 'Clique em "Enviar cobrança". Confira a mensagem, deixe marcado o link de Pix (o cliente paga e a conta baixa sozinha) e clique em "Enviar".',
-      marcar: [{ alvo: { papel: 'button', nome: 'Enviar cobrança' } }],
+      semPrint: true,
       dica: 'Clique em "Ver" num cliente para anotar "Prometeu pagar" com a data. Assim você não cobra de novo antes da hora.',
     },
   ],

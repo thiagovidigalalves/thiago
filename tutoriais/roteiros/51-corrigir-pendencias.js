@@ -14,17 +14,17 @@ module.exports = {
     {
       titulo: 'Leia o motivo do erro',
       texto: 'Clique em "Detalhes da pendência" para ver o que a Receita (SEFAZ) recusou. Normalmente é um dado do cliente ou do produto (CPF, endereço, NCM).',
-      marcar: [{ alvo: { texto: 'Detalhes da pendência' } }],
+      semPrint: true,
     },
     {
       titulo: 'Corrija o cadastro',
       texto: 'Clique no botão de cadastro do cartão (por exemplo "Conferir cadastro") e arrume o dado que estava errado.',
-      marcar: [{ alvo: { papel: 'button', nome: /Conferir cadastro/ } }],
+      semPrint: true,
     },
     {
       titulo: 'Clique em "Corrigir e transmitir novamente"',
       texto: 'Depois de corrigir, clique em "Corrigir e transmitir novamente". Escolha se é cupom (NFC-e) ou nota (NF-e) e clique em "Emitir nota".',
-      marcar: [{ alvo: { papel: 'button', nome: 'Corrigir e transmitir novamente' } }],
+      semPrint: true,
       dica: 'Use "Conferir dados sem emitir" para checar se ainda tem algum erro antes de enviar.',
     },
   ],

@@ -44,6 +44,7 @@ module.exports = {
     },
     {
       ir: '/comercial/ordens-servico',
+      antes: [{ tipo: 'escolher', alvo: { rotulo: 'Período' }, valor: 'Todas as datas', espera: 3000 }],
       titulo: 'Serviço pronto? Receba no caixa',
       texto: 'Na lista de ordens, clique em "Receber OS no caixa" na linha da OS. Ela vai para o PDV para receber o pagamento.',
       marcar: [{ alvo: { titulo: 'Receber OS no caixa' } }],

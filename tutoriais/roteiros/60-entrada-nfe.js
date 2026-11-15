@@ -26,7 +26,7 @@ module.exports = {
     {
       titulo: 'Clique em "Importar"',
       texto: 'Na linha da nota, clique em "Importar". Confira os produtos (o sistema liga cada item ao seu cadastro) e clique em "Confirmar e importar". O estoque e o contas a pagar são atualizados.',
-      marcar: [{ alvo: { papel: 'button', nome: 'Importar', exato: true } }],
+      semPrint: true,
       dica: 'Use o ícone "Visualizar" para ver a nota antes de importar.',
     },
     {

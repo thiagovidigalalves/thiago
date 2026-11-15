@@ -26,7 +26,7 @@ module.exports = {
       titulo: 'Preencha e salve',
       texto: 'Coloque a descrição, o plano de contas, as parcelas, o valor e o vencimento. Clique em "Salvar".',
       marcar: [
-        { alvo: { placeholder: 'Digite ou busque o plano de contas...', dentro: 'dialog' }, legenda: 'Plano de contas' },
+        { alvo: { texto: 'Digite ou busque o plano de contas...', dentro: 'dialog' }, legenda: 'Plano de contas' },
         { alvo: { papel: 'button', nome: 'Salvar', exato: true, dentro: 'dialog' }, legenda: 'Salvar' },
       ],
       dica: 'Conta que se repete todo mês (aluguel, internet)? Cadastre em Financeiro › Recorrências e ela é lançada sozinha.',

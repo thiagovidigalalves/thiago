@@ -16,12 +16,12 @@ module.exports = {
       titulo: 'Clique num grupo para abrir',
       texto: 'Clique no nome do grupo (por exemplo "Cadastros") para ver as telas dele. Clique de novo para fechar.',
       marcar: [{ alvo: { papel: 'button', nome: 'Cadastros' } }],
-      depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Cadastros' } }],
+      depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Cadastros' } }, { tipo: 'clicar', alvo: { papel: 'button', nome: 'Pessoas' } }],
     },
     {
       titulo: 'Marque suas telas favoritas',
       texto: 'Clique na estrelinha ao lado de uma tela que você usa muito. Ela vai aparecer lá em cima, em "Favoritos".',
-      marcar: [{ alvo: 'aside nav button[aria-label^="Adicionar aos favoritos"]' }],
+      marcar: [{ alvo: 'aside nav button[aria-label*="favoritos"]' }],
     },
     {
       titulo: 'Não achou? Pesquise',

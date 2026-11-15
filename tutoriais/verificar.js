@@ -10,7 +10,7 @@ const path = require('path');
 const PASTA = path.join(__dirname, 'roteiros');
 const IMG = path.join(__dirname, '..', 'ajuda', 'img');
 const TIPOS_ALVO = ['papel', 'rotulo', 'placeholder', 'texto', 'titulo', 'campo', 'css'];
-const TIPOS_ACAO = ['clicar', 'preencher', 'tecla'];
+const TIPOS_ACAO = ['clicar', 'preencher', 'tecla', 'escolher'];
 let erros = 0, avisos = 0;
 const erro = m => { erros++; console.log('  ✖ ' + m); };
 const aviso = m => { avisos++; console.log('  ⚠ ' + m); };
@@ -42,9 +42,9 @@ for (const arq of fs.readdirSync(PASTA).filter(f => f.endsWith('.js')).sort()) {
     for (const lista of ['antes', 'depois']) (p[lista] || []).forEach((a, j) => {
       if (!TIPOS_ACAO.includes(a.tipo)) erro(`${n}: ${lista}[${j}] com tipo "${a.tipo}" (use ${TIPOS_ACAO.join('/')})`);
       if (a.tipo !== 'tecla' && !alvoValido(a.alvo)) erro(`${n}: ${lista}[${j}] sem alvo válido`);
-      if (a.tipo === 'preencher' && a.valor === undefined) erro(`${n}: ${lista}[${j}] preencher sem "valor"`);
+      if (['preencher', 'escolher'].includes(a.tipo) && a.valor === undefined) erro(`${n}: ${lista}[${j}] preencher sem "valor"`);
     });
-    if (!fs.existsSync(path.join(IMG, r.id, `passo-${i + 1}.png`))) semPrint++;
+    if (!p.semPrint && !fs.existsSync(path.join(IMG, r.id, `passo-${i + 1}.png`))) semPrint++;
   });
 }
 console.log(`\n${ids.size} tutoriais, ${totalPassos} passos · ${totalPassos - semPrint} com print, ${semPrint} sem print · ${erros} erro(s), ${avisos} aviso(s).`);

@@ -15,8 +15,8 @@ module.exports = {
     },
     {
       titulo: 'Abra o caixa (início do dia)',
-      texto: 'No começo do dia, clique em "Abrir caixa", digite o valor do troco que tem na gaveta e confirme em "Abrir caixa".',
-      marcar: [{ alvo: { papel: 'button', nome: /Abrir caixa/ } }],
+      texto: 'No começo do dia, clique em "Abrir caixa", digite o valor do troco que tem na gaveta e confirme em "Abrir caixa". Com o caixa aberto, esse mesmo botão vira "Fechar caixa".',
+      marcar: [{ alvo: { papel: 'button', nome: /(Abrir|Fechar) caixa/ } }],
       dica: 'Atalho: Ctrl+6. Se o caixa já estiver aberto, pule este passo.',
     },
     {

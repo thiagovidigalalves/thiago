@@ -24,8 +24,8 @@ module.exports = {
     {
       titulo: 'Clique em "NF-e" ou "NFC-e"',
       texto: 'Na linha da venda, clique em "NF-e" (nota para empresa ou entrega) ou "NFC-e" (cupom fiscal para consumidor).',
-      marcar: [{ alvo: { titulo: 'Conferir e emitir NF-e' } }],
-      depois: [{ tipo: 'clicar', alvo: { titulo: 'Conferir e emitir NF-e' }, espera: 1500 }],
+      marcar: [{ alvo: { papel: 'button', nome: 'NF-e', exato: true } }],
+      depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'NF-e', exato: true }, espera: 2500, seguro: true }],
       dica: 'Na dúvida entre NF-e e NFC-e, pergunte ao seu contador qual usar.',
     },
     {

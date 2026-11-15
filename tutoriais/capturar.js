@@ -170,13 +170,16 @@ async function executar(page, acao, roteiro) {
   if (acao.clicar !== undefined || acao.tipo === 'clicar') {
     const texto = (await el.innerText().catch(() => '')) + ' ' + (await el.getAttribute('aria-label').catch(() => '') || '');
     const naJanela = await el.evaluate(e => !!e.closest('[role="dialog"],[role="alertdialog"]')).catch(() => false);
-    if ((BOTOES_PERIGOSOS.test(texto) || (naJanela && BOTOES_PERIGOSOS_JANELA.test(texto.trim()))) && !roteiro.gravaDados) {
+    // `seguro: true` = botão que só abre uma janela de conferência (não grava nada sozinho).
+    if (!acao.seguro && (BOTOES_PERIGOSOS.test(texto) || (naJanela && BOTOES_PERIGOSOS_JANELA.test(texto.trim()))) && !roteiro.gravaDados) {
       console.log(`   (segurança) não cliquei em "${texto.trim()}" — só marquei.`);
       return;
     }
     await el.click();
   } else if (acao.tipo === 'preencher') {
     await el.fill(acao.valor || '');
+  } else if (acao.tipo === 'escolher') {
+    await el.selectOption({ label: acao.valor });
   } else if (acao.tipo === 'tecla') {
     await page.keyboard.press(acao.tecla);
   }
@@ -272,6 +275,7 @@ async function entrar(context, page) {
         if (p.ir) { await page.goto(URL_BASE + comEmpresa(p.ir), { waitUntil: 'load' }).catch(() => {}); await page.waitForTimeout(p.espera || 2500); }
         for (const a of p.antes || []) await executar(page, a, r);
         await prepararTela(page);
+        if (p.semPrint) { console.log(`   – passo ${n}: ${p.titulo} (só texto)`); for (const a of p.depois || []) await executar(page, a, r); continue; }
         const marcas = (p.marcar || []).map((m, j) => ({ ...m, numero: p.marcar.length > 1 ? `${n}${String.fromCharCode(97 + j)}` : n }));
         const caixas = marcas.length ? await marcar(page, marcas) : [];
         await desfocarDados(page);
@@ -283,7 +287,9 @@ async function entrar(context, page) {
       } catch (e) {
         falhas++;
         console.log(`   ✖ passo ${n}: ${p.titulo} — ${e.message.split('\n')[0]}`);
-        await page.screenshot({ path: path.join(pasta, `passo-${n}.png`) }).catch(() => {});
+        // Nunca salva print de passo que falhou (sairia sem marcação e sem o desfoque dos dados).
+        fs.rmSync(path.join(pasta, `passo-${n}.png`), { force: true });
+        await limparMarcas(page).catch(() => {});
       }
     }
     relatorio.push({ id: r.id, ok: falhas === 0, falhas });
