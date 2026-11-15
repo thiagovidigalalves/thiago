@@ -302,11 +302,14 @@ async function entrar(context, page) {
     for (let i = 0; i < r.passos.length; i++) {
       const p = r.passos[i];
       const n = i + 1;
-      try {
+      let ok = false, erroFinal;
+      for (let tentativa = 1; tentativa <= 2 && !ok; tentativa++) {
+       try {
+        if (tentativa > 1) { await limparMarcas(page).catch(() => {}); await page.keyboard.press('Escape').catch(() => {}); await page.waitForTimeout(4000); if (!p.ir) throw erroFinal; }
         if (p.ir) { await page.goto(URL_BASE + comEmpresa(p.ir), { waitUntil: 'load' }).catch(() => {}); await page.waitForTimeout(p.espera || 2500); }
         for (const a of p.antes || []) await executar(page, a, r);
         await prepararTela(page);
-        if (p.semPrint) { console.log(`   – passo ${n}: ${p.titulo} (só texto)`); for (const a of p.depois || []) await executar(page, a, r); continue; }
+        if (p.semPrint) { console.log(`   – passo ${n}: ${p.titulo} (só texto)`); for (const a of p.depois || []) await executar(page, a, r); ok = true; continue; }
         const marcas = (p.marcar || []).map((m, j) => ({ ...m, numero: p.marcar.length > 1 ? `${n}${String.fromCharCode(97 + j)}` : n }));
         const caixas = marcas.length ? await marcar(page, marcas) : [];
         await desfocarDados(page, p);
@@ -315,9 +318,14 @@ async function entrar(context, page) {
         await limparMarcas(page);
         console.log(`   ✔ passo ${n}: ${p.titulo}`);
         for (const a of p.depois || []) await executar(page, a, r);
+        ok = true;
+       } catch (e) { erroFinal = e; }
+      }
+      try {
+        if (!ok) throw erroFinal;
       } catch (e) {
         falhas++;
-        console.log(`   ✖ passo ${n}: ${p.titulo} — ${e.message.split('\n')[0]}`);
+        console.log(`   ✖ passo ${n}: ${p.titulo} — ${String(e?.message || e).split('\n')[0]}`);
         // Nunca salva print de passo que falhou (sairia sem marcação e sem o desfoque dos dados).
         fs.rmSync(path.join(pasta, `passo-${n}.png`), { force: true });
         await limparMarcas(page).catch(() => {});
