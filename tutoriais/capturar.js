@@ -172,6 +172,12 @@ async function desfocarDados(page, passo = {}) {
       if (extra(t)) n.parentElement.setAttribute('data-tutorial-blur', '');
       else if (SENSIVEL.test(t)) borrar(n.parentElement);
     }
+    // O React divide textos como "Venda #" + "32486" em pedaços: confere também o texto próprio de cada elemento.
+    document.querySelectorAll('body *').forEach(el => {
+      if (el.closest('#__tutorial_marcas') || ['SCRIPT', 'STYLE'].includes(el.tagName)) return;
+      const proprio = [...el.childNodes].filter(c => c.nodeType === 3).map(c => c.textContent).join('');
+      if (proprio.trim() && proprio.length < 300 && SENSIVEL.test(proprio)) borrar(el);
+    });
     const st = document.createElement('style');
     st.id = '__tutorial_blur';
     st.textContent = '[data-tutorial-blur]{filter:blur(9px)!important}';
