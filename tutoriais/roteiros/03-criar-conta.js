@@ -8,11 +8,10 @@ module.exports = {
   precisaLogin: false,
   passos: [
     {
-      ir: '/login',
-      titulo: 'Clique em "Criar conta"',
-      texto: 'Na tela de entrada, desça até o final e clique em "Criar conta".',
-      marcar: [{ alvo: { texto: 'Criar conta', exato: true } }],
-      depois: [{ tipo: 'clicar', alvo: { texto: 'Criar conta', exato: true }, espera: 2000 }],
+      ir: '/register',
+      titulo: 'Abra o link do convite',
+      texto: 'Abra o link que chegou no seu e-mail de convite. Ele abre a tela "Criar Conta". Só funciona com e-mails autorizados pela sua empresa.',
+      marcar: [{ alvo: { texto: 'Criar Conta', exato: true } }],
     },
     {
       titulo: 'Preencha seus dados',

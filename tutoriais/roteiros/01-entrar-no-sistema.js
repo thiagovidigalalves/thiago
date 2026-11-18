@@ -10,7 +10,7 @@ module.exports = {
     {
       ir: '/login',
       titulo: 'Digite seu e-mail',
-      texto: 'Abra o endereço do sistema no navegador. Na tela "Bem-vindo!", clique no campo E-mail e digite o e-mail que você usa no sistema.',
+      texto: 'Abra o endereço do sistema no navegador. Na tela "Bem-vindo!", clique no campo E-mail e digite o e-mail que você usa no sistema. (Funcionário sem e-mail? Veja o tutorial "Entrar com usuário e senha".)',
       marcar: [{ alvo: { placeholder: 'seu@email.com' } }],
       depois: [{ tipo: 'preencher', alvo: { placeholder: 'seu@email.com' }, valor: 'maria@minhaloja.com.br' }],
     },
@@ -21,9 +21,9 @@ module.exports = {
       depois: [{ tipo: 'preencher', alvo: 'input[type="password"]', valor: 'senha1234' }],
     },
     {
-      titulo: 'Clique em Entrar',
-      texto: 'Confira o e-mail e clique no botão Entrar. Pronto: o sistema abre no Dashboard.',
-      marcar: [{ alvo: { papel: 'button', nome: 'Entrar', exato: true } }],
+      titulo: 'Clique em "Entrar com e-mail"',
+      texto: 'Confira o e-mail e clique no botão "Entrar com e-mail". Pronto: o sistema abre no Dashboard.',
+      marcar: [{ alvo: { papel: 'button', nome: 'Entrar com e-mail' } }],
       dica: 'Se o sistema pedir um código de verificação, abra o aplicativo autenticador ou o seu e-mail e digite o código que chegou.',
     },
     {

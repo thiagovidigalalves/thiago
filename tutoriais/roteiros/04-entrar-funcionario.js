@@ -2,17 +2,17 @@ module.exports = {
   id: 'entrar-funcionario',
   ordem: 4,
   grupo: 'Primeiros passos',
-  titulo: 'Entrar como funcionário (sem e-mail)',
+  titulo: 'Entrar com usuário e senha (funcionário sem e-mail)',
   resumo: 'Funcionário entra com o código da empresa, usuário e senha.',
   antesDeComecar: 'O administrador da empresa precisa ter cadastrado o seu usuário e senha.',
   precisaLogin: false,
   passos: [
     {
       ir: '/login',
-      titulo: 'Clique em "Sou funcionário"',
-      texto: 'Na tela de entrada, desça até o final e clique em "Sou funcionário · entrar com usuário e senha".',
-      marcar: [{ alvo: { texto: 'Sou funcionário' } }],
-      depois: [{ tipo: 'clicar', alvo: { texto: 'Sou funcionário' }, espera: 2000 }],
+      titulo: 'Clique em "Entrar com usuário e senha"',
+      texto: 'Na tela de entrada, clique no botão "Entrar com usuário e senha", no final da caixa.',
+      marcar: [{ alvo: { texto: 'Entrar com usuário e senha' } }],
+      depois: [{ tipo: 'clicar', alvo: { texto: 'Entrar com usuário e senha' }, espera: 2000 }],
     },
     {
       titulo: 'Preencha empresa, usuário e senha',

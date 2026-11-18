@@ -8,11 +8,10 @@ module.exports = {
   precisaLogin: false,
   passos: [
     {
-      ir: '/login',
-      titulo: 'Clique em "Sou contador"',
-      texto: 'Na tela de entrada, desça até o final e clique em "Sou contador · entrar com usuário e senha".',
-      marcar: [{ alvo: { texto: 'Sou contador' } }],
-      depois: [{ tipo: 'clicar', alvo: { texto: 'Sou contador' }, espera: 2000 }],
+      ir: '/entrar-contador',
+      titulo: 'Abra o Portal do Contador',
+      texto: 'O contador entra pelo endereço do sistema terminado em /entrar-contador. A empresa manda esse link pelo botão "Enviar acesso ao contador pelo WhatsApp", em Fiscal › Arquivos para contador.',
+      marcar: [{ alvo: { texto: 'Portal do Contador', exato: true } }],
     },
     {
       titulo: 'Clique em "Entrar com e-mail"',

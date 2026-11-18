@@ -265,7 +265,7 @@ async function entrar(context, page) {
     await page.getByPlaceholder('seu@email.com').fill(email);
   } else return false;
   await page.locator('input[type="password"]').first().fill(senha);
-  await page.getByRole('button', { name: 'Entrar', exact: true }).click();
+  await page.getByRole('button', { name: /^Entrar( com e-mail)?$/ }).first().click();
   await page.waitForURL(u => !/\/login/.test(String(u)), { timeout: 30000 }).catch(() => {});
   await page.waitForTimeout(3000);
   if (/\/login|mfa|verifica/i.test(page.url())) {
@@ -332,6 +332,8 @@ async function entrar(context, page) {
       }
     }
     relatorio.push({ id: r.id, ok: falhas === 0, falhas });
+    // Pausa entre tutoriais para não estourar o limite de consultas do Base44 (210 por minuto por usuário).
+    await page.waitForTimeout(Number(process.env.TUTORIAL_PAUSA || 8000));
   }
   fs.writeFileSync(path.join(process.env.TUTORIAL_SAIDA ? PASTA_IMG : __dirname, '.ultima-captura.json'), JSON.stringify(relatorio, null, 2));
   await browser.close();
