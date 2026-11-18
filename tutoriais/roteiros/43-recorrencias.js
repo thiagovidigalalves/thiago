@@ -7,6 +7,7 @@ module.exports = {
   passos: [
     {
       ir: '/financeiro/recorrencias',
+      desfocarTudo: true,
       titulo: 'Clique em "Nova recorrência"',
       texto: 'No menu, clique em Financeiro › Recorrências. Para uma conta a pagar, clique em "Nova recorrência". Para algo que você recebe todo mês, clique em "A receber".',
       marcar: [
@@ -16,21 +17,25 @@ module.exports = {
       depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Nova recorrência' }, espera: 1500 }],
     },
     {
+      desfocarTudo: true,
       titulo: 'Nome e plano de contas',
       texto: 'Dê um nome (ex.: Aluguel). O plano de contas é sugerido sozinho pelo nome; confira.',
       marcar: [{ alvo: { placeholder: 'Ex.: Aluguel, Salário, Energia', dentro: 'dialog' } }],
     },
     {
+      desfocarTudo: true,
       titulo: 'Para quem',
       texto: 'Escolha se é para um funcionário, um fornecedor ou outros (ex.: Cemig, condomínio).',
       marcar: [{ alvo: { papel: 'button', nome: 'Fornecedor', exato: true, dentro: 'dialog' } }],
     },
     {
+      desfocarTudo: true,
       titulo: 'Valor e dia do vencimento',
       texto: 'Informe o valor por mês e o dia que vence. O quadro azul mostra quantas contas vão ser lançadas.',
       marcar: [{ alvo: { campo: 'Valor por mês', dentro: 'dialog' } }],
     },
     {
+      desfocarTudo: true,
       titulo: 'Clique em "Criar e lançar"',
       texto: 'Clique em "Criar e lançar". As contas aparecem em Contas a Pagar (ou a Receber), uma por mês.',
       marcar: [{ alvo: { papel: 'button', nome: 'Criar e lançar', dentro: 'dialog' } }],

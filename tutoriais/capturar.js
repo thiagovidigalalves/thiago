@@ -144,7 +144,7 @@ async function desfocarDados(page, passo = {}) {
   let extras = [];
   try { extras = JSON.parse(fs.readFileSync(path.join(__dirname, 'privacidade.json'), 'utf8')).textos || []; } catch {}
   await page.evaluate(({ extras, tudo, campos }) => {
-    const SENSIVEL = /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b|R\$\s?-?[\d.,]+(\s?mil)?|\b\d{1,3}(\.\d{3})*,\d{2}\b|\b\d+([.,]\d+)?\s?mil\b|\bOS\s?\d{2,}|\bn[ºo°]\s?\d{2,}|#\d{3,}|\d+\s+\S+\(\S+\)\s+encontrad|Todo dia \d+|R\$\s?-?[\d.]+,\d{2}|\d{3}\.\d{3}\.\d{3}-\d{2}|\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}|\(?\d{2}\)?\s?9?\d{4}-?\d{4}|[\w.+-]+@[\w-]+\.[\w.]+|\b[A-Z]{3}-?\d[A-Z0-9]\d{2}\b/;
+    const SENSIVEL = /…\s?\d{4,}|\b\d{5,}\b|\bDoc\.?\s?\d+|\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b|R\$\s?-?[\d.,]+(\s?mil)?|\b\d{1,3}(\.\d{3})*,\d{2}\b|\b\d+([.,]\d+)?\s?mil\b|\bOS\s?\d{2,}|\bn[ºo°]\s?\d{2,}|#\d{3,}|\d+\s+\S+\(\S+\)\s+encontrad|Todo dia \d+|R\$\s?-?[\d.]+,\d{2}|\d{3}\.\d{3}\.\d{3}-\d{2}|\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}|\(?\d{2}\)?\s?9?\d{4}-?\d{4}|[\w.+-]+@[\w-]+\.[\w.]+|\b[A-Z]{3}-?\d[A-Z0-9]\d{2}\b/;
     const marcados = [...document.querySelectorAll('[data-tutorial-alvo]')];
     // Protege o elemento marcado e quem o contém; o que está DENTRO dele ainda é desfocado se for dado sensível.
     const protegido = el => el.closest('#__tutorial_marcas') || marcados.some(m => m === el || el.contains(m));
@@ -165,7 +165,10 @@ async function desfocarDados(page, passo = {}) {
     // Mantém legível só a "estrutura" da tela: títulos, cabeçalhos de coluna, rótulos de campo e abas.
     const ESTRUTURA = 'h1,h2,h3,th,label,[role="tab"],nav,[role="navigation"]';
     if (tudo) document.querySelectorAll('body *').forEach(e => {
-      if (e.children.length || !e.textContent.trim() || e.closest(ESTRUTURA)) return;
+      if (e.children.length || !e.textContent.trim()) return;
+      const titulo = e.closest('h2,h3');
+      if (titulo && (titulo.textContent.length > 40 || /\d/.test(titulo.textContent))) { borrarForte(e); return; }
+      if (e.closest(ESTRUTURA)) return;
       borrarForte(e);
     });
     // Gráficos (revelam o tamanho do faturamento): qualquer svg/canvas grande.
@@ -183,6 +186,8 @@ async function desfocarDados(page, passo = {}) {
       if (el.closest('#__tutorial_marcas') || ['SCRIPT', 'STYLE'].includes(el.tagName)) return;
       const proprio = [...el.childNodes].filter(c => c.nodeType === 3).map(c => c.textContent).join('');
       if (proprio.trim() && proprio.length < 300 && SENSIVEL.test(proprio)) borrar(el);
+      const inteiro = el.textContent || '';
+      if (inteiro.length < 120 && el.children.length <= 4 && extra(inteiro)) el.setAttribute('data-tutorial-blur', '');
     });
     const st = document.createElement('style');
     st.id = '__tutorial_blur';
