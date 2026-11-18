@@ -7,22 +7,26 @@ module.exports = {
   passos: [
     {
       ir: '/configuracoes/pdv',
+      desfocarCampos: true,
       titulo: 'Tipo de caixa',
       texto: 'Em Configurações › PDV, escolha "Caixa único" (todos os computadores somam no mesmo caixa) ou "Caixas múltiplos" (cada terminal tem o seu).',
       marcar: [{ alvo: { texto: 'Tipo de caixa da empresa' } }],
     },
     {
+      desfocarCampos: true,
       titulo: 'Fechamento de caixa',
       texto: 'Escolha como o operador fecha o caixa: Simples, Conferência aberta (vê o esperado) ou Às cegas (conta sem ver o valor). Você também escolhe o que acontece depois de fechar: imprimir, mandar no WhatsApp ou nada.',
       marcar: [{ alvo: { texto: 'Fechamento de caixa', exato: true } }],
       dica: '"Às cegas" é o mais seguro: o operador informa o que contou e o sistema mostra a diferença para o gerente.',
     },
     {
+      desfocarCampos: true,
       titulo: 'Impressões',
       texto: 'Em "Impressões" ajuste o comprovante da venda (formato e duas vias), o recibo de recebimento e quando perguntar sobre o cupom fiscal.',
       marcar: [{ alvo: { papel: 'button', nome: 'Vendas / PDV' } }],
     },
     {
+      desfocarCampos: true,
       titulo: 'Clique em "Salvar"',
       texto: 'Confira e clique em "Salvar". Os caixas abertos pegam a mudança na próxima venda.',
       marcar: [{ alvo: { papel: 'button', nome: 'Salvar', exato: true } }],

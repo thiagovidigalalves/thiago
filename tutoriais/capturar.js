@@ -144,7 +144,7 @@ async function desfocarDados(page, passo = {}) {
   let extras = [];
   try { extras = JSON.parse(fs.readFileSync(path.join(__dirname, 'privacidade.json'), 'utf8')).textos || []; } catch {}
   await page.evaluate(({ extras, tudo, campos }) => {
-    const SENSIVEL = /#\d{3,}|\d+\s+\S+\(\S+\)\s+encontrad|Todo dia \d+|R\$\s?-?[\d.]+,\d{2}|\d{3}\.\d{3}\.\d{3}-\d{2}|\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}|\(?\d{2}\)?\s?9?\d{4}-?\d{4}|[\w.+-]+@[\w-]+\.[\w.]+|\b[A-Z]{3}-?\d[A-Z0-9]\d{2}\b/;
+    const SENSIVEL = /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b|R\$\s?-?[\d.,]+(\s?mil)?|\b\d{1,3}(\.\d{3})*,\d{2}\b|\b\d+([.,]\d+)?\s?mil\b|\bOS\s?\d{2,}|\bn[ºo°]\s?\d{2,}|#\d{3,}|\d+\s+\S+\(\S+\)\s+encontrad|Todo dia \d+|R\$\s?-?[\d.]+,\d{2}|\d{3}\.\d{3}\.\d{3}-\d{2}|\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}|\(?\d{2}\)?\s?9?\d{4}-?\d{4}|[\w.+-]+@[\w-]+\.[\w.]+|\b[A-Z]{3}-?\d[A-Z0-9]\d{2}\b/;
     const marcados = [...document.querySelectorAll('[data-tutorial-alvo]')];
     // Protege o elemento marcado e quem o contém; o que está DENTRO dele ainda é desfocado se for dado sensível.
     const protegido = el => el.closest('#__tutorial_marcas') || marcados.some(m => m === el || el.contains(m));
@@ -162,7 +162,12 @@ async function desfocarDados(page, passo = {}) {
       if (campos ? v.trim() : (SENSIVEL.test(v) || /\d{8,}/.test(v.replace(/\D/g, '')))) i.setAttribute('data-tutorial-blur', '');
     });
     // `desfocarTudo`: só o menu e o que está marcado ficam nítidos (ex.: Dashboard com números da empresa).
-    if (tudo) document.querySelectorAll('body *').forEach(e => { if (!e.children.length && e.textContent.trim()) borrarForte(e); });
+    // Mantém legível só a "estrutura" da tela: títulos, cabeçalhos de coluna, rótulos de campo e abas.
+    const ESTRUTURA = 'h1,h2,h3,th,label,[role="tab"],nav,[role="navigation"]';
+    if (tudo) document.querySelectorAll('body *').forEach(e => {
+      if (e.children.length || !e.textContent.trim() || e.closest(ESTRUTURA)) return;
+      borrarForte(e);
+    });
     // Gráficos (revelam o tamanho do faturamento): qualquer svg/canvas grande.
     document.querySelectorAll('svg, canvas').forEach(g => { const r = g.getBoundingClientRect(); if (r.width > 150 && r.height > 80) borrar(g); });
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
@@ -306,12 +311,15 @@ async function entrar(context, page) {
       for (let tentativa = 1; tentativa <= 2 && !ok; tentativa++) {
        try {
         if (tentativa > 1) { await limparMarcas(page).catch(() => {}); await page.keyboard.press('Escape').catch(() => {}); await page.waitForTimeout(4000); if (!p.ir) throw erroFinal; }
-        if (p.ir) { await page.goto(URL_BASE + comEmpresa(p.ir), { waitUntil: 'load' }).catch(() => {}); await page.waitForTimeout(p.espera || 2500); }
+        if (p.ir) { await page.waitForTimeout(Number(process.env.TUTORIAL_PAUSA_TELA || 3000)); await page.goto(URL_BASE + comEmpresa(p.ir), { waitUntil: 'load' }).catch(() => {}); await page.waitForTimeout(p.espera || 3500); }
         for (const a of p.antes || []) await executar(page, a, r);
         await prepararTela(page);
         if (p.semPrint) { console.log(`   – passo ${n}: ${p.titulo} (só texto)`); for (const a of p.depois || []) await executar(page, a, r); ok = true; continue; }
         const marcas = (p.marcar || []).map((m, j) => ({ ...m, numero: p.marcar.length > 1 ? `${n}${String.fromCharCode(97 + j)}` : n }));
         const caixas = marcas.length ? await marcar(page, marcas) : [];
+        await desfocarDados(page, p);
+        // Segunda passada: pega o que a tela terminou de carregar depois da primeira.
+        await page.waitForTimeout(1200);
         await desfocarDados(page, p);
         await page.waitForTimeout(300);
         await page.screenshot({ path: path.join(pasta, `passo-${n}.png`), clip: recorte(caixas, p, page.viewportSize()) });

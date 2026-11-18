@@ -7,12 +7,14 @@ module.exports = {
   passos: [
     {
       ir: '/relatorios/resumo-clientes',
+      desfocarTudo: true,
       titulo: 'Resumo de Clientes',
       texto: 'Em Relatórios › Clientes › Resumo de Clientes escolha o período ("Mês", "Ano"...). Aparecem os melhores clientes, os que compram pouco e os que mais atrasam pagamento.',
       marcar: [{ alvo: { papel: 'button', nome: 'Mês', exato: true } }],
     },
     {
       ir: '/relatorios/crm',
+      desfocarTudo: true,
       titulo: 'CRM: clientes para chamar de volta',
       texto: 'No CRM de Clientes, a aba "Oportunidades" mostra quem já devia ter voltado a comprar e quanto isso vale. Marque os clientes e clique em "Enviar WhatsApp".',
       marcar: [{ alvo: { papel: 'button', nome: /Oportunidades/ } }],
@@ -20,6 +22,7 @@ module.exports = {
     },
     {
       ir: '/relatorios/aniversariantes',
+      desfocarTudo: true,
       titulo: 'Aniversariantes: mande os parabéns',
       texto: 'Escolha "Hoje", "Semana" ou "Mês". Marque os clientes (ou "Marcar todos") e clique em "Enviar para marcados" para mandar os parabéns pelo WhatsApp.',
       marcar: [
@@ -29,6 +32,7 @@ module.exports = {
     },
     {
       ir: '/relatorios/whatsapp',
+      desfocarTudo: true,
       titulo: 'Mensagens enviadas: chegou ou não?',
       texto: 'Em WhatsApp › Mensagens enviadas você vê cada mensagem que o sistema mandou (venda, cobrança, aniversário...) e se foi entregue ou lida.',
       marcar: [{ alvo: { papel: 'heading', nome: /Mensagens enviadas/ } }],

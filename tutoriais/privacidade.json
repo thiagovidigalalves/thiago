@@ -1,4 +1,11 @@
 {
   "comentario": "Textos que SEMPRE saem desfocados nos prints (nomes de pessoas da empresa usada na captura, saudações etc.).",
-  "textos": ["Thiago Vidigal Alves", "Olá,"]
+  "textos": [
+    "Olá,",
+    "THIAGO VIDIGAL",
+    "Thiago Vidigal",
+    "Thiago Vidigal Alves",
+    "Thiago!",
+    "Thiago,"
+  ]
 }

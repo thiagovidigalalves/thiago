@@ -7,11 +7,13 @@ module.exports = {
   passos: [
     {
       ir: '/comercial/revisoes',
+      desfocarTudo: true,
       titulo: 'Escolha há quanto tempo',
       texto: 'Em Comercial › Lembrete de revisão, clique em "3 meses", "6 meses" ou "12 meses". Aparecem os clientes que fizeram serviço nesse tempo e não voltaram.',
       marcar: [{ alvo: { papel: 'button', nome: '6 meses', exato: true } }],
     },
     {
+      desfocarTudo: true,
       titulo: 'Mande o convite',
       texto: 'Clique em "WhatsApp" na linha do cliente para mandar o convite. Para vários de uma vez, marque os clientes e clique em "Enviar para marcados".',
       marcar: [{ alvo: { rotulo: 'Marcar todos' } }],

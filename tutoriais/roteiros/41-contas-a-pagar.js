@@ -35,7 +35,7 @@ module.exports = {
       ir: '/financeiro/contas-pagar',
       titulo: 'Pagou? Clique em "Pagar"',
       texto: 'Na linha da conta, clique em "Pagar", confira o valor, a forma e de qual conta saiu o dinheiro, e confirme.',
-      marcar: [{ alvo: { papel: 'button', nome: 'Pagar', exato: true } }],
+      semPrint: true,
     },
   ],
 };

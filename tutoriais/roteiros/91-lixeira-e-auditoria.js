@@ -7,17 +7,20 @@ module.exports = {
   passos: [
     {
       ir: '/lixeira',
+      desfocarTudo: true,
       titulo: 'Encontre o que foi excluído',
       texto: 'Em Utilitários › Lixeira, escolha o tipo (Clientes, Produtos, Contas...) ou busque pelo nome.',
       marcar: [{ alvo: { placeholder: 'Buscar pelo nome, descrição ou quem excluiu' } }],
     },
     {
+      desfocarTudo: true,
       titulo: 'Clique em "Restaurar"',
       texto: 'Clique em "Restaurar" na linha do item e confirme. Ele volta para o lugar de antes.',
       marcar: [{ alvo: { papel: 'button', nome: 'Restaurar', exato: true } }],
     },
     {
       ir: '/auditoria',
+      desfocarTudo: true,
       titulo: 'Auditoria: quem fez o quê',
       texto: 'Em Utilitários › Auditoria você vê o histórico: o que foi excluído ou alterado, quem fez e quando. Use os filtros de tipo, ação, pessoa e datas.',
       marcar: [{ alvo: { rotulo: 'Pesquisar auditoria' } }],

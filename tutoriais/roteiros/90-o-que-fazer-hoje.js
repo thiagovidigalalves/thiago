@@ -7,12 +7,13 @@ module.exports = {
   passos: [
     {
       ir: '/hoje',
+      desfocarTudo: true,
       titulo: 'Abra "O que fazer hoje"',
       texto: 'No menu, clique em Utilitários › O que fazer hoje. A tela mostra quantos assuntos precisam da sua atenção hoje.',
       marcar: [{ alvo: { papel: 'heading', nome: /Bom dia|Boa tarde|Boa noite/ } }],
-      desfocarTudo: false,
     },
     {
+      desfocarTudo: true,
       titulo: 'Resolva pelos atalhos',
       texto: 'Cada quadro tem um botão que leva direto para resolver: "Cobrar no WhatsApp", "Abrir contas a pagar", "Mandar parabéns", "Ver produtos"...',
       marcar: [{ alvo: { papel: 'button', nome: 'Atualizar', exato: true } }],

@@ -7,11 +7,13 @@ module.exports = {
   passos: [
     {
       ir: '/comercial/agenda',
+      desfocarTudo: true,
       titulo: 'Abra a Agenda',
       texto: 'Em Comercial › Agenda aparece o calendário do mês com as OS agendadas. Use as setas para mudar de mês e clique numa OS para abrir.',
       marcar: [{ alvo: { rotulo: 'Próximo mês' } }],
     },
     {
+      desfocarTudo: true,
       titulo: 'Filtre pelo técnico',
       texto: 'Escolha o técnico para ver só a agenda dele.',
       marcar: [{ alvo: { rotulo: 'Técnico' } }],

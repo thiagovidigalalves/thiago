@@ -7,19 +7,22 @@ module.exports = {
   passos: [
     {
       ir: '/relatorios/vendas/bi',
+      desfocarTudo: true,
       titulo: 'BI Vendas: quanto vendeu e como pagaram',
-      texto: 'Em Relatórios › Vendas › BI Vendas escolha o período ("Este mês", "Hoje", "Últimos 7 dias"...). Os gráficos mostram as vendas por forma de pagamento e por situação. Clique numa fatia para filtrar.',
-      marcar: [{ alvo: { papel: 'button', nome: 'Este mês', exato: true } }],
+      texto: 'Em Relatórios › Vendas › BI Vendas escolha o período nos filtros do alto. Os gráficos mostram as vendas por forma de pagamento e por situação. Clique numa fatia para filtrar.',
+      marcar: [{ alvo: { papel: 'heading', nome: 'BI Vendas', exato: true } }],
       dica: 'O botão "Imprimir" gera o relatório para guardar em PDF.',
     },
     {
       ir: '/relatorios/vendas/faturamento',
+      desfocarTudo: true,
       titulo: 'Faturamento: do bruto ao líquido',
       texto: 'Em Relatórios › Vendas › Faturamento você vê o que vendeu, os descontos e taxas, e quanto ficou de verdade. Escolha o período nos botões do alto; ele compara sozinho com o período anterior.',
       marcar: [{ alvo: { papel: 'heading', nome: 'Faturamento', exato: true } }],
     },
     {
       ir: '/relatorios/comparativo-vendas',
+      desfocarTudo: true,
       titulo: 'Comparativo: vendeu mais ou menos?',
       texto: 'Em Comparativo de Vendas, clique em "Mês × anterior" (ou "Semana × anterior", "Ano × anterior"). Os cartões mostram faturamento, quantidade de vendas, ticket médio e o crescimento.',
       marcar: [{ alvo: { papel: 'button', nome: /Mês × anterior/ } }],
@@ -27,6 +30,7 @@ module.exports = {
     },
     {
       ir: '/relatorios/curva-abc',
+      desfocarTudo: true,
       titulo: 'Curva ABC: os produtos que mais trazem dinheiro',
       texto: 'Em Curva ABC, os produtos "A" são os poucos que trazem a maior parte do faturamento; os "C" quase não vendem. Classifique por faturamento, quantidade ou lucro.',
       marcar: [

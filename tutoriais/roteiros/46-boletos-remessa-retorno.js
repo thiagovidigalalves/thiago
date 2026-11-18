@@ -8,11 +8,13 @@ module.exports = {
   passos: [
     {
       ir: '/financeiro/boletos',
+      desfocarTudo: true,
       titulo: 'Gere a remessa',
       texto: 'Em Financeiro › Boletos, clique em "Gerar remessa" e envie o arquivo no internet banking da empresa.',
       marcar: [{ alvo: { papel: 'heading', nome: 'Boletos', exato: true } }],
     },
     {
+      desfocarTudo: true,
       titulo: 'Leia o retorno',
       texto: 'Baixe o arquivo de retorno no banco e clique em "Ler retorno do banco". Confira a lista (pagos, confirmados, rejeitados) e clique em "Confirmar e dar baixa".',
       atencao: 'Nada é gravado antes de você confirmar. Confira os pagos antes.',
