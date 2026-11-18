@@ -41,7 +41,7 @@ module.exports = {
         { alvo: { campo: 'Estoque atual', dentro: 'dialog' }, legenda: 'Estoque' },
         { alvo: { campo: 'Preço de venda', dentro: 'dialog' }, legenda: 'Preço de venda' },
       ],
-      dica: 'Se você informar o Preço de custo e a Margem (%), o preço de venda é calculado sozinho.',
+      dica: 'Se você informar o Preço de custo e a Margem (%), o preço de venda é calculado sozinho. Em Grupo, Subgrupo e Marca é só começar a digitar; se não existir, clique em "+ Cadastrar".',
     },
     {
       titulo: 'Dados fiscais (se você emite nota)',

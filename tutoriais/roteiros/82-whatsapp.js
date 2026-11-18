@@ -1,7 +1,7 @@
 module.exports = {
   id: 'whatsapp',
-  ordem: 82,
-  grupo: 'Configurações',
+  ordem: 84,
+  grupo: 'WhatsApp',
   titulo: 'Conectar o WhatsApp e editar as mensagens',
   resumo: 'Ligue o WhatsApp da loja ao sistema e personalize as mensagens enviadas.',
   antesDeComecar: 'Tenha em mãos o celular com o WhatsApp da empresa.',

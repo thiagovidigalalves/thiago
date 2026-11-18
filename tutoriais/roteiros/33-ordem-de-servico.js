@@ -19,20 +19,20 @@ module.exports = {
       marcar: [{ alvo: '#os-client-search' }],
     },
     {
-      titulo: 'Veículo (ou equipamento) e o defeito',
-      texto: 'Preencha o veículo (ou equipamento) e a placa. Escreva o que o cliente reclamou e, depois de olhar, o laudo técnico.',
+      titulo: 'Equipamento (obrigatório) e o defeito',
+      texto: 'Preencha o equipamento (ou veículo) e modelo: é o único campo obrigatório, por isso tem o asterisco. Ao lado vai a observação (ou placa). Escreva o defeito que o cliente relatou e, depois de olhar, o laudo técnico.',
       marcar: [{ alvo: { placeholder: /Veículo \(modelo\/marca\)|Equipamento e modelo/ } }],
     },
     {
       titulo: 'Adicione os serviços',
-      texto: 'Clique em "Adicionar serviço", busque o serviço pelo nome ou código, escolha o mecânico/técnico responsável e confira o valor.',
+      texto: 'Clique em "Adicionar serviço", busque o serviço pelo nome ou código e confira o valor. O técnico de cada serviço é opcional: escolha se ele ganha comissão.',
       marcar: [{ alvo: { rotulo: 'Adicionar serviço' } }],
     },
     {
       titulo: 'Adicione as peças',
       texto: 'Clique em "Adicionar produto" para incluir as peças usadas, com a quantidade. Elas saem do estoque.',
       marcar: [{ alvo: { rotulo: 'Adicionar produto' } }],
-      dica: 'Use "+ Adicionar fotos" para guardar fotos de antes, durante e depois do serviço.',
+      dica: 'Use "+ Adicionar fotos" para guardar fotos de antes, durante e depois do serviço. O equipamento pode ser opcional: mude em Configurações › Ordem de Serviço › Geral.',
     },
     {
       titulo: 'Salve ou gere o orçamento',

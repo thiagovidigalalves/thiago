@@ -9,7 +9,7 @@ module.exports = {
       ir: '/',
       desfocarTudo: true,
       titulo: 'O menu fica do lado esquerdo',
-      texto: 'Todas as telas do sistema estão no menu azul à esquerda, separadas por assunto: Comercial, Cadastros, Estoque, Financeiro, Fiscal, Relatórios e Configurações.',
+      texto: 'Todas as telas do sistema estão no menu azul à esquerda, separadas por assunto: Comercial, Cadastros, Estoque, Financeiro, Fiscal, WhatsApp, Relatórios, Configurações e Utilitários.',
       marcar: [{ alvo: 'aside nav', legenda: 'Menu do sistema' }],
       telaInteira: true,
     },
@@ -39,6 +39,13 @@ module.exports = {
       texto: 'Aparece a lista das telas encontradas. É só clicar na que você quer.',
       marcar: [{ alvo: '[role="listbox"]' }],
       dica: 'Aperte Enter para abrir o primeiro resultado da lista.',
+    },
+    {
+      ir: '/',
+      desfocarTudo: true,
+      titulo: 'Modo escuro',
+      texto: 'Prefere a tela escura (cansa menos a vista à noite)? Clique em "Modo escuro", no rodapé do menu, logo acima de "Sair". Para voltar, clique em "Modo claro".',
+      marcar: [{ alvo: { titulo: 'Usar o modo escuro' } }],
     },
   ],
 };

@@ -17,6 +17,11 @@ module.exports = {
       marcar: [{ alvo: { papel: 'button', nome: /1 a 15 dias/ } }],
     },
     {
+      titulo: 'Cobrar um cliente na hora',
+      texto: 'Na linha do cliente, o botão do WhatsApp manda a cobrança com as parcelas, e o botão do QR Code gera o Pix das parcelas e envia. O cliente paga e a conta baixa sozinha.',
+      marcar: [{ alvo: 'button[aria-label^="Cobrar "][aria-label$=" no WhatsApp"]' }],
+    },
+    {
       titulo: 'Marque os clientes',
       texto: 'Marque os clientes que você quer cobrar (ou "Marcar todos").',
       marcar: [{ alvo: { rotulo: 'Marcar todos' } }],
