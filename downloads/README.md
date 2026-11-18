@@ -4,6 +4,7 @@ Arquivos de instalação publicados na página https://thgestor.thiagoinformatic
 
 | Arquivo | Versão | SHA-256 |
 |---|---|---|
+| pdv-windows/THGestor-PDV-Windows-1.0.8.exe | 1.0.8 | ver `.sha256` ao lado |
 | pdv-windows/THGestor-PDV-Windows-1.0.7.exe | 1.0.7 | ver `.sha256` ao lado |
 | pdv-windows/THGestor-PDV-Windows-1.0.6.exe | 1.0.6 | ver `.sha256` ao lado |
 
