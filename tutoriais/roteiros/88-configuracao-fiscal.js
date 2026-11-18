@@ -23,7 +23,7 @@ module.exports = {
       desfocarCampos: true,
       titulo: 'Regime, CFOP, série e ambiente',
       texto: 'Confira o regime tributário (Simples Nacional ou MEI), a tributação padrão (CSOSN, CFOP, PIS e COFINS), a série e o próximo número das notas. Comece em "Homologação" (teste) e passe para "Produção" quando o contador liberar.',
-      marcar: [{ alvo: { texto: 'Regime tributário', exato: true } }],
+      marcar: [{ alvo: { texto: /Regime tribut/ } }],
       atencao: 'Em "Produção" as notas valem de verdade para a Receita.',
     },
     {
