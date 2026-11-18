@@ -165,7 +165,9 @@ async function desfocarDados(page, passo = {}) {
     // Mantém legível só a "estrutura" da tela: títulos, cabeçalhos de coluna, rótulos de campo e abas.
     const ESTRUTURA = 'h1,h2,h3,th,label,[role="tab"],nav,[role="navigation"]';
     if (tudo) document.querySelectorAll('body *').forEach(e => {
-      if (e.children.length || !e.textContent.trim()) return;
+      // Elemento com texto próprio (mesmo misturado com <b>, <span>...) também entra.
+      const temTextoProprio = [...e.childNodes].some(c => c.nodeType === 3 && c.textContent.trim());
+      if ((e.children.length && !temTextoProprio) || !e.textContent.trim()) return;
       const titulo = e.closest('h2,h3');
       if (titulo && (titulo.textContent.length > 40 || /\d/.test(titulo.textContent))) { borrarForte(e); return; }
       if (e.closest(ESTRUTURA)) return;
