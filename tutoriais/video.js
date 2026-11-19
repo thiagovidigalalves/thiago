@@ -30,33 +30,12 @@ const RAIZ = path.resolve(__dirname, '..');
 const SAIDA = path.join(RAIZ, 'ajuda', 'videos');
 const CACHE = path.join(__dirname, '.cache-audio');
 const SONS = path.join(__dirname, 'audio');
-const VOZ = process.env.ELEVENLABS_VOZ || 'EXAVITQu4vr4xnSDxMaL';
-const MODELO = process.env.ELEVENLABS_MODELO || 'eleven_multilingual_v2';
 const W = 1366, H = 768;
 
 const duracao = f => Number(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', f]).toString().trim()) || 0;
 const espera = ms => new Promise(r => setTimeout(r, ms));
 
-/** Narração: gera (ou reaproveita do cache) o mp3 do texto. Sem voz, devolve só a duração estimada. */
-function falar(texto) {
-  const estimada = Math.max(1.6, texto.length / 14);
-  if (process.env.TUTORIAL_SEM_VOZ === '1') return { arquivo: null, dur: estimada };
-  fs.mkdirSync(CACHE, { recursive: true });
-  const arq = path.join(CACHE, crypto.createHash('sha1').update(VOZ + MODELO + texto).digest('hex') + '.mp3');
-  if (!fs.existsSync(arq)) {
-    const corpo = JSON.stringify({ text: texto, model_id: MODELO, voice_settings: { stability: 0.45, similarity_boost: 0.8, style: 0.15 } });
-    try {
-      // A chave real é colocada pelo proxy do ambiente; "x" é só um valor de preenchimento.
-      execFileSync('curl', ['-sS', '-f', '-X', 'POST', `https://api.elevenlabs.io/v1/text-to-speech/${VOZ}?output_format=mp3_44100_128`,
-        '-H', 'xi-api-key: x', '-H', 'Content-Type: application/json', '--data-binary', corpo, '-o', arq], { stdio: ['ignore', 'ignore', 'pipe'] });
-    } catch (e) {
-      fs.rmSync(arq, { force: true });
-      console.log('   (sem voz: o ElevenLabs não respondeu — confira a chave no ambiente) ' + String(e.stderr || e.message).split('\n')[0]);
-      return { arquivo: null, dur: estimada };
-    }
-  }
-  return { arquivo: arq, dur: duracao(arq) };
-}
+const { falar } = require('./video-voz.js');
 
 /** Efeitos sonoros. Usa os arquivos de tutoriais/audio/ se existirem (ex.: gerados no ElevenLabs); senão cria simples. */
 function sons() {
@@ -190,6 +169,7 @@ async function gravar(r, s) {
   await context.addInitScript({ content: scriptDaPagina(logoUri) });
   const page = await context.newPage();
   const t0 = Date.now();
+  let corte = 0;
   const eventos = [];
   const agora = () => (Date.now() - t0) / 1000;
   const som = (arquivo, vol = 1) => arquivo && eventos.push({ t: agora(), arquivo, vol });
@@ -202,6 +182,8 @@ async function gravar(r, s) {
     await cortina(page, true, r.titulo, r.resumo || '');
     // Nomes reais da empresa -> fictícios (a cortina cobre a tela enquanto carrega).
     if (r.precisaLogin !== false) await C.instalarNomes(context, page, await C.carregarNomesReais(page));
+    // Corta o tempo parado de carregamento: o vídeo começa ~1 s antes da fala de abertura.
+    corte = Math.max(0, agora() - 1);
     som(s.transicao, 0.8); const ti = agora(); som(falaIntro.arquivo);
     await C.prepararTela(page);
     await espera(Math.max(0, (falaIntro.dur + 0.6 - (agora() - ti)) * 1000));
@@ -254,12 +236,12 @@ async function gravar(r, s) {
   // 4) Junta vídeo + narração + efeitos + música (ffmpeg).
   fs.mkdirSync(SAIDA, { recursive: true });
   const final = path.join(SAIDA, `${r.id}.mp4`);
-  const total = duracao(bruto);
-  const args = ['-y', '-v', 'error', '-i', bruto];
+  const total = duracao(bruto) - corte;
+  const args = ['-y', '-v', 'error', '-ss', corte.toFixed(2), '-i', bruto];
   const filtros = [], rotulos = [];
   eventos.forEach((e, k) => {
     args.push('-i', e.arquivo);
-    const ms = Math.max(0, Math.round(e.t * 1000));
+    const ms = Math.max(0, Math.round((e.t - corte) * 1000));
     filtros.push(`[${k + 1}:a]adelay=${ms}|${ms},volume=${e.vol}[a${k}]`); rotulos.push(`[a${k}]`);
   });
   if (s.musica) {
