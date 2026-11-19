@@ -18,15 +18,19 @@ function vozMaisNova() {
   } catch { /* sem rede: usa a conhecida */ }
   return 'k1RZuOyhqikku8ZLZvgx'; // "Thiago Informatica"
 }
-// Pedido do dono: usar SEMPRE a voz "Thiago Informatica". vozMaisNova() só se ela sumir da conta.
-const VOZ_THIAGO = 'k1RZuOyhqikku8ZLZvgx'; // "Thiago Informatica" (pedido do dono, nov/2026)
+// Pedido do dono: usar SEMPRE a voz profissional dele (clones rápidos ficaram robotizados).
+const VOZ_THIAGO = 'mbxPtQTaDkexDD8Ysw20'; // "Clone voz profissional" (13 gravações, natural; aprovada pelo dono)
 const VOZ = process.env.ELEVENLABS_VOZ || VOZ_THIAGO;
-const MODELO = process.env.ELEVENLABS_MODELO || 'eleven_multilingual_v2';
+const MODELO = process.env.ELEVENLABS_MODELO || 'eleven_v4'; // modelo em que a voz profissional foi treinada
 const CACHE = path.join(__dirname, '.cache-audio');
 const VELOCIDADE = Number(process.env.ELEVENLABS_VELOCIDADE || 1.0); // velocidade natural (1,1 ficou rápido e robotizado)
 const duracao = f => Number(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', f]).toString().trim()) || 0;
 
+/** Palavras que a voz lê errado: escreve do jeito que se fala. */
+const PRONUNCIA = [[/\bBI\b/g, 'bi-ai']];
+
 function falar(texto) {
+  for (const [de, para] of PRONUNCIA) texto = texto.replace(de, para);
   const estimada = Math.max(1.6, texto.length / 14);
   if (process.env.TUTORIAL_SEM_VOZ === '1') return { arquivo: null, dur: estimada };
   fs.mkdirSync(CACHE, { recursive: true });
