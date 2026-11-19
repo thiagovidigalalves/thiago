@@ -1,0 +1,290 @@
+#!/usr/bin/env node
+/**
+ * VÍDEOS DOS TUTORIAIS — o robô faz o tutorial no sistema enquanto grava a tela, com:
+ *  - abertura com a logo e o nome do tutorial, encerramento "Pronto!";
+ *  - mouse animado indo até cada botão, clique com som, bolinha vermelha aparecendo;
+ *  - legenda embaixo com o passo e o texto;
+ *  - narração com voz do ElevenLabs (texto do próprio roteiro) + efeitos (clique, transição) e música de fundo.
+ *
+ * Uso:   node tutoriais/video.js cadastrar-cliente [outro-id ...]
+ * Saída: ajuda/videos/<id>.mp4 (+ <id>.jpg de capa)
+ *
+ * Variáveis:
+ *   ELEVENLABS_VOZ      id da voz no ElevenLabs (padrão abaixo). A chave vai como "network secret" do ambiente
+ *                       (host api.elevenlabs.io, header xi-api-key): o proxy coloca a chave, o código nunca a vê.
+ *   ELEVENLABS_MODELO   padrão eleven_multilingual_v2
+ *   TUTORIAL_SEM_VOZ=1  gera o vídeo sem narração (só legenda e efeitos), para testar.
+ *   TUTORIAL_VER_EMPRESA, TUTORIAL_URL: iguais ao capturar.js (usa a mesma sessão salva).
+ *
+ * Privacidade: o desfoque roda ANTES de cada quadro (a cada mudança da tela) e a tela fica coberta
+ * enquanto carrega. Mesmo assim, revise o vídeo antes de publicar (veja conferir-video no CLAUDE.md).
+ */
+const fs = require('fs');
+const path = require('path');
+const crypto = require('crypto');
+const { execFileSync } = require('child_process');
+const { chromium } = require('playwright');
+const C = require('./capturar.js');
+
+const RAIZ = path.resolve(__dirname, '..');
+const SAIDA = path.join(RAIZ, 'ajuda', 'videos');
+const CACHE = path.join(__dirname, '.cache-audio');
+const SONS = path.join(__dirname, 'audio');
+const VOZ = process.env.ELEVENLABS_VOZ || 'EXAVITQu4vr4xnSDxMaL';
+const MODELO = process.env.ELEVENLABS_MODELO || 'eleven_multilingual_v2';
+const W = 1366, H = 768;
+
+const duracao = f => Number(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', f]).toString().trim()) || 0;
+const espera = ms => new Promise(r => setTimeout(r, ms));
+
+/** Narração: gera (ou reaproveita do cache) o mp3 do texto. Sem voz, devolve só a duração estimada. */
+function falar(texto) {
+  const estimada = Math.max(1.6, texto.length / 14);
+  if (process.env.TUTORIAL_SEM_VOZ === '1') return { arquivo: null, dur: estimada };
+  fs.mkdirSync(CACHE, { recursive: true });
+  const arq = path.join(CACHE, crypto.createHash('sha1').update(VOZ + MODELO + texto).digest('hex') + '.mp3');
+  if (!fs.existsSync(arq)) {
+    const corpo = JSON.stringify({ text: texto, model_id: MODELO, voice_settings: { stability: 0.45, similarity_boost: 0.8, style: 0.15 } });
+    try {
+      // A chave real é colocada pelo proxy do ambiente; "x" é só um valor de preenchimento.
+      execFileSync('curl', ['-sS', '-f', '-X', 'POST', `https://api.elevenlabs.io/v1/text-to-speech/${VOZ}?output_format=mp3_44100_128`,
+        '-H', 'xi-api-key: x', '-H', 'Content-Type: application/json', '--data-binary', corpo, '-o', arq], { stdio: ['ignore', 'ignore', 'pipe'] });
+    } catch (e) {
+      fs.rmSync(arq, { force: true });
+      console.log('   (sem voz: o ElevenLabs não respondeu — confira a chave no ambiente) ' + String(e.stderr || e.message).split('\n')[0]);
+      return { arquivo: null, dur: estimada };
+    }
+  }
+  return { arquivo: arq, dur: duracao(arq) };
+}
+
+/** Efeitos sonoros. Usa os arquivos de tutoriais/audio/ se existirem (ex.: gerados no ElevenLabs); senão cria simples. */
+function sons() {
+  fs.mkdirSync(SONS, { recursive: true });
+  const clique = path.join(SONS, 'clique.mp3'), transicao = path.join(SONS, 'transicao.mp3');
+  if (!fs.existsSync(clique)) execFileSync('ffmpeg', ['-y', '-v', 'error', '-f', 'lavfi', '-i', 'sine=frequency=1800:duration=0.05', '-af', 'afade=t=out:st=0.01:d=0.04,volume=0.6', clique]);
+  if (!fs.existsSync(transicao)) execFileSync('ffmpeg', ['-y', '-v', 'error', '-f', 'lavfi', '-i', 'anoisesrc=d=0.55:c=pink:a=0.25', '-af', 'highpass=f=400,lowpass=f=3500,afade=t=in:d=0.25,afade=t=out:st=0.3:d=0.25', transicao]);
+  const musica = ['musica.mp3', 'musica.wav'].map(f => path.join(SONS, f)).find(f => fs.existsSync(f)) || null;
+  return { clique, transicao, musica };
+}
+
+/** Script que roda em toda página: cortina, legenda, cursor e desfoque antes de cada quadro. */
+function scriptDaPagina(logoDataUri) {
+  const extras = C.lerExtrasPrivacidade();
+  return `
+  (() => {
+    window.__desfocar = ${C.desfocarNaPagina.toString()};
+    window.__desfArgs = { extras: ${JSON.stringify(extras)}, tudo: true, campos: true }; // começa no modo mais rígido
+    const css = \`
+      #__cortina{position:fixed;inset:0;z-index:2147483646;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+        background:radial-gradient(circle at 30% 20%,#1c3a96,#0c1f5c 60%,#081440);color:#fff;font:600 22px/1.3 system-ui,sans-serif;transition:opacity .35s}
+      #__cortina img{height:120px;background:#fff;border-radius:18px;padding:8px 14px}
+      #__cortina b{font:800 40px/1.15 system-ui,sans-serif;max-width:900px;text-align:center}
+      #__cortina span{opacity:.8;font-weight:500;max-width:820px;text-align:center}
+      #__cortina.saindo{opacity:0}
+      #__cortina:not(.saindo) ~ #__cursor{opacity:0}
+      #__legenda{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:2147483645;display:flex;gap:14px;align-items:flex-start;
+        width:min(1100px,92vw);background:rgba(10,18,45,.92);color:#fff;border-radius:16px;padding:14px 18px;box-shadow:0 10px 30px rgba(0,0,0,.35);
+        font:500 18px/1.4 system-ui,sans-serif;transition:opacity .3s,transform .3s}
+      #__legenda.oculta{opacity:0;transform:translate(-50%,20px)}
+      #__legenda.topo{bottom:auto;top:22px}
+      #__legenda .n{flex:0 0 auto;width:38px;height:38px;border-radius:50%;background:#ef4444;color:#fff;font:800 19px/38px system-ui;text-align:center;border:3px solid #fff}
+      #__legenda b{display:block;font-size:20px;margin-bottom:2px}
+      #__cursor{position:fixed;z-index:2147483647;width:30px;height:30px;pointer-events:none;transition:left .9s cubic-bezier(.4,0,.2,1),top .9s cubic-bezier(.4,0,.2,1);filter:drop-shadow(0 2px 3px rgba(0,0,0,.45))}
+      .__onda{position:fixed;z-index:2147483647;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;border:3px solid #ef4444;pointer-events:none;animation:__onda .55s ease-out forwards}
+      @keyframes __onda{to{transform:scale(4);opacity:0}}
+      #__tutorial_marcas > *{animation:__pop .35s cubic-bezier(.3,1.6,.5,1)}
+      @keyframes __pop{from{transform:scale(.6);opacity:0}}
+    \`;
+    let pend = false;
+    const tick = () => { pend = false; try {
+      window.__desfocar(window.__desfArgs);
+      // Esconde a faixa de Super Admin.
+      const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      for (let n; (n = w.nextNode());) { if (!/Modo superadmin/i.test(n.textContent)) continue; let el = n.parentElement;
+        while (el.parentElement && el.parentElement !== document.body && el.parentElement.getBoundingClientRect().height < 140) el = el.parentElement;
+        el.style.setProperty('display','none','important'); }
+    } catch (e) {} };
+    // MutationObserver roda antes da tela ser pintada: o dado novo já aparece desfocado.
+    new MutationObserver(() => { if (!pend) { pend = true; queueMicrotask(tick); } })
+      .observe(document, { childList: true, subtree: true, characterData: true });
+    setInterval(tick, 200); // campos preenchidos (o valor do input não gera mutação)
+    const montar = () => {
+      if (!document.body || document.getElementById('__cortina')) return;
+      const st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+      const c = document.createElement('div'); c.id = '__cortina';
+      c.innerHTML = '${logoDataUri ? `<img src="${logoDataUri}" alt="">` : ''}<b id="__cortina_t">Central de Ajuda</b><span id="__cortina_s"></span>';
+      const t = sessionStorage.getItem('__cortina_t'); if (t) { c.querySelector('#__cortina_t').textContent = t; c.querySelector('#__cortina_s').textContent = sessionStorage.getItem('__cortina_s') || ''; }
+      document.body.appendChild(c);
+      const cur = document.createElement('div'); cur.id = '__cursor';
+      cur.innerHTML = '<svg viewBox="0 0 24 24" width="30" height="30"><path d="M4 2l16 9-7 2-3 7z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+      cur.style.left = (sessionStorage.getItem('__cx') || ${W / 2}) + 'px'; cur.style.top = (sessionStorage.getItem('__cy') || ${H / 2}) + 'px';
+      document.body.appendChild(cur);
+      const l = document.createElement('div'); l.id = '__legenda'; l.className = 'oculta'; l.innerHTML = '<div class="n"></div><div><b></b><span></span></div>';
+      document.body.appendChild(l);
+      tick();
+    };
+    if (document.body) montar(); else document.addEventListener('DOMContentLoaded', montar);
+    new MutationObserver(montar).observe(document.documentElement, { childList: true });
+  })();`;
+}
+
+async function cortina(page, mostrar, titulo, sub) {
+  await page.evaluate(([mostrar, titulo, sub]) => {
+    if (titulo !== undefined) { sessionStorage.setItem('__cortina_t', titulo); sessionStorage.setItem('__cortina_s', sub || ''); }
+    const c = document.getElementById('__cortina'); if (!c) return;
+    if (titulo !== undefined) { c.querySelector('#__cortina_t').textContent = titulo; c.querySelector('#__cortina_s').textContent = sub || ''; }
+    c.style.display = 'flex'; requestAnimationFrame(() => c.classList.toggle('saindo', !mostrar));
+    if (!mostrar) setTimeout(() => { if (c.classList.contains('saindo')) c.style.display = 'none'; }, 400);
+  }, [mostrar, titulo, sub]).catch(() => {});
+  await espera(420);
+}
+
+async function legenda(page, n, titulo, texto) {
+  await page.evaluate(([n, titulo, texto]) => {
+    const l = document.getElementById('__legenda'); if (!l) return;
+    if (!titulo) { l.classList.add('oculta'); return; }
+    l.querySelector('.n').textContent = n; l.querySelector('.n').style.display = n ? 'block' : 'none';
+    l.querySelector('b').textContent = titulo; l.querySelector('span').textContent = texto || '';
+    l.classList.remove('oculta');
+  }, [n, titulo, texto]).catch(() => {});
+}
+
+async function moverCursor(page, x, y) {
+  await page.evaluate(([x, y]) => { const c = document.getElementById('__cursor'); if (c) { c.style.left = x + 'px'; c.style.top = y + 'px'; } sessionStorage.setItem('__cx', x); sessionStorage.setItem('__cy', y); }, [x, y]).catch(() => {});
+  await espera(950);
+}
+
+async function onda(page) {
+  await page.evaluate(() => { const c = document.getElementById('__cursor'); if (!c) return; const o = document.createElement('div'); o.className = '__onda'; o.style.left = (parseFloat(c.style.left) + 4) + 'px'; o.style.top = (parseFloat(c.style.top) + 3) + 'px'; document.body.appendChild(o); setTimeout(() => o.remove(), 600); }).catch(() => {});
+}
+
+/** Tira as marcações sem tirar o desfoque (no vídeo o desfoque nunca sai). */
+async function tirarMarcas(page) {
+  await page.evaluate(() => { document.getElementById('__tutorial_marcas')?.remove(); document.querySelectorAll('[data-tutorial-alvo]').forEach(e => e.removeAttribute('data-tutorial-alvo')); }).catch(() => {});
+}
+
+async function centro(page, alvo) {
+  const el = C.achar(page, alvo);
+  await el.waitFor({ state: 'visible', timeout: 15000 });
+  await el.scrollIntoViewIfNeeded().catch(() => {});
+  const b = await el.boundingBox();
+  return b ? [b.x + b.width / 2, b.y + b.height / 2] : null;
+}
+
+async function gravar(r, s) {
+  const logo = ['logo.webp', 'logo.png'].map(f => path.join(RAIZ, 'ajuda', f)).find(f => fs.existsSync(f));
+  const logoUri = logo ? `data:image/${logo.endsWith('png') ? 'png' : 'webp'};base64,${fs.readFileSync(logo).toString('base64')}` : '';
+
+  // 1) Narração antes de gravar: assim cada passo fica na tela o tempo exato da fala.
+  const falaIntro = falar(`${r.titulo}. ${r.resumo || ''}`);
+  const falas = r.passos.map((p, i) => falar(`Passo ${i + 1}. ${p.titulo}. ${p.texto}${p.dica ? ' Dica: ' + p.dica : ''}`));
+  const falaFim = falar('Pronto! Ficou com dúvida? Fale com o suporte da Thiago Informática.');
+
+  const dirTmp = fs.mkdtempSync(path.join(require('os').tmpdir(), 'video-'));
+  const browser = await chromium.launch();
+  const context = await browser.newContext({
+    viewport: { width: W, height: H }, locale: 'pt-BR', recordVideo: { dir: dirTmp, size: { width: W, height: H } },
+    ...(fs.existsSync(C.SESSAO) ? { storageState: C.SESSAO } : {}),
+  });
+  await context.addInitScript({ content: scriptDaPagina(logoUri) });
+  const page = await context.newPage();
+  const t0 = Date.now();
+  const eventos = [];
+  const agora = () => (Date.now() - t0) / 1000;
+  const som = (arquivo, vol = 1) => arquivo && eventos.push({ t: agora(), arquivo, vol });
+
+  try {
+    // 2) Abertura: logo + título enquanto a primeira tela carrega.
+    await page.evaluate(([t, sub]) => { sessionStorage.setItem('__cortina_t', t); sessionStorage.setItem('__cortina_s', sub); }, [r.titulo, r.resumo || '']).catch(() => {});
+    const primeira = r.passos.find(p => p.ir)?.ir || '/';
+    await page.goto(C.URL_BASE + (r.precisaLogin === false ? primeira : C.comEmpresa(primeira)), { waitUntil: 'load' }).catch(() => {});
+    await cortina(page, true, r.titulo, r.resumo || '');
+    som(s.transicao, 0.8); const ti = agora(); som(falaIntro.arquivo);
+    await C.prepararTela(page);
+    await espera(Math.max(0, (falaIntro.dur + 0.6 - (agora() - ti)) * 1000));
+
+    for (let i = 0; i < r.passos.length; i++) {
+      const p = r.passos[i], n = i + 1, fala = falas[i];
+      await page.evaluate(a => { window.__desfArgs = a; }, { extras: C.lerExtrasPrivacidade(), tudo: !!p.desfocarTudo, campos: !!p.desfocarCampos }).catch(() => {});
+      if (p.ir && i > 0) {
+        await legenda(page, '', '');
+        await cortina(page, true, `Passo ${n}`, p.titulo); som(s.transicao, 0.7);
+        await page.goto(C.URL_BASE + (r.precisaLogin === false ? p.ir : C.comEmpresa(p.ir)), { waitUntil: 'load' }).catch(() => {});
+        await espera(p.espera || 3000);
+      }
+      for (const a of p.antes || []) await C.executar(page, a, r);
+      await C.prepararTela(page);
+      await espera(400);
+      await cortina(page, false);
+      await legenda(page, n, p.titulo, p.texto);
+      const inicio = agora(); som(fala.arquivo);
+      // Mouse até o primeiro alvo, depois as bolinhas.
+      const marcas = (p.marcar || []).map((m, j) => ({ ...m, numero: p.marcar.length > 1 ? `${n}${String.fromCharCode(97 + j)}` : n }));
+      if (marcas.length) {
+        const c1 = await centro(page, marcas[0].alvo).catch(() => null);
+        if (c1) await moverCursor(page, c1[0], c1[1]);
+        const caixas = await C.marcar(page, marcas).catch(e => { console.log(`   (passo ${n}: não achei o alvo — ${String(e.message).split('\n')[0]})`); return []; });
+        // Botão marcado lá embaixo: a legenda sobe para não cobrir.
+        const embaixo = caixas.some(c => c.y + c.height > H - 190);
+        await page.evaluate(t => document.getElementById('__legenda')?.classList.toggle('topo', t), embaixo).catch(() => {});
+      }
+      await espera(Math.max(1200, (fala.dur + 0.7 - (agora() - inicio)) * 1000));
+      await tirarMarcas(page);
+      // Ações do passo (ex.: clicar em "Novo cliente"), com mouse e som de clique.
+      for (const a of p.depois || []) {
+        if (a.tipo === 'clicar') { const c = await centro(page, a.alvo).catch(() => null); if (c) await moverCursor(page, c[0], c[1]); som(s.clique, 0.9); await onda(page); }
+        await C.executar(page, a, r);
+      }
+      console.log(`   🎬 passo ${n}: ${p.titulo}`);
+    }
+    // 3) Encerramento.
+    await legenda(page, '', '');
+    await cortina(page, true, 'Pronto! ✅', 'Ficou com dúvida? Fale com o suporte da Thiago Informática.');
+    som(s.transicao, 0.7); som(falaFim.arquivo);
+    await espera((falaFim.dur + 1.2) * 1000);
+  } finally {
+    const video = page.video();
+    await context.close(); await browser.close();
+    var bruto = await video.path();
+  }
+
+  // 4) Junta vídeo + narração + efeitos + música (ffmpeg).
+  fs.mkdirSync(SAIDA, { recursive: true });
+  const final = path.join(SAIDA, `${r.id}.mp4`);
+  const total = duracao(bruto);
+  const args = ['-y', '-v', 'error', '-i', bruto];
+  const filtros = [], rotulos = [];
+  eventos.forEach((e, k) => {
+    args.push('-i', e.arquivo);
+    const ms = Math.max(0, Math.round(e.t * 1000));
+    filtros.push(`[${k + 1}:a]adelay=${ms}|${ms},volume=${e.vol}[a${k}]`); rotulos.push(`[a${k}]`);
+  });
+  if (s.musica) {
+    args.push('-stream_loop', '-1', '-i', s.musica);
+    const k = eventos.length + 1;
+    filtros.push(`[${k}:a]volume=0.07,atrim=0:${total.toFixed(2)},afade=t=in:d=1.5,afade=t=out:st=${Math.max(0, total - 2).toFixed(2)}:d=2[mus]`); rotulos.push('[mus]');
+  }
+  if (rotulos.length) {
+    filtros.push(`${rotulos.join('')}amix=inputs=${rotulos.length}:normalize=0:dropout_transition=0,apad[aout]`);
+    args.push('-filter_complex', filtros.join(';'), '-map', '0:v', '-map', '[aout]', '-c:a', 'aac', '-b:a', '128k');
+  } else args.push('-map', '0:v');
+  args.push('-t', total.toFixed(2), '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '24', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', final);
+  execFileSync('ffmpeg', args, { stdio: 'inherit' });
+  execFileSync('ffmpeg', ['-y', '-v', 'error', '-ss', '1.2', '-i', final, '-frames:v', '1', '-q:v', '4', path.join(SAIDA, `${r.id}.jpg`)]);
+  fs.rmSync(dirTmp, { recursive: true, force: true });
+  const mb = (fs.statSync(final).size / 1048576).toFixed(1);
+  console.log(`   ✅ ${path.relative(RAIZ, final)} · ${total.toFixed(0)} s · ${mb} MB · ${eventos.filter(e => e.arquivo && e.arquivo.includes('.cache-audio')).length} falas`);
+}
+
+(async () => {
+  const ids = process.argv.slice(2);
+  if (!ids.length) { console.log('Uso: node tutoriais/video.js <id-do-tutorial> [...]'); process.exit(1); }
+  const roteiros = C.carregarRoteiros(ids);
+  const s = sons();
+  for (const r of roteiros) {
+    console.log(`\n▶ Vídeo: ${r.titulo}`);
+    try { await gravar(r, s); } catch (e) { console.log('   ✖ ' + String(e.message).split('\n')[0]); }
+    await espera(Number(process.env.TUTORIAL_PAUSA || 8000));
+  }
+})();

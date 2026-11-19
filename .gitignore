@@ -2,3 +2,6 @@ tutoriais/.sessao.json
 tutoriais/.ultima-captura.json
 node_modules/
 tutoriais/.conferencia/
+
+# vídeos
+tutoriais/.cache-audio/

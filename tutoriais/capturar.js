@@ -141,13 +141,16 @@ function recorte(caixas, passo, tela) {
  */
 async function desfocarDados(page, passo = {}) {
   if (process.env.TUTORIAL_DESFOCAR === '0') return;
-  let extras = [];
-  try { extras = JSON.parse(fs.readFileSync(path.join(__dirname, 'privacidade.json'), 'utf8')).textos || []; } catch {}
-  await page.evaluate(({ extras, tudo, campos }) => {
+  const extras = lerExtrasPrivacidade();
+  await page.evaluate(desfocarNaPagina, { extras, tudo: !!passo.desfocarTudo, campos: !!passo.desfocarCampos });
+}
+
+/** Roda dentro da página. Exportada para o vídeo aplicar o desfoque antes de cada quadro. */
+function desfocarNaPagina({ extras, tudo, campos }) {
     const SENSIVEL = /…\s?\d{4,}|\b\d{5,}\b|\bDoc\.?\s?\d+|\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b|R\$\s?-?[\d.,]+(\s?mil)?|\b\d{1,3}(\.\d{3})*,\d{2}\b|\b\d+([.,]\d+)?\s?mil\b|\bOS\s?\d{2,}|\bn[ºo°]\s?\d{2,}|#\d{3,}|\d+\s+\S+\(\S+\)\s+encontrad|Todo dia \d+|R\$\s?-?[\d.]+,\d{2}|\d{3}\.\d{3}\.\d{3}-\d{2}|\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}|\(?\d{2}\)?\s?9?\d{4}-?\d{4}|[\w.+-]+@[\w-]+\.[\w.]+|\b[A-Z]{3}-?\d[A-Z0-9]\d{2}\b/;
     const marcados = [...document.querySelectorAll('[data-tutorial-alvo]')];
     // Protege o elemento marcado e quem o contém; o que está DENTRO dele ainda é desfocado se for dado sensível.
-    const protegido = el => el.closest('#__tutorial_marcas') || marcados.some(m => m === el || el.contains(m));
+    const protegido = el => el.closest('#__tutorial_marcas,#__cortina,#__legenda,#__cursor') || marcados.some(m => m === el || el.contains(m));
     const protegidoForte = el => protegido(el) || marcados.some(m => m.contains(el));
     const borrar = el => { if (!protegido(el) && !el.closest('aside')) el.setAttribute('data-tutorial-blur', ''); };
     const borrarForte = el => { if (!protegidoForte(el) && !el.closest('aside')) el.setAttribute('data-tutorial-blur', ''); };
@@ -179,23 +182,28 @@ async function desfocarDados(page, passo = {}) {
     const extra = t => extras.some(x => t.includes(x));
     for (let n; (n = walker.nextNode());) {
       const t = n.textContent;
-      if (!n.parentElement || n.parentElement.closest('#__tutorial_marcas')) continue;
+      if (!n.parentElement || n.parentElement.closest('#__tutorial_marcas,#__cortina,#__legenda')) continue;
       if (extra(t)) n.parentElement.setAttribute('data-tutorial-blur', '');
       else if (SENSIVEL.test(t)) borrar(n.parentElement);
     }
     // O React divide textos como "Venda #" + "32486" em pedaços: confere também o texto próprio de cada elemento.
     document.querySelectorAll('body *').forEach(el => {
-      if (el.closest('#__tutorial_marcas') || ['SCRIPT', 'STYLE'].includes(el.tagName)) return;
+      if (el.closest('#__tutorial_marcas,#__cortina,#__legenda,#__cursor') || ['SCRIPT', 'STYLE'].includes(el.tagName)) return;
       const proprio = [...el.childNodes].filter(c => c.nodeType === 3).map(c => c.textContent).join('');
       if (proprio.trim() && proprio.length < 300 && SENSIVEL.test(proprio)) borrar(el);
       const inteiro = el.textContent || '';
       if (inteiro.length < 120 && el.children.length <= 4 && extra(inteiro)) el.setAttribute('data-tutorial-blur', '');
     });
-    const st = document.createElement('style');
-    st.id = '__tutorial_blur';
-    st.textContent = '[data-tutorial-blur]{filter:blur(9px)!important}';
-    document.head.appendChild(st);
-  }, { extras, tudo: !!passo.desfocarTudo, campos: !!passo.desfocarCampos });
+    if (!document.getElementById('__tutorial_blur')) {
+      const st = document.createElement('style');
+      st.id = '__tutorial_blur';
+      st.textContent = '[data-tutorial-blur]{filter:blur(9px)!important}';
+      document.head.appendChild(st);
+    }
+}
+
+function lerExtrasPrivacidade() {
+  try { return JSON.parse(fs.readFileSync(path.join(__dirname, 'privacidade.json'), 'utf8')).textos || []; } catch { return []; }
 }
 
 async function limparMarcas(page) {
@@ -288,7 +296,7 @@ async function entrar(context, page) {
   return true;
 }
 
-(async () => {
+async function main() {
   const roteiros = carregarRoteiros(process.argv.slice(2));
   if (!roteiros.length) { console.log('Nenhum roteiro encontrado.'); return; }
   const browser = await chromium.launch();
@@ -353,4 +361,7 @@ async function entrar(context, page) {
   fs.writeFileSync(path.join(process.env.TUTORIAL_SAIDA ? PASTA_IMG : __dirname, '.ultima-captura.json'), JSON.stringify(relatorio, null, 2));
   await browser.close();
   console.log('\nPronto. Agora rode: node tutoriais/gerar-ajuda.js');
-})();
+}
+
+module.exports = { URL_BASE, SESSAO, BOTOES_PERIGOSOS, BOTOES_PERIGOSOS_JANELA, carregarRoteiros, achar, marcar, desfocarDados, desfocarNaPagina, lerExtrasPrivacidade, limparMarcas, executar, comEmpresa, prepararTela, entrar };
+if (require.main === module) main();
