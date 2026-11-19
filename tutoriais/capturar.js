@@ -198,7 +198,9 @@ function desfocarNaPagina({ extras, tudo, campos, fantasia }) {
         if (n.__falso === n.textContent) { trocou = true; continue; }
         const orig = n.textContent;
         let f = falso(orig);
-        for (const x of extras) if (f.includes(x)) f = f.split(x).join(x.split(' ').length > 1 ? 'Ana Gestora' : 'Ana');
+        // Nome do dono -> "Ana": o mais longo primeiro ("Thiago Vidigal Alves" antes de "Thiago"); saudações ("Olá,") ficam.
+        for (const x of [...extras].filter(x => !/^(olá|oi|bom dia|boa tarde|boa noite)(?=[\s,!.]|$)/i.test(x)).sort((a, b) => b.length - a.length)) if (f.includes(x)) f = f.split(x).join(x.replace(/[!,.]$/, '').split(' ').length > 1 ? 'Ana Gestora' : 'Ana') + '';
+        f = f.replace(/\bAna Gestora Gestora\b/g, 'Ana Gestora');
         if (f === orig) f = f.split(/(\s[·•|]\s|\s-\s)/).map(seg => { if (/^\s[·•|-]\s$/.test(seg)) return seg; const nucleo = seg.trim().replace(/^[^A-Za-zÀ-ÿ0-9]+|[^A-Za-zÀ-ÿ0-9…]+$/g, ''); return nucleo && real(seg, el) ? seg.replace(nucleo, nomeFalso(nucleo.replace(/(…|\.\.\.)$/, ''))) : seg; }).join('');
         if (f === orig && forca && pareceNome(orig) && orig.trim().split(/\s+/).length >= 2 && orig.trim() !== orig.trim().toUpperCase() && !el.closest(ESTRUT)) { const nucleo = orig.trim().replace(/^[^A-Za-zÀ-ÿ0-9]+|[^A-Za-zÀ-ÿ0-9]+$/g, ''); f = orig.replace(nucleo, nomeFalso(nucleo)); }
         if (f !== orig) { n.textContent = f; n.__falso = f; trocou = true; } else if (/[A-Za-zÀ-ÿ]{3,}/.test(orig) && !UI.test(orig.trim())) sobrou = true;

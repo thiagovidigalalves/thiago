@@ -97,7 +97,7 @@ header{background:var(--faixa);border-bottom:1px solid var(--borda);position:rel
 header::after{content:"";position:absolute;inset:auto 0 0 0;height:4px;background:linear-gradient(90deg,var(--marinho) 0 70%,var(--vermelho) 70% 100%)}
 .topo{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:14px}
 .logo{display:flex;align-items:center;gap:12px;text-decoration:none}
-.logo img{height:68px;width:auto;display:block;background:#fff;border-radius:12px;padding:4px 8px}
+.logo img{height:68px;width:auto;display:block}
 .logo span{font:600 13px/1.2 var(--f-texto);color:var(--suave);border-left:1px solid var(--borda);padding-left:12px}
 .topo .suporte{font-size:14px;color:var(--suave)}
 .hero{padding-block:18px 30px}

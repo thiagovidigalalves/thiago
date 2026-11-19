@@ -57,7 +57,7 @@ function scriptDaPagina(logoDataUri) {
     const css = \`
       #__cortina{position:fixed;inset:0;z-index:2147483646;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
         background:radial-gradient(circle at 30% 20%,#1c3a96,#0c1f5c 60%,#081440);color:#fff;font:600 22px/1.3 system-ui,sans-serif;transition:opacity .35s}
-      #__cortina img{height:120px;background:#fff;border-radius:18px;padding:8px 14px}
+      #__cortina img{height:130px;filter:drop-shadow(0 6px 18px rgba(0,0,0,.35))}
       #__cortina b{font:800 40px/1.15 system-ui,sans-serif;max-width:900px;text-align:center}
       #__cortina span{opacity:.8;font-weight:500;max-width:820px;text-align:center}
       #__cortina.saindo{opacity:0}
@@ -131,7 +131,7 @@ async function legenda(page, n, titulo, texto) {
 
 async function moverCursor(page, x, y) {
   await page.evaluate(([x, y]) => { const c = document.getElementById('__cursor'); if (c) { c.style.left = x + 'px'; c.style.top = y + 'px'; } sessionStorage.setItem('__cx', x); sessionStorage.setItem('__cy', y); }, [x, y]).catch(() => {});
-  await espera(950);
+  await espera(700);
 }
 
 async function onda(page) {
@@ -141,6 +141,72 @@ async function onda(page) {
 /** Tira as marcações sem tirar o desfoque (no vídeo o desfoque nunca sai). */
 async function tirarMarcas(page) {
   await page.evaluate(() => { document.getElementById('__tutorial_marcas')?.remove(); document.querySelectorAll('[data-tutorial-alvo]').forEach(e => e.removeAttribute('data-tutorial-alvo')); }).catch(() => {});
+}
+
+/** "No menu, clique em Cadastros › Clientes." -> ['Cadastros', 'Clientes'] */
+function caminhoDoMenu(texto) {
+  const m = /clique em ([^.:]+?›[^.:]+?)(?:[.:]|$)/.exec(texto || '');
+  return m ? m[1].split('›').map(x => x.trim().replace(/^"|"$/g, '')).filter(Boolean) : null;
+}
+
+/** Descobre (numa aba que NÃO é gravada) o caminho real no menu até a rota: grupo › subgrupo › item. */
+async function descobrirMenu(browser, rota, grupo) {
+  const ctx = await browser.newContext({ viewport: { width: W, height: H }, locale: 'pt-BR', ...(fs.existsSync(C.SESSAO) ? { storageState: C.SESSAO } : {}) });
+  try {
+    const pg = await ctx.newPage();
+    await pg.goto(C.URL_BASE + C.comEmpresa('/'), { waitUntil: 'load' });
+    const menu = pg.locator('aside').first();
+    await menu.waitFor({ state: 'visible', timeout: 20000 });
+    await espera(1500);
+    const rotaSo = rota.split('?')[0];
+    const link = () => menu.locator(`a[href="${rotaSo}"], a[href^="${rotaSo}?"]`).first();
+    const visiveis = async () => (await menu.locator('button:visible').allInnerTexts()).map(t => t.trim()).filter(Boolean);
+    const nomeLink = async () => (await link().innerText()).trim().split('\n')[0];
+    if (await link().isVisible().catch(() => false)) return [await nomeLink()];
+    const antes = new Set(await visiveis());
+    const g = menu.locator('button:visible').filter({ hasText: new RegExp('^\\s*' + grupo + '\\s*$') }).first();
+    await g.click(); await espera(700);
+    if (await link().isVisible().catch(() => false)) return [grupo, await nomeLink()];
+    for (const sub of (await visiveis()).filter(t => !antes.has(t))) {
+      const b = menu.locator('button:visible').filter({ hasText: new RegExp('^\\s*' + sub.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*$') }).first();
+      await b.click().catch(() => {}); await espera(600);
+      if (await link().isVisible().catch(() => false)) return [grupo, sub, await nomeLink()];
+    }
+    return null;
+  } catch { return null; } finally { await ctx.close(); }
+}
+
+/** Mostra no vídeo o caminho pelo menu lateral: o cursor vai em cada nível e clica. */
+async function andarNoMenu(page, caminho, som, clique) {
+  const menu = page.locator('aside').first();
+  for (let k = 0; k < caminho.length; k++) {
+    const nome = caminho[k], ultimo = k === caminho.length - 1;
+    const el = (ultimo ? menu.locator('a:visible') : menu.locator('button:visible')).filter({ hasText: nome }).first();
+    if (!(await el.isVisible().catch(() => false))) { console.log(`   (menu: não achei "${nome}")`); return false; }
+    const proximo = !ultimo && await menu.getByText(caminho[k + 1], { exact: true }).first().isVisible().catch(() => false);
+    const b = await el.boundingBox(); if (!b) return false;
+    await moverCursor(page, b.x + Math.min(40, b.width / 2), b.y + b.height / 2);
+    if (proximo) { await espera(300); continue; } // grupo já aberto: só passa o mouse
+    som(clique, 0.9); await onda(page);
+    await el.click().catch(() => {});
+    await espera(ultimo ? 1800 : 650);
+  }
+  return true;
+}
+
+/** Se o sistema mostrar "Rate limit exceeded" (muitos acessos), cobre com a cortina, espera e recarrega. */
+async function semErroDeLimite(page) {
+  for (let k = 0; k < 4; k++) {
+    const erro = await page.getByText(/Rate limit exceeded|Não foi possível conferir o acesso/i).first().isVisible().catch(() => false);
+    if (!erro) return;
+    console.log('   (limite de acessos do sistema: espero e recarrego)');
+    await cortina(page, true);
+    await espera(20000);
+    await page.reload({ waitUntil: 'load' }).catch(() => {});
+    await espera(3500);
+    await C.prepararTela(page).catch(() => {});
+    await cortina(page, false);
+  }
 }
 
 async function centro(page, alvo) {
@@ -177,7 +243,11 @@ async function gravar(r, s) {
   try {
     // 2) Abertura: logo + título enquanto a primeira tela carrega.
     await page.evaluate(([t, sub]) => { sessionStorage.setItem('__cortina_t', t); sessionStorage.setItem('__cortina_s', sub); }, [r.titulo, r.resumo || '']).catch(() => {});
-    const primeira = r.passos.find(p => p.ir)?.ir || '/';
+    // Passo 1 "No menu, clique em X › Y": o vídeo começa no início e mostra o caminho pelo menu.
+    const dica1 = r.precisaLogin !== false && r.passos[0]?.ir ? caminhoDoMenu(r.passos[0].texto) : null;
+    const menu1 = dica1 ? await descobrirMenu(browser, r.passos[0].ir, dica1[0]) : null;
+    if (dica1) console.log('   menu: ' + (menu1 ? menu1.join(' › ') : 'não achei o caminho, abro direto'));
+    const primeira = menu1 ? '/' : (r.passos.find(p => p.ir)?.ir || '/');
     await page.goto(C.URL_BASE + (r.precisaLogin === false ? primeira : C.comEmpresa(primeira)), { waitUntil: 'load' }).catch(() => {});
     await cortina(page, true, r.titulo, r.resumo || '');
     // Nomes reais da empresa -> fictícios (a cortina cobre a tela enquanto carrega).
@@ -186,7 +256,7 @@ async function gravar(r, s) {
     corte = Math.max(0, agora() - 1);
     som(s.transicao, 0.8); const ti = agora(); som(falaIntro.arquivo);
     await C.prepararTela(page);
-    await espera(Math.max(0, (falaIntro.dur + 0.6 - (agora() - ti)) * 1000));
+    await espera(Math.max(0, (falaIntro.dur + 0.2 - (agora() - ti)) * 1000));
 
     for (let i = 0; i < r.passos.length; i++) {
       const p = r.passos[i], n = i + 1, fala = falas[i];
@@ -197,12 +267,24 @@ async function gravar(r, s) {
         await page.goto(C.URL_BASE + (r.precisaLogin === false ? p.ir : C.comEmpresa(p.ir)), { waitUntil: 'load' }).catch(() => {});
         await espera(p.espera || 3000);
       }
+      let inicio = null;
+      if (i === 0 && menu1) {
+        await C.prepararTela(page); await espera(400);
+        await cortina(page, false);
+        await legenda(page, n, p.titulo, p.texto);
+        inicio = agora(); som(fala.arquivo);
+        const foi = await andarNoMenu(page, menu1, som, s.clique);
+        if (!foi || !page.url().includes(p.ir.split('?')[0])) { await page.goto(C.URL_BASE + C.comEmpresa(p.ir), { waitUntil: 'load' }).catch(() => {}); await espera(p.espera || 3000); await cortina(page, false); }
+      }
+      await semErroDeLimite(page);
       for (const a of p.antes || []) await C.executar(page, a, r);
       await C.prepararTela(page);
       await espera(400);
-      await cortina(page, false);
-      await legenda(page, n, p.titulo, p.texto);
-      const inicio = agora(); som(fala.arquivo);
+      if (inicio === null) {
+        await cortina(page, false);
+        await legenda(page, n, p.titulo, p.texto);
+        inicio = agora(); som(fala.arquivo);
+      }
       // Mouse até o primeiro alvo, depois as bolinhas.
       const marcas = (p.marcar || []).map((m, j) => ({ ...m, numero: p.marcar.length > 1 ? `${n}${String.fromCharCode(97 + j)}` : n }));
       if (marcas.length) {
@@ -213,7 +295,7 @@ async function gravar(r, s) {
         const embaixo = caixas.some(c => c.y + c.height > H - 190);
         await page.evaluate(t => document.getElementById('__legenda')?.classList.toggle('topo', t), embaixo).catch(() => {});
       }
-      await espera(Math.max(1200, (fala.dur + 0.7 - (agora() - inicio)) * 1000));
+      await espera(Math.max(900, (fala.dur + 0.25 - (agora() - inicio)) * 1000));
       await tirarMarcas(page);
       // Ações do passo (ex.: clicar em "Novo cliente"), com mouse e som de clique.
       for (const a of p.depois || []) {
@@ -226,7 +308,7 @@ async function gravar(r, s) {
     await legenda(page, '', '');
     await cortina(page, true, 'Pronto! ✅', 'Ficou com dúvida? Fale com o suporte da Thiago Informática.');
     som(s.transicao, 0.7); som(falaFim.arquivo);
-    await espera((falaFim.dur + 1.2) * 1000);
+    await espera((falaFim.dur + 0.8) * 1000);
   } finally {
     const video = page.video();
     await context.close(); await browser.close();
@@ -247,7 +329,7 @@ async function gravar(r, s) {
   if (s.musica) {
     args.push('-stream_loop', '-1', '-i', s.musica);
     const k = eventos.length + 1;
-    filtros.push(`[${k}:a]volume=0.07,atrim=0:${total.toFixed(2)},afade=t=in:d=1.5,afade=t=out:st=${Math.max(0, total - 2).toFixed(2)}:d=2[mus]`); rotulos.push('[mus]');
+    filtros.push(`[${k}:a]volume=0.12,atrim=0:${total.toFixed(2)},afade=t=in:d=1.5,afade=t=out:st=${Math.max(0, total - 2).toFixed(2)}:d=2[mus]`); rotulos.push('[mus]');
   }
   if (rotulos.length) {
     filtros.push(`${rotulos.join('')}amix=inputs=${rotulos.length}:normalize=0:dropout_transition=0,apad[aout]`);
