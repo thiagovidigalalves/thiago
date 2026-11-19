@@ -29,7 +29,7 @@ começar qualquer sessão neste repositório**, faça a conferência completa. N
    (https://claude.ai/artifact/MRUQr3ptkgF2jGomadCt3K), atualize `tutoriais/estado.json`, commit e push.
 
 ## Vídeos
-- Regras do dono para TODO vídeo: a voz é SEMPRE a dele: ElevenLabs, voz **"Thiago Voz"** (id `AkmlIKM5rnmuQFUBbcpX`, regravada sem sopro; vale também para o Thiaguinho); a logo da
+- Regras do dono para TODO vídeo: a voz é SEMPRE a dele: ElevenLabs, voz **"Thiago Informatica"** (id `k1RZuOyhqikku8ZLZvgx`; vale também para o Thiaguinho); a logo da
   Thiago Informática NUNCA com fundo branco (logo transparente, só sombra); o passo 1 começa no início e mostra o
   caminho pelo menu (o robô descobre sozinho: grupo › subgrupo › item); ritmo um pouco acelerado (fala 1,1x,
   pausas curtas) e música de fundo baixinha. Grave os vídeos quando nenhuma captura estiver rodando (limite de acessos).
