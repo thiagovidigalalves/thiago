@@ -24,6 +24,8 @@ try { execFileSync('python3', [path.join(__dirname, 'otimizar.py')], { stdio: 'i
 const dados = roteiros.map(r => ({
   id: r.id, grupo: r.grupo || 'Outros', titulo: r.titulo, resumo: r.resumo || '', antes: r.antesDeComecar || '',
   destaque: !!r.destaque,
+  video: fs.existsSync(path.join(RAIZ, 'ajuda', 'videos', r.id + '.mp4')) ? `videos/${r.id}.mp4` : '',
+  capa: fs.existsSync(path.join(RAIZ, 'ajuda', 'videos', r.id + '.jpg')) ? `videos/${r.id}.jpg` : '',
   passos: r.passos.map((p, i) => {
     const png = `img/${r.id}/passo-${i + 1}.png`, webp = `img-web/${r.id}/passo-${i + 1}.webp`;
     const img = web && fs.existsSync(path.join(RAIZ, 'ajuda', webp)) ? webp : png;
@@ -142,6 +144,10 @@ main{min-width:0}
 .cab-tut small{font:700 12px var(--f-texto);text-transform:uppercase;letter-spacing:.07em;color:var(--suave)}
 .tutorial h2{font:800 clamp(24px,3vw,32px)/1.2 var(--f-titulo);margin:2px 0 4px;text-wrap:balance}
 .tutorial .resumo{color:var(--suave);margin:0}
+.video{display:grid;gap:6px;margin-bottom:18px}
+.video video{width:100%;aspect-ratio:16/9;border-radius:16px;background:#000;box-shadow:var(--sombra)}
+.video small{color:var(--suave);font-size:14px}
+.cartao em .v{background:var(--marinho);color:var(--card)}
 .antes{background:var(--antes);border-left:5px solid var(--antes-b);padding:12px 16px;border-radius:12px;margin-bottom:18px}
 .indice{background:var(--card);border:1px solid var(--borda);border-radius:16px;padding:14px 18px;margin-bottom:22px}
 .indice ol{margin:8px 0 0;padding:0;list-style:none;display:grid;gap:6px;counter-reset:p}
@@ -227,7 +233,7 @@ const passosCom = t => t.passos.length + ' passo' + (t.passos.length > 1 ? 's' :
 function cartoes(lista, comIcone){
   if(!lista.length) return '<p class="vazio">Nenhum tutorial encontrado. Tente outra palavra, como "venda", "cliente" ou "nota".</p>';
   return '<div class="grade">'+lista.map(t =>
-    '<a class="cartao" href="#'+t.id+'">'+(comIcone?'<div class="ic">'+ic(t.grupo)+'</div>':'')+'<b>'+esc(t.titulo)+'</b><span>'+esc(t.resumo)+'</span><em><i>'+passosCom(t)+'</i>Ver tutorial →</em></a>').join('')+'</div>';
+    '<a class="cartao" href="#'+t.id+'">'+(comIcone?'<div class="ic">'+ic(t.grupo)+'</div>':'')+'<b>'+esc(t.titulo)+'</b><span>'+esc(t.resumo)+'</span><em><i>'+passosCom(t)+'</i>'+(t.video?'<i class="v">▶ vídeo</i>':'')+'Ver tutorial →</em></a>').join('')+'</div>';
 }
 function inicio(filtro){
   document.body.classList.remove('lendo');
@@ -250,6 +256,7 @@ function tutorial(t){
   $('#conteudo').innerHTML = '<article class="tutorial">'
    + '<a class="voltar" href="#">← Todos os tutoriais</a>'
    + '<div class="cab-tut"><div class="ic">'+ic(t.grupo)+'</div><div><small>'+esc(t.grupo)+' · '+passosCom(t)+'</small><h2>'+esc(t.titulo)+'</h2><p class="resumo">'+esc(t.resumo)+'</p></div></div>'
+   + (t.video ? '<div class="video"><video controls preload="none" playsinline'+(t.capa?' poster="'+t.capa+'"':'')+' src="'+t.video+'"></video><small>Assista ao vídeo com narração ou siga os passos com imagens logo abaixo.</small></div>' : '')
    + (t.antes ? '<div class="antes"><b>Antes de começar:</b> '+esc(t.antes)+'</div>' : '')
    + '<div class="indice"><b>Neste tutorial</b><ol>'+t.passos.map((p,n)=>'<li><a href="#'+t.id+'/'+(n+1)+'">'+esc(p.titulo)+'</a></li>').join('')+'</ol></div>'
    + t.passos.map((p,n) => '<section class="passo" id="p'+(n+1)+'"><div class="passo-topo"><div class="num">'+(n+1)+'</div><div>'
