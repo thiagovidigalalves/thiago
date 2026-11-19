@@ -88,6 +88,8 @@
   }
   quadro();
   window.comecar = () => { rodando = true; document.body.classList.add('rodando'); };
+  // Sons da abertura (padrão de todos os vídeos): cliques suaves + impacto da logo + "plim". Sem assovio.
+  window.SONS = [{ t: 0.3, som: 'toque', vol: 0.8 }, { t: 1.05, som: 'impacto', vol: 0.9 }, { t: 1.6, som: 'sino', vol: 0.8 }, { t: 2.6, som: 'toque', vol: 0.9 }, { t: 3.15, som: 'toque', vol: 0.6 }];
   window.DURACAO = 5.5;
   window.CAPA = 3.9;
 </script>

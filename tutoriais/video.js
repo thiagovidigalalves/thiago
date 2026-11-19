@@ -43,8 +43,10 @@ function sons() {
   const clique = path.join(SONS, 'clique.mp3'), transicao = path.join(SONS, 'transicao.mp3');
   if (!fs.existsSync(clique)) execFileSync('ffmpeg', ['-y', '-v', 'error', '-f', 'lavfi', '-i', 'sine=frequency=1800:duration=0.05', '-af', 'afade=t=out:st=0.01:d=0.04,volume=0.6', clique]);
   if (!fs.existsSync(transicao)) execFileSync('ffmpeg', ['-y', '-v', 'error', '-f', 'lavfi', '-i', 'anoisesrc=d=0.55:c=pink:a=0.25', '-af', 'highpass=f=400,lowpass=f=3500,afade=t=in:d=0.25,afade=t=out:st=0.3:d=0.25', transicao]);
+  // Pedido do dono: nada de "assovio" (whoosh). Troca de tela com um toque de clique suave.
+  const toque = path.join(SONS, 'toque.mp3'); const transicaoBonita = fs.existsSync(toque) ? toque : transicao;
   const musica = ['musica.mp3', 'musica.wav'].map(f => path.join(SONS, f)).find(f => fs.existsSync(f)) || null;
-  return { clique, transicao, musica };
+  return { clique, transicao: transicaoBonita, musica };
 }
 
 /** Script que roda em toda página: cortina, legenda, cursor e desfoque antes de cada quadro. */

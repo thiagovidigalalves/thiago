@@ -16,9 +16,11 @@ function vozMaisNova() {
     const v = (d.voices || []).filter(x => x.category !== 'premade' && /thiago/i.test(x.name)).sort((a, b) => (b.created_at_unix || 0) - (a.created_at_unix || 0))[0];
     if (v) return v.voice_id;
   } catch { /* sem rede: usa a conhecida */ }
-  return 'raWp8W6crHict9dwrvex'; // thiago vidigal (pt-BR, clonada em 2026)
+  return 'AkmlIKM5rnmuQFUBbcpX'; // "Thiago Voz" (regravada, nov/2026)
 }
-const VOZ = process.env.ELEVENLABS_VOZ || vozMaisNova();
+// Pedido do dono: usar SEMPRE a "Thiago Voz" (regravada sem sopro). vozMaisNova() só se ela sumir da conta.
+const VOZ_THIAGO = 'AkmlIKM5rnmuQFUBbcpX';
+const VOZ = process.env.ELEVENLABS_VOZ || VOZ_THIAGO;
 const MODELO = process.env.ELEVENLABS_MODELO || 'eleven_multilingual_v2';
 const CACHE = path.join(__dirname, '.cache-audio');
 const VELOCIDADE = Number(process.env.ELEVENLABS_VELOCIDADE || 1.1); // fala um pouco mais rápida (pedido do dono)
