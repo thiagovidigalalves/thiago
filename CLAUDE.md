@@ -35,6 +35,9 @@ começar qualquer sessão neste repositório**, faça a conferência completa. N
   filtro forte na voz), pausas curtas e música de fundo baixinha. Grave os vídeos quando nenhuma captura estiver rodando (limite de acessos).
 - Tutorial com narração: `node tutoriais/video.js <id>` → `ajuda/videos/<id>.mp4` (vinheta + passos + voz ElevenLabs).
   A chave do ElevenLabs fica como network secret do ambiente (host `api.elevenlabs.io`, header `xi-api-key`).
-- Vinheta e apresentação: `node tutoriais/animar.js vinheta|apresentacao` (animações em `tutoriais/animacoes/`).
+- Vinheta e apresentação: `node tutoriais/animar.js vinheta|apresentacao|apresentacao-status` (animações em `tutoriais/animacoes/`).
+  A apresentação (fala, cenas e efeitos) foi APROVADA pelo dono: é o padrão. Não mude as falas sem ele pedir.
+  `apresentacao-status` é a mesma em pé (1080x1920) para o status do WhatsApp; corte em 2 partes (0-40 s e 40 s-fim)
+  porque o status aceita vídeos curtos. Ao mudar uma, mude a outra igual.
 - O Thiaguinho (app, `src/lib/videosTutoriais.js`) mostra o vídeo da tela no "Me explica": ao publicar vídeos
   novos, suba o mp4 como asset do app e acrescente na lista `VIDEOS_TUTORIAIS` (rotas, palavras, titulo, video, capa).

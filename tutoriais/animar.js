@@ -20,7 +20,7 @@ const RAIZ = path.resolve(__dirname, '..');
 const PASTA = path.join(__dirname, 'animacoes');
 const SONS = path.join(__dirname, 'audio');
 const SAIDA = path.join(RAIZ, 'ajuda', 'videos');
-const W = 1920, H = 1080;
+let W = 1920, H = 1080; // a página pode pedir outro tamanho: <meta name="tamanho" content="1080x1920">
 const espera = ms => new Promise(r => setTimeout(r, ms));
 const duracao = f => Number(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', f]).toString().trim()) || 0;
 
@@ -40,6 +40,8 @@ function garantirSons() {
   const html = path.join(PASTA, `${nome}.html`);
   if (!nome || !fs.existsSync(html)) { console.log('Uso: node tutoriais/animar.js <nome>  (arquivo em tutoriais/animacoes/<nome>.html)'); process.exit(1); }
   garantirSons();
+  const tam = /<meta name="tamanho" content="(\d+)x(\d+)"/.exec(fs.readFileSync(html, 'utf8'));
+  if (tam) { W = +tam[1]; H = +tam[2]; }
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'anim-'));
   const browser = await chromium.launch();
   const context = await browser.newContext({ viewport: { width: W, height: H }, recordVideo: { dir: tmp, size: { width: W, height: H } } });
