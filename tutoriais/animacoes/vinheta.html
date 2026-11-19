@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Vinheta Thiago Informática</title>
+<!-- Vinheta de abertura dos vídeos (1920x1080, ~5,5 s). Gravada pelo tutoriais/animar.js.
+     A animação só começa quando o robô chama window.comecar(). -->
+<style>
+  :root{--azul-1:#04103a;--azul-2:#0c2a7a;--azul-3:#1f56c8;--vermelho:#e3262f;--verde:#25d366;--branco:#ffffff}
+  *{box-sizing:border-box;margin:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--azul-1);font-family:"Inter Display","Inter",sans-serif;color:var(--branco)}
+  #palco{position:fixed;inset:0;background:radial-gradient(1200px 800px at 50% 40%,var(--azul-3),var(--azul-2) 45%,var(--azul-1) 100%);opacity:0}
+  canvas{position:fixed;inset:0}
+  .raios{position:fixed;left:50%;top:42%;width:2600px;height:2600px;margin:-1300px 0 0 -1300px;opacity:0;
+    background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.07) 0 6deg,transparent 6deg 18deg);mask:radial-gradient(circle,#000 10%,transparent 60%);-webkit-mask:radial-gradient(circle,#000 10%,transparent 60%)}
+  .logo-wrap{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%) scale(.2);opacity:0;filter:drop-shadow(0 30px 60px rgba(0,0,0,.45))}
+  .logo-wrap img{display:block;width:820px;height:auto}
+  .brilho{position:absolute;inset:0;overflow:hidden;border-radius:50%;mix-blend-mode:screen;-webkit-mask:url(logo.png) center/contain no-repeat;mask:url(logo.png) center/contain no-repeat}
+  .brilho::after{content:"";position:absolute;top:-20%;bottom:-20%;width:160px;left:-200px;transform:skewX(-20deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),transparent)}
+  .halo{position:fixed;left:50%;top:40%;width:900px;height:900px;margin:-450px 0 0 -450px;border-radius:50%;opacity:0;
+    background:radial-gradient(circle,rgba(120,170,255,.55),rgba(120,170,255,0) 60%)}
+  .linha{position:fixed;left:50%;top:63%;height:6px;width:0;transform:translateX(-50%);border-radius:6px;background:linear-gradient(90deg,var(--azul-3),var(--branco) 30%,var(--vermelho) 70%,var(--azul-3))}
+  .slogan{position:fixed;left:0;right:0;top:66%;text-align:center;font-weight:800;font-size:58px;letter-spacing:.02em}
+  .slogan span{display:inline-block;opacity:0;transform:translateY(30px)}
+  .zap{position:fixed;left:50%;top:79%;transform:translate(-50%,40px);opacity:0;display:flex;align-items:center;gap:22px;
+    background:rgba(255,255,255,.10);border:2px solid rgba(255,255,255,.25);backdrop-filter:blur(6px);border-radius:999px;padding:16px 38px 16px 18px;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+  .zap i{width:74px;height:74px;border-radius:50%;background:var(--verde);display:grid;place-items:center;box-shadow:0 0 0 0 rgba(37,211,102,.6)}
+  .zap svg{width:44px;height:44px}
+  .zap b{font-size:60px;font-weight:800;letter-spacing:.01em}
+  .zap small{display:block;font-size:24px;font-weight:600;opacity:.8;margin-bottom:2px}
+  .flash{position:fixed;inset:0;background:#fff;opacity:0}
+
+  /* Linha do tempo (só roda com body.rodando) */
+  .rodando #palco{animation:aparece .6s ease-out forwards}
+  .rodando .raios{animation:aparece 1s .2s ease-out forwards,gira 14s linear infinite}
+  .rodando .halo{animation:halo 2.4s .5s ease-out forwards}
+  .rodando .logo-wrap{animation:logo 1.3s .35s cubic-bezier(.2,1.4,.4,1) forwards, flutua 3s 1.8s ease-in-out infinite}
+  .rodando .brilho::after{animation:brilho 1s 1.55s ease-in-out forwards}
+  .rodando .linha{animation:linha .8s 1.55s cubic-bezier(.6,0,.2,1) forwards}
+  .rodando .slogan span{animation:letra .5s cubic-bezier(.2,1.2,.4,1) forwards}
+  .rodando .zap{animation:zap .7s 2.55s cubic-bezier(.2,1.4,.4,1) forwards}
+  .rodando .zap i{animation:pulso 1.4s 3.1s ease-out 2}
+  .rodando .flash{animation:flash .5s 1.05s ease-out forwards}
+  .rodando .fim{animation:sai .7s 4.8s ease-in forwards}
+  @keyframes aparece{to{opacity:1}}
+  @keyframes gira{to{transform:rotate(360deg)}}
+  @keyframes halo{0%{opacity:0;transform:scale(.4)}40%{opacity:1}100%{opacity:.55;transform:scale(1.15)}}
+  @keyframes logo{0%{opacity:0;transform:translate(-50%,-50%) scale(.2) rotate(-8deg)}60%{opacity:1}100%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0)}}
+  @keyframes flutua{0%,100%{margin-top:0}50%{margin-top:-10px}}
+  @keyframes brilho{to{left:110%}}
+  @keyframes linha{to{width:880px}}
+  @keyframes letra{to{opacity:1;transform:none}}
+  @keyframes zap{to{opacity:1;transform:translate(-50%,0)}}
+  @keyframes pulso{0%{box-shadow:0 0 0 0 rgba(37,211,102,.7)}100%{box-shadow:0 0 0 34px rgba(37,211,102,0)}}
+  @keyframes flash{0%{opacity:.0}20%{opacity:.35}100%{opacity:0}}
+  @keyframes sai{to{opacity:0;transform:scale(1.06)}}
+  .fim{position:fixed;inset:0;transform-origin:50% 45%}
+</style>
+</head>
+<body>
+<div class="fim">
+  <div id="palco"></div>
+  <div class="raios"></div>
+  <canvas id="particulas" width="1920" height="1080"></canvas>
+  <div class="halo"></div>
+  <div class="logo-wrap"><img src="logo.png" alt="Thiago Informática Sistemas"><div class="brilho"></div></div>
+  <div class="linha"></div>
+  <div class="slogan" id="slogan">Tecnologia que trabalha por você</div>
+  <div class="zap">
+    <i><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7a11.4 11.4 0 0 1-4.6-4.1c-.6-.8-1-1.8-1-2.7 0-.9.4-1.6.8-2 .2-.3.5-.4.7-.4h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .6l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.7-.1l1.8.9c.3.1.5.2.5.3.1.2.1.6-.1 1.1z"/></svg></i>
+    <div><small>Fale com a gente no WhatsApp</small><b>(34) 3431-1099</b></div>
+  </div>
+  <div class="flash"></div>
+</div>
+<script>
+  // Separa o slogan em letras para a entrada letra a letra.
+  const s = document.getElementById('slogan');
+  s.innerHTML = [...s.textContent].map((c, i) => `<span style="animation-delay:${1.85 + i * 0.025}s">${c === ' ' ? '&nbsp;' : c}</span>`).join('');
+  // Partículas de luz subindo.
+  const cv = document.getElementById('particulas'), g = cv.getContext('2d');
+  const P = Array.from({ length: 90 }, () => ({ x: Math.random() * 1920, y: Math.random() * 1080, r: 1 + Math.random() * 3.2, v: .3 + Math.random() * 1.1, a: .2 + Math.random() * .6 }));
+  let rodando = false;
+  function quadro() {
+    g.clearRect(0, 0, 1920, 1080);
+    for (const p of P) { if (rodando) p.y -= p.v; if (p.y < -10) { p.y = 1090; p.x = Math.random() * 1920; }
+      g.beginPath(); g.arc(p.x, p.y, p.r, 0, Math.PI * 2); g.fillStyle = `rgba(170,205,255,${rodando ? p.a : 0})`; g.fill(); }
+    requestAnimationFrame(quadro);
+  }
+  quadro();
+  window.comecar = () => { rodando = true; document.body.classList.add('rodando'); };
+  window.DURACAO = 5.5;
+  window.CAPA = 3.9;
+</script>
+</body>
+</html>

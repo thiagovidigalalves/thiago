@@ -268,10 +268,19 @@ async function gravar(r, s) {
   if (rotulos.length) {
     filtros.push(`${rotulos.join('')}amix=inputs=${rotulos.length}:normalize=0:dropout_transition=0,apad[aout]`);
     args.push('-filter_complex', filtros.join(';'), '-map', '0:v', '-map', '[aout]', '-c:a', 'aac', '-b:a', '128k');
-  } else args.push('-map', '0:v');
+  } else args.push('-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=stereo', '-map', '0:v', '-map', '1:a', '-c:a', 'aac');
   args.push('-t', total.toFixed(2), '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '24', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', final);
   execFileSync('ffmpeg', args, { stdio: 'inherit' });
-  execFileSync('ffmpeg', ['-y', '-v', 'error', '-ss', '1.2', '-i', final, '-frames:v', '1', '-q:v', '4', path.join(SAIDA, `${r.id}.jpg`)]);
+  // Vinheta da Thiago Informática antes do tutorial (se existir ajuda/videos/vinheta.mp4).
+  const vinheta = path.join(SAIDA, 'vinheta.mp4');
+  if (fs.existsSync(vinheta) && process.env.TUTORIAL_SEM_VINHETA !== '1') {
+    const junto = final.replace(/\.mp4$/, '.tmp.mp4');
+    execFileSync('ffmpeg', ['-y', '-v', 'error', '-i', vinheta, '-i', final, '-filter_complex',
+      `[0:v]scale=${W}:${H},fps=25,setsar=1[v0];[1:v]fps=25,setsar=1[v1];[0:a]aresample=44100[a0];[1:a]aresample=44100[a1];[v0][a0][v1][a1]concat=n=2:v=1:a=1[v][a]`,
+      '-map', '[v]', '-map', '[a]', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '24', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '128k', '-movflags', '+faststart', junto], { stdio: 'inherit' });
+    fs.renameSync(junto, final);
+  }
+  execFileSync('ffmpeg', ['-y', '-v', 'error', '-ss', '7.5', '-i', final, '-frames:v', '1', '-q:v', '4', path.join(SAIDA, `${r.id}.jpg`)]);
   fs.rmSync(dirTmp, { recursive: true, force: true });
   const mb = (fs.statSync(final).size / 1048576).toFixed(1);
   console.log(`   ✅ ${path.relative(RAIZ, final)} · ${total.toFixed(0)} s · ${mb} MB · ${eventos.filter(e => e.arquivo && e.arquivo.includes('.cache-audio')).length} falas`);
