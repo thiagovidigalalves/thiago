@@ -74,7 +74,7 @@ function scriptDaPagina(logoDataUri) {
   return `
   (() => {
     window.__desfocar = ${C.desfocarNaPagina.toString()};
-    window.__desfArgs = { extras: ${JSON.stringify(extras)}, tudo: true, campos: true }; // começa no modo mais rígido
+    window.__desfArgs = { extras: ${JSON.stringify(extras)}, tudo: true, campos: true, fantasia: ${process.env.TUTORIAL_FANTASIA !== '0'} }; // começa no modo mais rígido
     const css = \`
       #__cortina{position:fixed;inset:0;z-index:2147483646;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
         background:radial-gradient(circle at 30% 20%,#1c3a96,#0c1f5c 60%,#081440);color:#fff;font:600 22px/1.3 system-ui,sans-serif;transition:opacity .35s}
@@ -200,13 +200,15 @@ async function gravar(r, s) {
     const primeira = r.passos.find(p => p.ir)?.ir || '/';
     await page.goto(C.URL_BASE + (r.precisaLogin === false ? primeira : C.comEmpresa(primeira)), { waitUntil: 'load' }).catch(() => {});
     await cortina(page, true, r.titulo, r.resumo || '');
+    // Nomes reais da empresa -> fictícios (a cortina cobre a tela enquanto carrega).
+    if (r.precisaLogin !== false) await C.instalarNomes(context, page, await C.carregarNomesReais(page));
     som(s.transicao, 0.8); const ti = agora(); som(falaIntro.arquivo);
     await C.prepararTela(page);
     await espera(Math.max(0, (falaIntro.dur + 0.6 - (agora() - ti)) * 1000));
 
     for (let i = 0; i < r.passos.length; i++) {
       const p = r.passos[i], n = i + 1, fala = falas[i];
-      await page.evaluate(a => { window.__desfArgs = a; }, { extras: C.lerExtrasPrivacidade(), tudo: !!p.desfocarTudo, campos: !!p.desfocarCampos }).catch(() => {});
+      await page.evaluate(a => { window.__desfArgs = a; }, { extras: C.lerExtrasPrivacidade(), tudo: !!p.desfocarTudo, campos: !!p.desfocarCampos, fantasia: process.env.TUTORIAL_FANTASIA !== '0' }).catch(() => {});
       if (p.ir && i > 0) {
         await legenda(page, '', '');
         await cortina(page, true, `Passo ${n}`, p.titulo); som(s.transicao, 0.7);

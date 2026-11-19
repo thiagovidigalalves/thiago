@@ -67,6 +67,8 @@ async function marcar(page, marcas) {
     const janela = await el.evaluate(e => { const d = e.closest('[role="dialog"]'); if (!d) return null; const r = d.getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height }; }).catch(() => null);
     if (b) caixas.push({ ...b, numero: m.numero, legenda: m.legenda || '', janela });
   }
+  // TUTORIAL_SEM_MARCAS=1: tela limpa (sem bolinha/contorno), usada no vídeo de apresentação.
+  if (process.env.TUTORIAL_SEM_MARCAS === '1') return caixas;
   await page.evaluate(caixas => {
     const camada = document.createElement('div');
     window.__bolas = [];
@@ -142,19 +144,78 @@ function recorte(caixas, passo, tela) {
 async function desfocarDados(page, passo = {}) {
   if (process.env.TUTORIAL_DESFOCAR === '0') return;
   const extras = lerExtrasPrivacidade();
-  await page.evaluate(desfocarNaPagina, { extras, tudo: !!passo.desfocarTudo, campos: !!passo.desfocarCampos });
+  await page.evaluate(desfocarNaPagina, { extras, tudo: !!passo.desfocarTudo, campos: !!passo.desfocarCampos, fantasia: process.env.TUTORIAL_FANTASIA !== '0' });
 }
 
 /** Roda dentro da página. Exportada para o vídeo aplicar o desfoque antes de cada quadro. */
-function desfocarNaPagina({ extras, tudo, campos }) {
+function desfocarNaPagina({ extras, tudo, campos, fantasia }) {
+    // ---- Dados fictícios: troca o dado real por um inventado (sempre o mesmo para o mesmo original). ----
+    const h = t => { let x = 2166136261; for (const c of String(t)) { x ^= c.charCodeAt(0); x = Math.imul(x, 16777619); } return Math.abs(x); };
+    const PESSOAS = ['Ana Souza', 'Bruno Lima', 'Carla Mendes', 'Diego Rocha', 'Eduarda Alves', 'Felipe Costa', 'Gabriela Nunes', 'Henrique Dias', 'Isabela Martins', 'João Pereira', 'Karina Lopes', 'Lucas Ribeiro', 'Mariana Castro', 'Natália Freitas', 'Otávio Barros', 'Paula Gomes', 'Rafael Teixeira', 'Sofia Carvalho', 'Tiago Moreira', 'Vanessa Duarte', 'Wagner Pinto', 'Yasmin Correia'];
+    const EMPRESAS = ['Mercado Bom Preço', 'Padaria Pão Dourado', 'Auto Peças Rota', 'Clínica Sorriso', 'Posto Estrela', 'Ótica Visão', 'Papelaria Lápis de Cor', 'Pet Shop Amigo Fiel', 'Distribuidora Norte', 'Loja Exemplo'];
+    const digitos = (t, n) => { let v = String(h(t)); while (v.length < n) v += String(h(v)); return v.slice(0, n); };
+    const UI = /^(paga|pago|pagas|aberto|aberta|em aberto|ativo|ativa|inativo|venda|vendas|dinheiro|pix|cart[aã]o|cr[eé]dito|d[eé]bito|credi[aá]rio|boleto|outros?|todos?|todas?|sim|n[aã]o|hoje|ontem|novo|nova|ver|editar|excluir|detalhes|status|total|servi[cç]o|servi[cç]os|os|produto|produtos|cliente|clientes|entrada|sa[ií]da|cancelad[ao]|conclu[ií]d[ao]|pendente|enviado|entregue|lida|na fila|urgente|comprado|chegou|falta comprar|receita|despesa|cofre|caixa)$/i;
+    const pareceNome = t => { const v = String(t).trim().replace(/^[^A-Za-zÀ-ÿ(]+|[^A-Za-zÀ-ÿ)]+$/g, ''); if (v.length < 3 || v.length > 80 || /\d|@|R\$/.test(v) || UI.test(v)) return false;
+      const ws = v.split(/\s+/); return ws.length >= 2 ? ws.every(w => /^[A-ZÀ-Ý(]/.test(w) || /^(da|de|do|das|dos|e)$/i.test(w)) : /^[A-ZÀ-Ý][A-Za-zÀ-ÿ]+$/.test(v); };
+    const empresa = t => /\b(LTDA|ME|EIRELI|S\.?A\.?|COM[EÉ]RCIO|MERCADO|POSTO|SUPERMERCADO|TRANSPORTE|DISTRIBUIDORA|RESTAURANTE|LOJA|MOVEIS|M[ÓO]VEIS|AUTO|CL[IÍ]NICA|FARM[AÁ]CIA|SINDICATO|OAB|ENCOMENDAS|VIVEIRO)\b/i.test(t) || (t === t.toUpperCase() && t.split(/\s+/).length <= 3 && t.length > 6);
+    const falso = t => {
+      let v = String(t);
+      const zero = m => !/[1-9]/.test(m);
+      v = v.replace(/R\$\s?-?[\d.,]+(\s?mil)?/g, m => zero(m) ? m : /mil/.test(m) ? `R$ ${(h(m) % 90) + 2},${h(m) % 10} mil` : `R$ ${((h(m) % 4800) + 35).toLocaleString('pt-BR')},${digitos(m, 2)}`);
+      v = v.replace(/\b\d{1,3}(\.\d{3})*,\d{2}\b/g, m => zero(m) ? m : `${((h(m) % 4800) + 35).toLocaleString('pt-BR')},${digitos(m, 2)}`);
+      v = v.replace(/\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}/g, m => { const d = digitos(m, 14); return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/0001-${d.slice(12, 14)}`; });
+      v = v.replace(/\d{3}\.\d{3}\.\d{3}-\d{2}/g, m => { const d = digitos(m, 11); return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9, 11)}`; });
+      v = v.replace(/\(?\d{2}\)?\s?9?\d{4}-?\d{4}/g, m => { const d = digitos(m, 8); return `(34) 9 ${d.slice(0, 4)}-${d.slice(4, 8)}`; });
+      v = v.replace(/[\w.+-]+@[\w-]+\.[\w.]+/g, m => `${PESSOAS[h(m) % PESSOAS.length].split(' ')[0].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}@exemplo.com.br`);
+      v = v.replace(/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/g, m => { const d = digitos(m, 32).replace(/\d/g, c => 'abcdef0123456789'[c]); return `${d.slice(0,8)}-${d.slice(8,12)}-${d.slice(12,16)}-${d.slice(16,20)}-${d.slice(20,32)}`; });
+      v = v.replace(/\b\d{5,}\b/g, m => digitos(m, m.length));
+      return v;
+    };
+    const nomeFalso = t => empresa(t) ? EMPRESAS[h(t) % EMPRESAS.length] : PESSOAS[h(t) % PESSOAS.length];
+    const normN = t => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+    const REAIS = window.__nomesReais || null;
+    // Nome real da empresa (cadastro de clientes, fornecedores, usuários): exato ou pelo começo (nome cortado com "…").
+    // Uma palavra só conta como nome se estiver em MAIÚSCULAS (como no cadastro) ou dentro de uma tabela.
+    const real = (t, el) => { if (!REAIS) return false; const bruto = String(t).trim().replace(/^[^A-Za-zÀ-ÿ0-9]+|[^A-Za-zÀ-ÿ0-9]+$/g, '');
+      const cortado = /(…|\.\.\.)\s*$/.test(String(t).trim());
+      const n = normN(bruto); if (n.length < 3) return false; const w = n.split(' ');
+      if (REAIS.exatos.has(n) && (w.length >= 2 || (n.length >= 4 && !UI.test(bruto)))) return true;
+      const umaPalavraOk = w.length >= 2 || (bruto === bruto.toUpperCase() && bruto.length >= 5) || (el && el.closest && el.closest('tbody,[role="cell"]'));
+      if (!umaPalavraOk) return false;
+      if (w.length >= 2 && REAIS.dois.has(w.slice(0, 2).join(' '))) return true;
+      if (cortado && n.length >= 5) { for (const x of REAIS.exatos) if (x.startsWith(n)) return true; }
+      return false; };
+    // Troca o texto de um elemento. Devolve true se trocou (aí não precisa desfocar).
+    const ESTRUT = 'h1,h2,h3,th,thead,[role="columnheader"],label,button,[role="tab"],nav,[role="navigation"],aside,option,select';
+    const trocar = (el, forca) => {
+      if (!fantasia || el.closest('#__tutorial_marcas,#__cortina,#__legenda,#__cursor')) return false;
+      if (el.matches('input,textarea')) { const v = String(el.value || ''); if (!v.trim()) return true; const f = real(v, el) ? nomeFalso(v) : falso(v); if (f !== v) { el.value = f; el.dataset.tutorialFalso = '1'; return true; } return false; }
+      let trocou = false, sobrou = false;
+      for (const n of el.childNodes) {
+        if (n.nodeType !== 3 || !n.textContent.trim()) continue;
+        if (n.__falso === n.textContent) { trocou = true; continue; }
+        const orig = n.textContent;
+        let f = falso(orig);
+        for (const x of extras) if (f.includes(x)) f = f.split(x).join(x.split(' ').length > 1 ? 'Ana Gestora' : 'Ana');
+        if (f === orig) f = f.split(/(\s[·•|]\s|\s-\s)/).map(seg => { if (/^\s[·•|-]\s$/.test(seg)) return seg; const nucleo = seg.trim().replace(/^[^A-Za-zÀ-ÿ0-9]+|[^A-Za-zÀ-ÿ0-9…]+$/g, ''); return nucleo && real(seg, el) ? seg.replace(nucleo, nomeFalso(nucleo.replace(/(…|\.\.\.)$/, ''))) : seg; }).join('');
+        if (f === orig && forca && pareceNome(orig) && orig.trim().split(/\s+/).length >= 2 && !el.closest(ESTRUT)) { const nucleo = orig.trim().replace(/^[^A-Za-zÀ-ÿ0-9]+|[^A-Za-zÀ-ÿ0-9]+$/g, ''); f = orig.replace(nucleo, nomeFalso(nucleo)); }
+        if (f !== orig) { n.textContent = f; n.__falso = f; trocou = true; } else if (/[A-Za-zÀ-ÿ]{3,}/.test(orig) && !UI.test(orig.trim())) sobrou = true;
+      }
+      return !sobrou; // nada real sobrou (trocado, só números/zeros ou palavra de tela)
+    };
     const SENSIVEL = /…\s?\d{4,}|\b\d{5,}\b|\bDoc\.?\s?\d+|\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b|R\$\s?-?[\d.,]+(\s?mil)?|\b\d{1,3}(\.\d{3})*,\d{2}\b|\b\d+([.,]\d+)?\s?mil\b|\bOS\s?\d{2,}|\bn[ºo°]\s?\d{2,}|#\d{3,}|\d+\s+\S+\(\S+\)\s+encontrad|Todo dia \d+|R\$\s?-?[\d.]+,\d{2}|\d{3}\.\d{3}\.\d{3}-\d{2}|\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}|\(?\d{2}\)?\s?9?\d{4}-?\d{4}|[\w.+-]+@[\w-]+\.[\w.]+|\b[A-Z]{3}-?\d[A-Z0-9]\d{2}\b/;
     const marcados = [...document.querySelectorAll('[data-tutorial-alvo]')];
     // Protege o elemento marcado e quem o contém; o que está DENTRO dele ainda é desfocado se for dado sensível.
     const protegido = el => el.closest('#__tutorial_marcas,#__cortina,#__legenda,#__cursor') || marcados.some(m => m === el || el.contains(m));
     const protegidoForte = el => protegido(el) || marcados.some(m => m.contains(el));
-    const borrar = el => { if (!protegido(el) && !el.closest('aside')) el.setAttribute('data-tutorial-blur', ''); };
-    const borrarForte = el => { if (!protegidoForte(el) && !el.closest('aside')) el.setAttribute('data-tutorial-blur', ''); };
-    document.querySelectorAll('tbody td, [role="row"] [role="cell"], [role="dialog"] li').forEach(borrarForte);
+    // Modo fantasia (padrão): nada fica borrado; o dado real vira fictício. Sem fantasia: desfoca.
+    const borrar = el => { if (protegido(el) || el.closest('aside')) return; if (fantasia) { trocar(el, true); return; } if (!trocar(el)) el.setAttribute('data-tutorial-blur', ''); };
+    const borrarForte = el => { if (protegidoForte(el) || el.closest('aside')) return; if (fantasia) { trocar(el, true); return; } if (!trocar(el)) el.setAttribute('data-tutorial-blur', ''); };
+    document.querySelectorAll('tbody td, [role="row"] [role="cell"], [role="dialog"] li').forEach(td => {
+      if (!fantasia) return borrarForte(td);
+      const partes = [td, ...td.querySelectorAll('*')].filter(e => [...e.childNodes].some(c => c.nodeType === 3 && c.textContent.trim()));
+      partes.forEach(borrarForte);
+    });
     // Campos preenchidos com dados reais (CNPJ, telefone, endereço...): o valor não é texto da página, então confere o input.
     document.querySelectorAll('input, textarea').forEach(i => {
       const v = String(i.value || '');
@@ -162,12 +223,20 @@ function desfocarNaPagina({ extras, tudo, campos }) {
       const DEMO = ['Maria da Silva', 'maria@minhaloja.com.br', 'Mouse sem fio', 'senha1234', 'contas'];
       if (DEMO.includes(v.trim())) return;
       // Dado real em campo: desfoca mesmo que seja o campo marcado (a bolinha e o contorno continuam nítidos).
-      if (campos ? v.trim() : (SENSIVEL.test(v) || /\d{8,}/.test(v.replace(/\D/g, '')))) i.setAttribute('data-tutorial-blur', '');
+      if (i.dataset.tutorialFalso) return;
+      if (campos ? v.trim() : (SENSIVEL.test(v) || /\d{8,}/.test(v.replace(/\D/g, '')))) { if (!trocar(i, true) && !fantasia) i.setAttribute('data-tutorial-blur', ''); }
     });
     // `desfocarTudo`: só o menu e o que está marcado ficam nítidos (ex.: Dashboard com números da empresa).
     // Mantém legível só a "estrutura" da tela: títulos, cabeçalhos de coluna, rótulos de campo e abas.
     const ESTRUTURA = 'h1,h2,h3,th,label,[role="tab"],nav,[role="navigation"]';
-    if (tudo) document.querySelectorAll('body *').forEach(e => {
+    // Com dados fictícios, no modo "tudo" só some o que parece nome ou dado pessoal; o resto da tela fica legível.
+    if (tudo && fantasia) document.querySelectorAll('body *').forEach(e => {
+      if (e.closest('aside,#__tutorial_marcas,#__cortina,#__legenda,#__cursor')) return;
+      const proprio = [...e.childNodes].filter(c => c.nodeType === 3).map(c => c.textContent).join(' ').trim();
+      if (!proprio) return;
+      if (real(proprio, e) || SENSIVEL.test(proprio) || extras.some(x => proprio.includes(x)) || (pareceNome(proprio) && proprio.split(/\s+/).length >= 2 && !e.closest('h1,h2,h3,th,label,button,[role="tab"],nav'))) borrarForte(e);
+    });
+    if (tudo && !fantasia) document.querySelectorAll('body *').forEach(e => {
       // Elemento com texto próprio (mesmo misturado com <b>, <span>...) também entra.
       const temTextoProprio = [...e.childNodes].some(c => c.nodeType === 3 && c.textContent.trim());
       if ((e.children.length && !temTextoProprio) || !e.textContent.trim()) return;
@@ -177,13 +246,13 @@ function desfocarNaPagina({ extras, tudo, campos }) {
       borrarForte(e);
     });
     // Gráficos (revelam o tamanho do faturamento): qualquer svg/canvas grande.
-    document.querySelectorAll('svg, canvas').forEach(g => { const r = g.getBoundingClientRect(); if (r.width > 150 && r.height > 80) borrar(g); });
+    if (!fantasia) document.querySelectorAll('svg, canvas').forEach(g => { const r = g.getBoundingClientRect(); if (r.width > 150 && r.height > 80) borrar(g); });
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     const extra = t => extras.some(x => t.includes(x));
     for (let n; (n = walker.nextNode());) {
       const t = n.textContent;
       if (!n.parentElement || n.parentElement.closest('#__tutorial_marcas,#__cortina,#__legenda')) continue;
-      if (extra(t)) n.parentElement.setAttribute('data-tutorial-blur', '');
+      if (extra(t)) { if (!trocar(n.parentElement, true) && !fantasia) n.parentElement.setAttribute('data-tutorial-blur', ''); }
       else if (SENSIVEL.test(t)) borrar(n.parentElement);
     }
     // O React divide textos como "Venda #" + "32486" em pedaços: confere também o texto próprio de cada elemento.
@@ -192,7 +261,7 @@ function desfocarNaPagina({ extras, tudo, campos }) {
       const proprio = [...el.childNodes].filter(c => c.nodeType === 3).map(c => c.textContent).join('');
       if (proprio.trim() && proprio.length < 300 && SENSIVEL.test(proprio)) borrar(el);
       const inteiro = el.textContent || '';
-      if (inteiro.length < 120 && el.children.length <= 4 && extra(inteiro)) el.setAttribute('data-tutorial-blur', '');
+      if (inteiro.length < 120 && el.children.length <= 4 && extra(inteiro)) { [el, ...el.querySelectorAll('*')].forEach(e => trocar(e, true)); if (!fantasia && extra(el.textContent || '')) el.setAttribute('data-tutorial-blur', ''); }
     });
     if (!document.getElementById('__tutorial_blur')) {
       const st = document.createElement('style');
@@ -235,6 +304,39 @@ async function executar(page, acao, roteiro) {
     await page.keyboard.press(acao.tecla);
   }
   await page.waitForTimeout(acao.espera || 900);
+}
+
+/**
+ * Lista de nomes reais da empresa (clientes, fornecedores, usuários), lida pela API do próprio sistema
+ * com a sessão do robô. Fica só na memória: serve para trocar exatamente esses nomes por fictícios.
+ */
+async function carregarNomesReais(page) {
+  const emp = process.env.TUTORIAL_VER_EMPRESA;
+  if (!emp || process.env.TUTORIAL_FANTASIA === '0') return null;
+  const nomes = await page.evaluate(async (emp) => {
+    const tok = localStorage.getItem('base44_access_token'), app = '6a8469ea2eec118b03c63b1e';
+    const pegar = async (ent, campos, filtro) => { try {
+      const q = encodeURIComponent(JSON.stringify(filtro)); const r = await fetch(`/api/apps/${app}/entities/${ent}?q=${q}&limit=20000&fields=${campos.join(',')}`, { headers: { 'X-App-Id': app, Authorization: 'Bearer ' + tok } });
+      const l = await r.json(); return Array.isArray(l) ? l.flatMap(x => campos.map(c => x[c]).filter(Boolean)) : [];
+    } catch { return []; } };
+    return [...await pegar('Client', ['nome'], { company_id: emp }), ...await pegar('Supplier', ['nome'], { company_id: emp }),
+      ...await pegar('Employee', ['nome', 'name'], { company_id: emp }), ...await pegar('User', ['full_name'], { 'data.company_id': emp }),
+      // Nomes escritos direto em contas, vendas, OS, orçamentos e recorrências (ex.: "Toninho" numa conta a pagar).
+      ...(await Promise.all(['FinanceAccount', 'Sale', 'ServiceOrder', 'Quote', 'Recorrencia', 'Condicional', 'CommercialProposal'].map(ent =>
+        pegar(ent, ['cliente_nome', 'client_name', 'fornecedor_nome', 'supplier_name', 'pessoa_nome', 'beneficiario', 'favorecido', 'nome_pessoa', 'vendedor_nome', 'tecnico_nome', 'nome'], { company_id: emp })))).flat()];
+  }, emp).catch(() => []);
+  const norm = t => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+  const exatos = [...new Set(nomes.map(norm).filter(n => n.length >= 3))];
+  console.log(`   (dados fictícios: ${exatos.length} nomes reais da empresa serão trocados)`);
+  return exatos;
+}
+
+/** Instala a lista de nomes na página (e em cada página nova) sem passar pelo log. */
+async function instalarNomes(context, page, exatos) {
+  if (!exatos) return;
+  const js = `window.__nomesReais = (() => { const e = new Set(${JSON.stringify(exatos)}); const d = new Set(); for (const n of e) { const w = n.split(' '); if (w.length >= 2) d.add(w.slice(0, 2).join(' ')); } return { exatos: e, dois: d }; })();`;
+  await context.addInitScript({ content: js });
+  await page.evaluate(js).catch(() => {});
 }
 
 /** Super Admin vendo uma empresa: TUTORIAL_VER_EMPRESA=EMP_... acrescenta ?empresa= em cada página. */
@@ -313,7 +415,7 @@ async function main() {
   for (const r of roteiros) {
     console.log(`\n▶ ${r.titulo}`);
     if (r.precisaLogin !== false) {
-      if (logado === null) logado = await entrar(context, page);
+      if (logado === null) { logado = await entrar(context, page); if (logado) { await page.goto(URL_BASE + comEmpresa('/'), { waitUntil: 'load' }).catch(() => {}); await page.waitForTimeout(3000); await instalarNomes(context, page, await carregarNomesReais(page)); } }
       if (!logado) { console.log('   pulado: precisa de login (defina TUTORIAL_EMAIL e TUTORIAL_SENHA, ou TUTORIAL_EMPRESA, TUTORIAL_USUARIO e TUTORIAL_SENHA).'); relatorio.push({ id: r.id, ok: false, motivo: 'sem login' }); continue; }
     }
     const pasta = path.join(PASTA_IMG, r.id);
@@ -363,5 +465,5 @@ async function main() {
   console.log('\nPronto. Agora rode: node tutoriais/gerar-ajuda.js');
 }
 
-module.exports = { URL_BASE, SESSAO, BOTOES_PERIGOSOS, BOTOES_PERIGOSOS_JANELA, carregarRoteiros, achar, marcar, desfocarDados, desfocarNaPagina, lerExtrasPrivacidade, limparMarcas, executar, comEmpresa, prepararTela, entrar };
+module.exports = { carregarNomesReais, instalarNomes, URL_BASE, SESSAO, BOTOES_PERIGOSOS, BOTOES_PERIGOSOS_JANELA, carregarRoteiros, achar, marcar, desfocarDados, desfocarNaPagina, lerExtrasPrivacidade, limparMarcas, executar, comEmpresa, prepararTela, entrar };
 if (require.main === module) main();

@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Apresentação THGestor</title>
+<!-- Vídeo de apresentação do sistema (~54 s + vinheta). Usa só prints já revisados (dados desfocados).
+     Gravado por: node tutoriais/animar.js apresentacao -->
+<style>
+  :root{--azul-1:#04103a;--azul-2:#0c2a7a;--azul-3:#1f56c8;--vermelho:#e3262f;--verde:#25d366;--branco:#fff;--ouro:#ffd166}
+  *{box-sizing:border-box;margin:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--azul-1);font-family:"Inter Display","Inter",sans-serif;color:var(--branco)}
+  #fundo{position:fixed;inset:0;background:radial-gradient(1400px 900px at 70% 30%,var(--azul-3),var(--azul-2) 45%,var(--azul-1))}
+  #fundo::after{content:"";position:fixed;inset:0;background:linear-gradient(115deg,transparent 0 55%,rgba(255,255,255,.05) 55% 56%,transparent 56%),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 48px),repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 48px)}
+  canvas{position:fixed;inset:0}
+  .marca{position:fixed;left:56px;top:44px;display:flex;align-items:center;gap:16px;opacity:.95;z-index:5}
+  .marca img{height:70px;background:#fff;border-radius:14px;padding:5px 10px}
+  .marca span{font-weight:700;font-size:22px;opacity:.85}
+  .cena{position:fixed;inset:0;opacity:0;pointer-events:none}
+  .cena.ativa{opacity:1;transition:opacity .5s}
+  .cena.saindo{opacity:0;transition:opacity .45s}
+  .texto{position:absolute;left:96px;top:250px;width:640px}
+  .tag{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);border-radius:999px;padding:8px 18px;font-weight:700;font-size:22px;letter-spacing:.06em;text-transform:uppercase;transform:translateX(-30px);opacity:0}
+  .tag i{width:12px;height:12px;border-radius:50%;background:var(--vermelho);box-shadow:0 0 12px var(--vermelho)}
+  h1{font-weight:900;font-size:78px;line-height:1.02;letter-spacing:-.02em;margin-top:22px;text-wrap:balance}
+  h1 .p{display:inline-block;opacity:0;transform:translateY(40px) rotate(2deg)}
+  h1 em{font-style:normal;color:var(--ouro)}
+  .sub{font-size:30px;line-height:1.35;font-weight:500;opacity:0;margin-top:22px;max-width:600px;color:#dbe6ff;transform:translateY(20px)}
+  .chips{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+  .chips b{background:#fff;color:#0c2a7a;font-weight:800;font-size:22px;border-radius:14px;padding:10px 16px;opacity:0;transform:scale(.6);box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  .tela{position:absolute;left:800px;top:190px;width:1040px;height:640px;border-radius:22px;overflow:hidden;background:#fff;
+    box-shadow:0 40px 90px rgba(0,0,0,.55),0 0 0 10px rgba(255,255,255,.08);transform:perspective(1800px) rotateY(-14deg) translateX(120px);opacity:0}
+  .vidro{position:absolute;inset:0;overflow:hidden;border-radius:22px;transform:translateZ(0);isolation:isolate}
+  .tela img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;transform-origin:50% 50%}
+  .foco{position:absolute;border:4px solid var(--vermelho);border-radius:16px;box-shadow:0 0 0 9999px rgba(4,16,58,.0);opacity:0}
+  .camera{position:absolute;inset:40px;opacity:0}
+  .camera i{position:absolute;width:70px;height:70px;border:6px solid #fff}
+  .camera i:nth-child(1){left:0;top:0;border-right:0;border-bottom:0}.camera i:nth-child(2){right:0;top:0;border-left:0;border-bottom:0}
+  .camera i:nth-child(3){left:0;bottom:0;border-right:0;border-top:0}.camera i:nth-child(4){right:0;bottom:0;border-left:0;border-top:0}
+  .rec{position:absolute;right:26px;top:22px;background:rgba(0,0,0,.55);border-radius:10px;padding:6px 12px;font-weight:800;font-size:20px;display:flex;gap:8px;align-items:center}
+  .rec::before{content:"";width:14px;height:14px;border-radius:50%;background:var(--vermelho);animation:pisca 1s infinite}
+  .flashcam{position:absolute;inset:0;background:#fff;opacity:0}
+  .chat{position:absolute;right:46px;bottom:40px;width:470px;display:grid;gap:12px}
+  .bolha{padding:14px 18px;border-radius:20px;font-size:22px;line-height:1.35;font-weight:600;opacity:0;transform:translateY(20px);box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .bolha.eu{justify-self:end;background:linear-gradient(135deg,#2563eb,#4f46e5);color:#fff;border-bottom-right-radius:6px}
+  .bolha.ele{background:#fff;color:#0c1f5c;border-bottom-left-radius:6px;display:flex;gap:12px;align-items:flex-start}
+  .bolha.ele img{width:54px;height:54px;border-radius:50%;flex:0 0 auto}
+  .digitando span{display:inline-block;width:9px;height:9px;border-radius:50%;background:#0c2a7a;margin-right:5px;animation:pula 1s infinite}
+  .digitando span:nth-child(2){animation-delay:.15s}.digitando span:nth-child(3){animation-delay:.3s}
+  .zapcard{position:absolute;right:56px;top:70px;width:430px;background:#e7ffdb;color:#0b3d22;border-radius:20px 20px 20px 6px;padding:16px 20px;font-size:21px;line-height:1.35;font-weight:600;box-shadow:0 14px 40px rgba(0,0,0,.35);opacity:0;transform:translateY(-20px) scale(.9)}
+  .zapcard b{display:flex;align-items:center;gap:8px;color:#075e54;font-size:18px;margin-bottom:4px}
+  .barra{position:fixed;left:0;bottom:0;height:8px;background:linear-gradient(90deg,var(--azul-3),#fff,var(--vermelho));width:0}
+  /* cena final */
+  .final{display:flex;align-items:center;justify-content:center;text-align:center}
+  .final > div{display:flex;flex-direction:column;align-items:center;gap:34px}
+  .final .logo{width:700px;filter:drop-shadow(0 30px 60px rgba(0,0,0,.45));opacity:0;transform:scale(.5)}
+  .final h2{font-weight:900;font-size:72px;opacity:0}
+  .final .zap{display:inline-flex;align-items:center;gap:20px;background:var(--verde);color:#063b1d;border-radius:999px;padding:18px 40px 18px 22px;font-weight:900;font-size:58px;opacity:0;box-shadow:0 20px 60px rgba(37,211,102,.45)}
+  .final .zap svg{width:64px;height:64px}
+  @keyframes pisca{50%{opacity:.2}}
+  @keyframes pula{50%{transform:translateY(-7px)}}
+</style>
+</head>
+<body>
+<div id="fundo"></div>
+<canvas id="particulas" width="1920" height="1080"></canvas>
+<div class="marca"><img src="logo.png" alt=""><span>THGestor · Sistema de Gestão</span></div>
+<div id="cenas"></div>
+<div class="barra" id="barra"></div>
+<script>
+const IMG = n => `../.limpo/${n}.png`;
+const ZAP = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7a11.4 11.4 0 0 1-4.6-4.1c-.6-.8-1-1.8-1-2.7 0-.9.4-1.6.8-2 .2-.3.5-.4.7-.4h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .6l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.7-.1l1.8.9c.3.1.5.2.5.3.1.2.1.6-.1 1.1z"/></svg>';
+const AVATAR = 'https://media.base44.com/images/public/6a8469ea2eec118b03c63b1e/4e600e917_suporte-avatar.webp';
+// Cada cena: 6 s. foco = área da imagem para a "câmera" aproximar (fração da largura/altura).
+const CENAS = [
+  { tag: 'Vendas', titulo: 'Venda no caixa em <em>segundos</em>', sub: 'Leitor de código de barras, atalhos no teclado e Pix com QR Code na hora.', chips: ['PDV rápido', 'Pix', 'Cartão'], img: 'vender-no-pdv/passo-4', foco: [.08, .02, .62, .2], fala: 'Venda no caixa em segundos: leitor de código de barras, atalhos e Pix com QR Code na hora.' },
+  { tag: 'WhatsApp', titulo: 'O WhatsApp <em>trabalha sozinho</em>', sub: 'Cobrança, pós-venda e parabéns de aniversário saem automáticos, no horário certo.', chips: ['Cobrança', 'Pós-venda', 'Aniversário'], img: 'whatsapp-automatico/passo-1', foco: [.1, .1, .7, .5], zap: 'Olá! Sua parcela vence amanhã. Pague pelo Pix neste link 👇', fala: 'O WhatsApp trabalha sozinho: cobrança, pós-venda e aniversário saem automáticos.' },
+  { tag: 'Inteligência Artificial', titulo: 'Pergunte ao <em>Thiaguinho</em>', sub: 'A IA responde suas dúvidas, mostra na tela onde clicar e faz junto com você.', img: 'sugestoes-e-ia/passo-1', foco: [.1, .05, .8, .35], chat: ['Como faço uma venda?', 'Eu te mostro na tela! Clique em Nova venda e passe o leitor ✨'], fala: 'Pergunte ao Thiaguinho: a inteligência artificial responde, mostra onde clicar e faz junto com você.' },
+  { tag: 'Câmera + IA', titulo: 'Cadastro e fotos <em>pela câmera</em>', sub: 'Aponte o celular: a IA lê o produto, preenche o cadastro e deixa a foto bonita.', chips: ['Foto do produto', 'Cadastro automático'], img: 'cadastrar-produto/passo-3', foco: [.02, .1, .45, .45], camera: true, fala: 'Cadastro e fotos pela câmera: a IA lê o produto, preenche o cadastro e deixa a foto bonita.' },
+  { tag: 'Banco integrado', titulo: 'Boleto e Pix <em>direto no banco</em>', sub: 'Sem arquivo de remessa e retorno: o pagamento cai e a conta baixa sozinha.', chips: ['Sem remessa', 'Baixa automática'], img: 'boletos/passo-1', foco: [.05, .05, .7, .45], fala: 'Boleto e Pix direto no banco, sem remessa e retorno: pagou, a conta baixa sozinha.' },
+  { tag: 'Fiscal', titulo: 'Nota fiscal em <em>um clique</em>', sub: 'NF-e e NFC-e da venda, notas de compra que chegam sozinhas da SEFAZ e arquivos para o contador.', chips: ['NF-e', 'NFC-e', 'Contador'], img: 'emitir-nota/passo-4', foco: [.25, .3, .5, .35], fala: 'Nota fiscal em um clique, e as notas de compra chegam sozinhas da SEFAZ.' },
+  { tag: 'Assistência técnica', titulo: 'Ordem de serviço <em>completa</em>', sub: 'Equipamento, fotos, peças, técnico e aviso no WhatsApp quando ficar pronto.', chips: ['Fotos', 'Agenda', 'Garantia'], img: 'ordem-de-servico/passo-3', foco: [.05, .15, .6, .4], fala: 'Ordem de serviço completa, com fotos, peças, agenda do técnico e aviso no WhatsApp.' },
+  { tag: 'Gestão', titulo: 'Seus números <em>na palma da mão</em>', sub: 'Caixa, contas, DRE, metas por vendedor e o que fazer hoje, tudo numa tela.', chips: ['DRE', 'Metas', 'O que fazer hoje'], img: 'relatorios-de-vendas/passo-3', foco: [.05, .05, .9, .5], fala: 'E seus números na palma da mão: caixa, contas, DRE e metas.' },
+];
+const DUR = 6, FINAL = 6.5;
+window.DURACAO = CENAS.length * DUR + FINAL;
+window.CAPA = 9;
+window.SONS = [
+  ...CENAS.flatMap((c, i) => [{ t: i * DUR + 0.05, som: 'transicao', vol: .8 }, { t: i * DUR + 0.6, fala: c.fala }, ...(c.camera ? [{ t: i * DUR + 3.4, som: 'clique', vol: 1 }] : []), ...(c.zap || c.chat ? [{ t: i * DUR + 2.6, som: 'pop', vol: .8 }] : [])]),
+  { t: CENAS.length * DUR + 0.1, som: 'impacto' }, { t: CENAS.length * DUR + 0.9, fala: 'THGestor. Tudo num só sistema. Chame a Thiago Informática no WhatsApp: três quatro, três quatro três um, mil e noventa e nove.' },
+];
+
+const palco = document.getElementById('cenas');
+const html = c => `
+  <div class="texto"><div class="tag"><i></i>${c.tag}</div><h1>${c.titulo.split(/(<em>.*?<\/em>)/).flatMap(p => p.startsWith('<em>') ? [`<span class="p">${p}</span>`] : p.split(' ').filter(Boolean).map(w => `<span class="p">${w}&nbsp;</span>`)).join('')}</h1>
+  <p class="sub">${c.sub}</p><div class="chips">${(c.chips || []).map(x => `<b>${x}</b>`).join('')}</div></div>
+  <div class="tela"><div class="vidro"><img src="${IMG(c.img)}" alt=""></div>${c.camera ? '<div class="camera"><i></i><i></i><i></i><i></i></div><div class="rec">REC</div><div class="flashcam"></div>' : ''}<div class="foco"></div></div>
+  ${c.zap ? `<div class="zapcard"><b>${ZAP.replace('<svg', '<svg width="22" height="22"')}WhatsApp · enviado automático</b>${c.zap}</div>` : ''}
+  ${c.chat ? `<div class="chat"><div class="bolha eu">${c.chat[0]}</div><div class="bolha ele"><img src="${AVATAR}" alt=""><div><span class="digitando"><span></span><span></span><span></span></span><span class="resp" style="display:none">${c.chat[1]}</span></div></div></div>` : ''}`;
+CENAS.forEach(c => { const d = document.createElement('div'); d.className = 'cena'; d.innerHTML = html(c); palco.appendChild(d); });
+const fim = document.createElement('div'); fim.className = 'cena final';
+fim.innerHTML = `<div><img class="logo" src="logo.png" alt=""><h2>Tudo num só sistema.</h2><div class="zap">${ZAP}(34) 3431-1099</div></div>`;
+palco.appendChild(fim);
+
+const anim = (el, quadros, ms, atraso = 0, easing = 'cubic-bezier(.2,1.2,.4,1)') => el && el.animate(quadros, { duration: ms, delay: atraso, easing, fill: 'forwards' });
+function tocar(i) {
+  const cenas = [...palco.children];
+  cenas.forEach((c, k) => { c.classList.toggle('ativa', k === i); if (k === i - 1) { c.classList.add('saindo'); setTimeout(() => c.classList.remove('ativa', 'saindo'), 500); } });
+  const c = cenas[i], dado = CENAS[i];
+  if (!dado) { // final
+    anim(c.querySelector('.logo'), [{ opacity: 0, transform: 'scale(.5) rotate(-6deg)' }, { opacity: 1, transform: 'scale(1)' }], 1100);
+    anim(c.querySelector('h2'), [{ opacity: 0, transform: 'translateY(30px)' }, { opacity: 1, transform: 'none' }], 700, 700);
+    anim(c.querySelector('.zap'), [{ opacity: 0, transform: 'translateY(40px) scale(.8)' }, { opacity: 1, transform: 'none' }], 800, 1300);
+    return;
+  }
+  anim(c.querySelector('.tag'), [{ opacity: 0, transform: 'translateX(-30px)' }, { opacity: 1, transform: 'none' }], 500, 100);
+  c.querySelectorAll('h1 .p').forEach((p, k) => anim(p, [{ opacity: 0, transform: 'translateY(40px) rotate(2deg)' }, { opacity: 1, transform: 'none' }], 600, 250 + k * 70));
+  anim(c.querySelector('.sub'), [{ opacity: 0, transform: 'translateY(20px)' }, { opacity: 1, transform: 'none' }], 600, 900);
+  c.querySelectorAll('.chips b').forEach((b, k) => anim(b, [{ opacity: 0, transform: 'scale(.6)' }, { opacity: 1, transform: 'scale(1)' }], 450, 1400 + k * 150));
+  const tela = c.querySelector('.tela'), img = tela.querySelector('.vidro img');
+  anim(tela, [{ opacity: 0, transform: 'perspective(1800px) rotateY(-14deg) translateX(120px)' }, { opacity: 1, transform: 'perspective(1800px) rotateY(-6deg) translateX(0)' }], 900, 200);
+  // "Câmera focando": aproxima na área do foco e desenha o contorno.
+  const [fx, fy, fw, fh] = dado.foco, z = Math.min(1.9, 0.9 / Math.max(fw, fh));
+  const cx = (fx + fw / 2) * 100, cy = (fy + fh / 2) * 100;
+  img.style.transformOrigin = `${cx}% ${cy}%`;
+  anim(img, [{ transform: 'scale(1)' }, { transform: 'scale(1)', offset: .25 }, { transform: `scale(${z})` }], 4800, 600, 'cubic-bezier(.5,0,.2,1)');
+  const foco = tela.querySelector('.foco');
+  Object.assign(foco.style, { left: '30%', top: '30%', width: '40%', height: '40%' });
+  anim(foco, [{ opacity: 0, transform: 'scale(1.4)' }, { opacity: 1, transform: 'scale(1)' }, { opacity: 0 }], 1600, 3600);
+  if (dado.camera) {
+    anim(tela.querySelector('.camera'), [{ opacity: 0, transform: 'scale(1.15)' }, { opacity: 1, transform: 'scale(1)' }], 600, 1200);
+    anim(tela.querySelector('.flashcam'), [{ opacity: 0 }, { opacity: .9 }, { opacity: 0 }], 500, 3400, 'ease-out');
+  }
+  if (dado.zap) anim(c.querySelector('.zapcard'), [{ opacity: 0, transform: 'translateY(-20px) scale(.9)' }, { opacity: 1, transform: 'none' }], 600, 2500);
+  if (dado.chat) {
+    const [eu, ele] = c.querySelectorAll('.bolha');
+    anim(eu, [{ opacity: 0, transform: 'translateY(20px)' }, { opacity: 1, transform: 'none' }], 500, 1500);
+    anim(ele, [{ opacity: 0, transform: 'translateY(20px)' }, { opacity: 1, transform: 'none' }], 500, 2500);
+    setTimeout(() => { ele.querySelector('.digitando').style.display = 'none'; ele.querySelector('.resp').style.display = 'inline'; }, 3700);
+  }
+}
+// Partículas.
+const cv = document.getElementById('particulas'), g = cv.getContext('2d');
+const P = Array.from({ length: 70 }, () => ({ x: Math.random() * 1920, y: Math.random() * 1080, r: 1 + Math.random() * 3, v: .2 + Math.random() * .8, a: .15 + Math.random() * .45 }));
+(function quadro() { g.clearRect(0, 0, 1920, 1080); for (const p of P) { p.y -= p.v; if (p.y < -10) { p.y = 1090; p.x = Math.random() * 1920; } g.beginPath(); g.arc(p.x, p.y, p.r, 0, 7); g.fillStyle = `rgba(170,205,255,${p.a})`; g.fill(); } requestAnimationFrame(quadro); })();
+window.comecar = () => {
+  document.getElementById('barra').animate([{ width: '0' }, { width: '100%' }], { duration: window.DURACAO * 1000, fill: 'forwards' });
+  CENAS.forEach((_, i) => setTimeout(() => tocar(i), i * DUR * 1000));
+  setTimeout(() => tocar(CENAS.length), CENAS.length * DUR * 1000);
+};
+</script>
+</body>
+</html>
