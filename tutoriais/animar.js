@@ -51,6 +51,8 @@ function garantirSons() {
   const dur = await page.evaluate(() => window.DURACAO || 5);
   const capa = await page.evaluate(() => window.CAPA || null);
   const sons = await page.evaluate(() => window.SONS || null);
+  const musicaPagina = await page.evaluate(() => window.MUSICA || null);
+  const volMusica = await page.evaluate(() => window.VOL_MUSICA || 0.18);
   const inicio = (Date.now() - t0) / 1000;
   await page.evaluate(() => window.comecar && window.comecar());
   if (capa != null) {
@@ -75,10 +77,10 @@ function garantirSons() {
     entradas.push('-i', arq);
     filtros.push(`[${k}:a]adelay=${ms}|${ms},volume=${s.vol ?? 1}[s${k}]`); rotulos.push(`[s${k}]`);
   }
-  const musica = ['musica.mp3', 'musica.wav'].map(f => path.join(SONS, f)).find(f => fs.existsSync(f));
+  const musica = [musicaPagina && musicaPagina + '.mp3', 'musica.mp3', 'musica.wav'].filter(Boolean).map(f => path.join(SONS, f)).find(f => fs.existsSync(f));
   if (musica && lista.some(s => s.fala)) {
     const k = ++nIn; entradas.push('-stream_loop', '-1', '-i', musica);
-    filtros.push(`[${k}:a]volume=0.18,atrim=0:${dur},afade=t=out:st=${Math.max(0, dur - 1.5)}:d=1.5[mus]`); rotulos.push('[mus]');
+    filtros.push(`[${k}:a]volume=${volMusica},atrim=0:${dur},afade=t=out:st=${Math.max(0, dur - 1.5)}:d=1.5[mus]`); rotulos.push('[mus]');
   }
   const saida = path.join(SAIDA, `${nome}.mp4`);
   const args = ['-y', '-v', 'error', '-ss', inicio.toFixed(2), '-i', bruto, ...entradas];
