@@ -31,8 +31,8 @@ começar qualquer sessão neste repositório**, faça a conferência completa. N
 ## Vídeos
 - Regras do dono para TODO vídeo: a voz é SEMPRE a dele: ElevenLabs, voz **"Thiago Informatica"** (id `k1RZuOyhqikku8ZLZvgx`; vale também para o Thiaguinho); a logo da
   Thiago Informática NUNCA com fundo branco (logo transparente, só sombra); o passo 1 começa no início e mostra o
-  caminho pelo menu (o robô descobre sozinho: grupo › subgrupo › item); ritmo um pouco acelerado (fala 1,1x,
-  pausas curtas) e música de fundo baixinha. Grave os vídeos quando nenhuma captura estiver rodando (limite de acessos).
+  caminho pelo menu (o robô descobre sozinho: grupo › subgrupo › item); voz natural na velocidade normal (1,1x ficou rápido e robotizado; nada de
+  filtro forte na voz), pausas curtas e música de fundo baixinha. Grave os vídeos quando nenhuma captura estiver rodando (limite de acessos).
 - Tutorial com narração: `node tutoriais/video.js <id>` → `ajuda/videos/<id>.mp4` (vinheta + passos + voz ElevenLabs).
   A chave do ElevenLabs fica como network secret do ambiente (host `api.elevenlabs.io`, header `xi-api-key`).
 - Vinheta e apresentação: `node tutoriais/animar.js vinheta|apresentacao` (animações em `tutoriais/animacoes/`).

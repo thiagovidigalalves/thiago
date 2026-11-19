@@ -23,16 +23,16 @@ const VOZ_THIAGO = 'k1RZuOyhqikku8ZLZvgx'; // "Thiago Informatica" (pedido do do
 const VOZ = process.env.ELEVENLABS_VOZ || VOZ_THIAGO;
 const MODELO = process.env.ELEVENLABS_MODELO || 'eleven_multilingual_v2';
 const CACHE = path.join(__dirname, '.cache-audio');
-const VELOCIDADE = Number(process.env.ELEVENLABS_VELOCIDADE || 1.1); // fala um pouco mais rápida (pedido do dono)
+const VELOCIDADE = Number(process.env.ELEVENLABS_VELOCIDADE || 1.0); // velocidade natural (1,1 ficou rápido e robotizado)
 const duracao = f => Number(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', f]).toString().trim()) || 0;
 
 function falar(texto) {
   const estimada = Math.max(1.6, texto.length / 14);
   if (process.env.TUTORIAL_SEM_VOZ === '1') return { arquivo: null, dur: estimada };
   fs.mkdirSync(CACHE, { recursive: true });
-  const arq = path.join(CACHE, crypto.createHash('sha1').update(VOZ + MODELO + VELOCIDADE + texto).digest('hex') + '.mp3');
+  const arq = path.join(CACHE, crypto.createHash('sha1').update(VOZ + MODELO + VELOCIDADE + 'natural2' + texto).digest('hex') + '.mp3');
   if (!fs.existsSync(arq)) {
-    const corpo = JSON.stringify({ text: texto, model_id: MODELO, voice_settings: { stability: 0.5, similarity_boost: 0.85, style: 0.1, use_speaker_boost: true, speed: VELOCIDADE } });
+    const corpo = JSON.stringify({ text: texto, model_id: MODELO, voice_settings: { stability: 0.4, similarity_boost: 0.8, style: 0.25, use_speaker_boost: true, speed: VELOCIDADE } });
     try {
       execFileSync('curl', ['-sS', '-f', '-X', 'POST', `https://api.elevenlabs.io/v1/text-to-speech/${VOZ}?output_format=mp3_44100_128`,
         '-H', 'xi-api-key: x', '-H', 'Content-Type: application/json', '--data-binary', corpo, '-o', arq], { stdio: ['ignore', 'ignore', 'pipe'] });
@@ -43,9 +43,9 @@ function falar(texto) {
     }
   }
   // Limpa sopro/estalo de microfone: corta graves abaixo de 100 Hz, reduz chiado e nivela o volume.
-  const limpo = arq.replace(/\.mp3$/, '-limpo.mp3');
+  const limpo = arq.replace(/\.mp3$/, '-suave.mp3');
   if (!fs.existsSync(limpo)) {
-    try { execFileSync('ffmpeg', ['-y', '-v', 'error', '-i', arq, '-af', 'highpass=f=100,afftdn=nf=-28,deesser=i=0.4,acompressor=threshold=-20dB:ratio=3:attack=5:release=80,loudnorm=I=-16:TP=-1.5', '-ar', '44100', '-b:a', '160k', limpo]); }
+    try { execFileSync('ffmpeg', ['-y', '-v', 'error', '-i', arq, '-af', 'highpass=f=75,loudnorm=I=-16:TP=-1.5', '-ar', '44100', '-b:a', '160k', limpo]); }
     catch { return { arquivo: arq, dur: duracao(arq) }; }
   }
   return { arquivo: limpo, dur: duracao(limpo) };

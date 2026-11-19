@@ -258,7 +258,7 @@ async function gravar(r, s) {
     corte = Math.max(0, agora() - 1);
     som(s.transicao, 0.8); const ti = agora(); som(falaIntro.arquivo);
     await C.prepararTela(page);
-    await espera(Math.max(0, (falaIntro.dur + 0.2 - (agora() - ti)) * 1000));
+    await espera(Math.max(0, (falaIntro.dur + 0.4 - (agora() - ti)) * 1000));
 
     for (let i = 0; i < r.passos.length; i++) {
       const p = r.passos[i], n = i + 1, fala = falas[i];
@@ -297,7 +297,7 @@ async function gravar(r, s) {
         const embaixo = caixas.some(c => c.y + c.height > H - 190);
         await page.evaluate(t => document.getElementById('__legenda')?.classList.toggle('topo', t), embaixo).catch(() => {});
       }
-      await espera(Math.max(900, (fala.dur + 0.25 - (agora() - inicio)) * 1000));
+      await espera(Math.max(900, (fala.dur + 0.6 - (agora() - inicio)) * 1000));
       await tirarMarcas(page);
       // Ações do passo (ex.: clicar em "Novo cliente"), com mouse e som de clique.
       for (const a of p.depois || []) {
