@@ -8,7 +8,17 @@ const path = require('path');
 const crypto = require('crypto');
 const { execFileSync } = require('child_process');
 
-const VOZ = process.env.ELEVENLABS_VOZ || 'raWp8W6crHict9dwrvex'; // thiago vidigal (pt-BR, clonada)
+// Voz: a clonada MAIS NOVA do Thiago na conta ElevenLabs (nome com "thiago"). Se ele regravar a voz, o robô
+// passa a usar a nova sozinho. Dá para forçar uma com ELEVENLABS_VOZ=<voice_id>.
+function vozMaisNova() {
+  try {
+    const d = JSON.parse(execFileSync('curl', ['-sS', '-f', 'https://api.elevenlabs.io/v1/voices', '-H', 'xi-api-key: x'], { stdio: ['ignore', 'pipe', 'ignore'] }).toString());
+    const v = (d.voices || []).filter(x => x.category !== 'premade' && /thiago/i.test(x.name)).sort((a, b) => (b.created_at_unix || 0) - (a.created_at_unix || 0))[0];
+    if (v) return v.voice_id;
+  } catch { /* sem rede: usa a conhecida */ }
+  return 'raWp8W6crHict9dwrvex'; // thiago vidigal (pt-BR, clonada em 2026)
+}
+const VOZ = process.env.ELEVENLABS_VOZ || vozMaisNova();
 const MODELO = process.env.ELEVENLABS_MODELO || 'eleven_multilingual_v2';
 const CACHE = path.join(__dirname, '.cache-audio');
 const VELOCIDADE = Number(process.env.ELEVENLABS_VELOCIDADE || 1.1); // fala um pouco mais rápida (pedido do dono)
@@ -30,7 +40,13 @@ function falar(texto) {
       return { arquivo: null, dur: estimada };
     }
   }
-  return { arquivo: arq, dur: duracao(arq) };
+  // Limpa sopro/estalo de microfone: corta graves abaixo de 100 Hz, reduz chiado e nivela o volume.
+  const limpo = arq.replace(/\.mp3$/, '-limpo.mp3');
+  if (!fs.existsSync(limpo)) {
+    try { execFileSync('ffmpeg', ['-y', '-v', 'error', '-i', arq, '-af', 'highpass=f=100,afftdn=nf=-28,deesser=i=0.4,acompressor=threshold=-20dB:ratio=3:attack=5:release=80,loudnorm=I=-16:TP=-1.5', '-ar', '44100', '-b:a', '160k', limpo]); }
+    catch { return { arquivo: arq, dur: duracao(arq) }; }
+  }
+  return { arquivo: limpo, dur: duracao(limpo) };
 }
 
 /** Efeito sonoro gerado pelo ElevenLabs (texto em inglês descreve melhor o som). Salva em tutoriais/audio/<nome>.mp3. */
