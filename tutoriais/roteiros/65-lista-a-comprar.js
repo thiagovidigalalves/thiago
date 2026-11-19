@@ -16,7 +16,7 @@ module.exports = {
       desfocarTudo: true,
       titulo: 'Errou? Clique no lápis para editar',
       texto: 'Para corrigir um item (nome, quantidade, observação ou urgente), clique no lápis "Editar" na linha dele, mude o que precisa e clique em "Salvar". Nos itens já comprados dá para corrigir também a quantidade comprada e os preços.',
-      marcar: [{ alvo: { titulo: 'Editar' } }],
+      semPrint: true,
     },
     {
       desfocarTudo: true,

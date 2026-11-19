@@ -15,7 +15,7 @@ module.exports = {
     {
       titulo: 'Conecte pelo QR Code',
       texto: 'Clique em "Conectar WhatsApp". No celular, abra o WhatsApp › Aparelhos conectados › Conectar aparelho e aponte a câmera para o QR Code.',
-      marcar: [{ alvo: { papel: 'button', nome: /Conectar WhatsApp|Gerar novo QR Code|Reconectar/ } }],
+      semPrint: true,
     },
     {
       titulo: 'Escolha o que sai automático',

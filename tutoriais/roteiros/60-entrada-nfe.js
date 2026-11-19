@@ -18,7 +18,7 @@ module.exports = {
       desfocarTudo: true,
       titulo: 'Busque novas notas',
       texto: 'Clique em "Atualizar agora" para buscar as notas mais recentes na SEFAZ.',
-      marcar: [{ alvo: { papel: 'button', nome: 'Atualizar agora' } }],
+      semPrint: true,
     },
     {
       desfocarTudo: true,

@@ -149,6 +149,7 @@ async function desfocarDados(page, passo = {}) {
 
 /** Roda dentro da página. Exportada para o vídeo aplicar o desfoque antes de cada quadro. */
 function desfocarNaPagina({ extras, tudo, campos, fantasia }) {
+    const ESTRUT = 'h1,h2,h3,th,thead,[role="columnheader"],label,button,[role="tab"],nav,[role="navigation"],aside,option,select';
     // ---- Dados fictícios: troca o dado real por um inventado (sempre o mesmo para o mesmo original). ----
     const h = t => { let x = 2166136261; for (const c of String(t)) { x ^= c.charCodeAt(0); x = Math.imul(x, 16777619); } return Math.abs(x); };
     const PESSOAS = ['Ana Souza', 'Bruno Lima', 'Carla Mendes', 'Diego Rocha', 'Eduarda Alves', 'Felipe Costa', 'Gabriela Nunes', 'Henrique Dias', 'Isabela Martins', 'João Pereira', 'Karina Lopes', 'Lucas Ribeiro', 'Mariana Castro', 'Natália Freitas', 'Otávio Barros', 'Paula Gomes', 'Rafael Teixeira', 'Sofia Carvalho', 'Tiago Moreira', 'Vanessa Duarte', 'Wagner Pinto', 'Yasmin Correia'];
@@ -165,7 +166,7 @@ function desfocarNaPagina({ extras, tudo, campos, fantasia }) {
       v = v.replace(/\b\d{1,3}(\.\d{3})*,\d{2}\b/g, m => zero(m) ? m : `${((h(m) % 4800) + 35).toLocaleString('pt-BR')},${digitos(m, 2)}`);
       v = v.replace(/\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}/g, m => { const d = digitos(m, 14); return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/0001-${d.slice(12, 14)}`; });
       v = v.replace(/\d{3}\.\d{3}\.\d{3}-\d{2}/g, m => { const d = digitos(m, 11); return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9, 11)}`; });
-      v = v.replace(/\(?\d{2}\)?\s?9?\d{4}-?\d{4}/g, m => { const d = digitos(m, 8); return `(34) 9 ${d.slice(0, 4)}-${d.slice(4, 8)}`; });
+      v = v.replace(/\(\d{2}\)\s?9?\s?\d{4}-?\d{4}|\b\d{2}\s9?\d{4}-\d{4}\b|\b9?\d{4}-\d{4}\b/g, m => { const d = digitos(m, 8); return `(34) 9 ${d.slice(0, 4)}-${d.slice(4, 8)}`; });
       v = v.replace(/[\w.+-]+@[\w-]+\.[\w.]+/g, m => `${PESSOAS[h(m) % PESSOAS.length].split(' ')[0].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}@exemplo.com.br`);
       v = v.replace(/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/g, m => { const d = digitos(m, 32).replace(/\d/g, c => 'abcdef0123456789'[c]); return `${d.slice(0,8)}-${d.slice(8,12)}-${d.slice(12,16)}-${d.slice(16,20)}-${d.slice(20,32)}`; });
       v = v.replace(/\b\d{5,}\b/g, m => digitos(m, m.length));
@@ -179,14 +180,15 @@ function desfocarNaPagina({ extras, tudo, campos, fantasia }) {
     const real = (t, el) => { if (!REAIS) return false; const bruto = String(t).trim().replace(/^[^A-Za-zÀ-ÿ0-9]+|[^A-Za-zÀ-ÿ0-9]+$/g, '');
       const cortado = /(…|\.\.\.)\s*$/.test(String(t).trim());
       const n = normN(bruto); if (n.length < 3) return false; const w = n.split(' ');
+      // Títulos, botões e rótulos da tela só contam com nome exato de várias palavras.
+      if (el && el.closest && el.closest(ESTRUT)) return w.length >= 2 && REAIS.exatos.has(n) && !cortado;
       if (REAIS.exatos.has(n) && (w.length >= 2 || (n.length >= 4 && !UI.test(bruto)))) return true;
       const umaPalavraOk = w.length >= 2 || (bruto === bruto.toUpperCase() && bruto.length >= 5) || (el && el.closest && el.closest('tbody,[role="cell"]'));
       if (!umaPalavraOk) return false;
-      if (w.length >= 2 && REAIS.dois.has(w.slice(0, 2).join(' '))) return true;
+      if (cortado && w.length >= 2 && REAIS.dois.has(w.slice(0, 2).join(' '))) return true;
       if (cortado && n.length >= 5) { for (const x of REAIS.exatos) if (x.startsWith(n)) return true; }
       return false; };
     // Troca o texto de um elemento. Devolve true se trocou (aí não precisa desfocar).
-    const ESTRUT = 'h1,h2,h3,th,thead,[role="columnheader"],label,button,[role="tab"],nav,[role="navigation"],aside,option,select';
     const trocar = (el, forca) => {
       if (!fantasia || el.closest('#__tutorial_marcas,#__cortina,#__legenda,#__cursor')) return false;
       if (el.matches('input,textarea')) { const v = String(el.value || ''); if (!v.trim()) return true; const f = real(v, el) ? nomeFalso(v) : falso(v); if (f !== v) { el.value = f; el.dataset.tutorialFalso = '1'; return true; } return false; }
@@ -198,7 +200,7 @@ function desfocarNaPagina({ extras, tudo, campos, fantasia }) {
         let f = falso(orig);
         for (const x of extras) if (f.includes(x)) f = f.split(x).join(x.split(' ').length > 1 ? 'Ana Gestora' : 'Ana');
         if (f === orig) f = f.split(/(\s[·•|]\s|\s-\s)/).map(seg => { if (/^\s[·•|-]\s$/.test(seg)) return seg; const nucleo = seg.trim().replace(/^[^A-Za-zÀ-ÿ0-9]+|[^A-Za-zÀ-ÿ0-9…]+$/g, ''); return nucleo && real(seg, el) ? seg.replace(nucleo, nomeFalso(nucleo.replace(/(…|\.\.\.)$/, ''))) : seg; }).join('');
-        if (f === orig && forca && pareceNome(orig) && orig.trim().split(/\s+/).length >= 2 && !el.closest(ESTRUT)) { const nucleo = orig.trim().replace(/^[^A-Za-zÀ-ÿ0-9]+|[^A-Za-zÀ-ÿ0-9]+$/g, ''); f = orig.replace(nucleo, nomeFalso(nucleo)); }
+        if (f === orig && forca && pareceNome(orig) && orig.trim().split(/\s+/).length >= 2 && orig.trim() !== orig.trim().toUpperCase() && !el.closest(ESTRUT)) { const nucleo = orig.trim().replace(/^[^A-Za-zÀ-ÿ0-9]+|[^A-Za-zÀ-ÿ0-9]+$/g, ''); f = orig.replace(nucleo, nomeFalso(nucleo)); }
         if (f !== orig) { n.textContent = f; n.__falso = f; trocou = true; } else if (/[A-Za-zÀ-ÿ]{3,}/.test(orig) && !UI.test(orig.trim())) sobrou = true;
       }
       return !sobrou; // nada real sobrou (trocado, só números/zeros ou palavra de tela)
@@ -234,7 +236,7 @@ function desfocarNaPagina({ extras, tudo, campos, fantasia }) {
       if (e.closest('aside,#__tutorial_marcas,#__cortina,#__legenda,#__cursor')) return;
       const proprio = [...e.childNodes].filter(c => c.nodeType === 3).map(c => c.textContent).join(' ').trim();
       if (!proprio) return;
-      if (real(proprio, e) || SENSIVEL.test(proprio) || extras.some(x => proprio.includes(x)) || (pareceNome(proprio) && proprio.split(/\s+/).length >= 2 && !e.closest('h1,h2,h3,th,label,button,[role="tab"],nav'))) borrarForte(e);
+      if (real(proprio, e) || SENSIVEL.test(proprio) || extras.some(x => proprio.includes(x)) || (pareceNome(proprio) && proprio.split(/\s+/).length >= 2 && proprio !== proprio.toUpperCase() && !e.closest('h1,h2,h3,th,label,button,[role="tab"],nav'))) borrarForte(e);
     });
     if (tudo && !fantasia) document.querySelectorAll('body *').forEach(e => {
       // Elemento com texto próprio (mesmo misturado com <b>, <span>...) também entra.
