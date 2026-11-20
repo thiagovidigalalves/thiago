@@ -1080,8 +1080,8 @@
   "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/1bd6958fd_passo-2.webp"
  },
  "img-web/funcionarios-relatorios-13-ferias/passo-4.webp": {
-  "sha": "d505f7a207ba205382f94232b7cedd9ab2c6c1ec",
-  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/473e4888d_passo-4.webp"
+  "sha": "aa869112007ef4112dddb6897ee3052fe9d3a248",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/a01633378_passo-4.webp"
  },
  "img-web/funcionarios-salario/passo-1.webp": {
   "sha": "9998846799e3959c79a00d50ec2fef998b857066",
@@ -1166,5 +1166,9 @@
  "img-web/funcionarios-salario/passo-8.webp": {
   "sha": "779ae1b54837fff30240b1abffbb1aa45345266f",
   "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/59772eeb2_passo-8.webp"
+ },
+ "img-web/funcionarios-relatorios-13-ferias/passo-3.webp": {
+  "sha": "94948a737400d906b4b1b57f0806ec1d67f1358c",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/a078a01eb_passo-3.webp"
  }
 }

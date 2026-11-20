@@ -26,9 +26,9 @@ module.exports = {
     {
       ir: '/funcionarios',
       espera: 6000,
-      antes: [{ tipo: 'clicar', alvo: { papel: 'button', nome: '🎁 13º salário' }, espera: 2000 }],
+      antes: [{ tipo: 'clicar', alvo: { papel: 'button', nome: /Lançar 13º salário/ }, seguro: true, espera: 2000 }], // só abre a janela
       titulo: '13º salário',
-      texto: 'No Painel, o botão décimo terceiro salário já traz a sugestão das duas parcelas: dia trinta de novembro e dia vinte de dezembro. Dá pra mudar o valor antes de lançar no Contas a pagar.',
+      texto: 'No Painel, perto da busca, o botão Lançar décimo terceiro salário já traz a sugestão das duas parcelas: dia trinta de novembro e dia vinte de dezembro. Dá pra mudar o valor antes de lançar no Contas a pagar.',
       marcar: [{ alvo: { papel: 'button', nome: 'Lançar no Contas a pagar', dentro: JANELA }, legenda: 'Lançar' }],
       depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Voltar', exato: true, dentro: JANELA }, espera: 1200 }],
     },
