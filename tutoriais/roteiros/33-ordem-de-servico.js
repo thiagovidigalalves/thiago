@@ -3,6 +3,7 @@ module.exports = {
   ordem: 33,
   grupo: 'Comercial',
   titulo: 'Abrir uma ordem de serviço (OS)',
+  assunto: {"chave": ["ordem", "os", "servico", "serviço"], "acoes": ["abrir", "abro", "fazer", "faço", "lançar", "criar", "nova", "cadastrar", "funciona", "usar"]}, // como o Thiaguinho acha o vídeo
   resumo: 'Registre o conserto: cliente, veículo/equipamento, serviços, peças e fotos.',
   antesDeComecar: 'Ter os serviços cadastrados (Cadastros › Serviços › Serviços e Status) e os mecânicos/técnicos cadastrados como usuários. Os nomes dos campos mudam conforme o ramo: oficina mostra "Veículo/Placa/Mecânico"; assistência técnica mostra "Equipamento/Técnico".',
   passos: [

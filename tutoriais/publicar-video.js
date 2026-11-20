@@ -16,6 +16,24 @@ const APP = '6a8469ea2eec118b03c63b1e';
 const API = `https://base44.app/api/apps/${APP}`;
 const RAIZ = path.resolve(__dirname, '..');
 
+// Termos para o Thiaguinho achar o vídeo pela pergunta. Sem `assunto` no roteiro, tira do título:
+// verbos viram `acoes` e o resto (substantivos) vira `chave`.
+const VERBOS = /^(cadastrar|fazer|abrir|emitir|consultar|lan[çc]ar|dar|configurar|conectar|entrar|criar|gerar|enviar|imprimir|ajustar|corrigir|inutilizar|fechar|conferir|usar|ver|receber|pagar|agradecer|editar|mudar|trocar|cobrar|baixar|importar|exportar|definir|acompanhar|vender|devolver|recuperar|esqueci|transformar)$/i;
+const PARADA = new Set('o a os as um uma de do da dos das no na nos nas em e ou pra para com sem seu sua meu minha como que por pelo pela se ao aos'.split(' '));
+function termos(r) {
+  const a = r.assunto || {};
+  if (a.chave && a.chave.length) return { chave: a.chave, acoes: a.acoes || [] };
+  const ws = r.titulo.toLowerCase().replace(/[^a-zà-ÿ0-9 ]/g, ' ').split(/\s+/).filter(w => w.length >= 3 && !PARADA.has(w));
+  const acoes = ws.filter(w => VERBOS.test(w));
+  // Palavras que aparecem em muitos títulos (cliente, venda...) só contam se forem o único assunto.
+  const COMUM = /^(clientes?|vendas?|sistema|contas?|tela|dados|dia|volta|leva|chamar|novo|nova|mail)$/;
+  let chave = ws.filter(w => !VERBOS.test(w));
+  if (chave.some(w => !COMUM.test(w))) chave = chave.filter(w => !COMUM.test(w));
+  // Ações comuns de quem pergunta; "excluir cliente" não cai num vídeo que não ensina a excluir.
+  const COMUNS = ['funciona', 'usar', 'fazer', 'faço', 'ver', 'abrir', 'configurar', 'consultar', 'lançar', 'cadastrar', 'mexer', 'ligar', 'mudar', 'criar'];
+  return { chave, acoes: [...new Set([...acoes, ...COMUNS])] };
+}
+
 function token() {
   const s = JSON.parse(fs.readFileSync(C.SESSAO, 'utf8'));
   for (const o of s.origins || []) for (const i of o.localStorage || []) if (/token/i.test(i.name) && String(i.value || '').length > 40) return i.value.replace(/^"|"$/g, '');
@@ -49,6 +67,12 @@ async function api(metodo, rota, tok, corpo) {
   const cfg = (Array.isArray(lista) ? lista : lista.items || [])[0];
   if (!cfg) throw new Error('SystemSettings não encontrado.');
   let videos = cfg.videos_tutoriais || [];
+  if (process.argv[2] === '--termos') {
+    videos = videos.map(v => { const id = String(v.id).replace(/^tut-/, ''); const r = roteiros.find(x => x.id === id); if (!r) return v; const a = r.assunto || {}; return { ...v, ...termos(r), categoria: r.grupo, rotas: a.rotas || v.rotas }; });
+    await api('PUT', `SystemSettings/${cfg.id}`, tok, { videos_tutoriais: videos });
+    for (const v of videos) console.log(`${v.id}: chave=${(v.chave || []).join(',')} | acoes=${(v.acoes || []).join(',')}`);
+    return;
+  }
   if (remover) {
     videos = videos.filter(v => !ids.includes(String(v.id).replace(/^tut-/, '')));
     await api('PUT', `SystemSettings/${cfg.id}`, tok, { videos_tutoriais: videos });
@@ -65,7 +89,7 @@ async function api(metodo, rota, tok, corpo) {
     const item = {
       id: 'tut-' + id, titulo: r.titulo, categoria: r.grupo,
       rotas: a.rotas || [...new Set(r.passos.map(p => p.ir).filter(Boolean).map(x => x.split('?')[0]))].slice(0, 4),
-      chave: a.chave || [], acoes: a.acoes || [],
+      ...termos(r),
       palavras: (a.palavras || [r.titulo.toLowerCase()]).slice(0, 30),
       video, capa, gerado_pelo_robo: true,
     };
