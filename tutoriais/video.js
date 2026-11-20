@@ -344,7 +344,7 @@ async function gravar(r, s) {
 
     for (let i = 0; i < r.passos.length; i++) {
       const p = r.passos[i], n = i + 1, fala = falas[i];
-      await page.evaluate(a => { window.__desfArgs = a; }, { extras: C.lerExtrasPrivacidade(), tudo: !!p.desfocarTudo, campos: !!p.desfocarCampos, fantasia: process.env.TUTORIAL_FANTASIA !== '0' }).catch(() => {});
+      await page.evaluate(a => { window.__desfArgs = a; }, { extras: C.lerExtrasPrivacidade(), tudo: !!p.desfocarTudo, campos: !!p.desfocarCampos, fantasia: process.env.TUTORIAL_FANTASIA !== '0', borrar: p.borrar || r.borrar || '' }).catch(() => {});
       let inicio = null;
       if (p.ir && i > 0 && menus[i]) {
         // Fecha janela aberta (o menu fica atrás dela) e mostra o caminho pelo menu com a fala já começando.
