@@ -37,6 +37,9 @@ sem tutorial. Troque os prints, ajuste/crie os roteiros, revise a privacidade e 
 - O robô desfoca sozinho nomes nas tabelas, valores em R$, CPF/CNPJ, telefone, e-mail e placa.
   Nunca desligue (`TUTORIAL_DESFOCAR=0`) em empresa real. Confira nos prints se nada escapou.
 - O robô não clica em botões que gravam/apagam (Salvar, Excluir, Finalizar, Emitir...). Ele só marca.
+  EXCEÇÃO (pedido do dono): na empresa de demonstração (`EMP_DEMOTHGE_STOR01`) o roteiro pode ter `gravaDados: true`
+  e o robô salva de verdade, com dados fictícios, pra mostrar o lançamento completo. Se a tela estiver vazia lá,
+  cadastre antes dados fictícios pra ela parecer uma loja real funcionando (e deixe-os lá).
   Só use `gravaDados: true` num roteiro se o usuário pedir e for na empresa de demonstração.
 - Os dados de exemplo digitados devem ser fictícios (ex.: "Maria da Silva", CPF de teste).
 

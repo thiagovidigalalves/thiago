@@ -12,6 +12,16 @@ do sistema THGestor, para a Central de Ajuda dos clientes.
   Exceção autorizada pelo dono: o tutorial **Entrada de NF-e** usa a THIAGO INFORMATICA (`EMP_MT236D4F_KRZBER`), que tem
   notas da SEFAZ (campo `empresa` no roteiro); os emitentes das notas também viram nomes fictícios.
 
+## REGRA PERMANENTE: a Demonstração é uma loja de verdade funcionando (pedido do dono, 20/11/2026)
+- Todo vídeo e print é gravado na **TH Gestor · Demonstração** (`EMP_DEMOTHGE_STOR01`). Lá PODE lançar e SALVAR de verdade,
+  sempre com dados fictícios (cliente, funcionário, valores inventados): vender, pagar salário, lançar advertência,
+  cadastrar, agendar... O vídeo fica completo, mostrando o Salvar e o resultado salvo.
+- No roteiro, `gravaDados: true` libera o robô a clicar em Salvar/Lançar/Pagar. O `capturar.js` só aceita isso na
+  Demonstração; em qualquer outra empresa (inclusive a THIAGO INFORMATICA da Entrada de NF-e) ele continua só marcando.
+- Antes de gravar: se a tela estiver vazia na Demonstração, PRIMEIRO cadastre dados fictícios pra ela parecer uma loja real
+  funcionando (ex.: compromissos na Agenda, produtos com grade, vendas, contas). Deixe esses dados lá pros próximos vídeos.
+- Nunca use dados reais de cliente e nunca salve nada em empresa de cliente.
+
 ## REGRA PERMANENTE: o sistema mudou → conferir os tutoriais (pedido do dono)
 
 Sempre que o THGestor ganhar módulo novo, tela nova, campo novo ou mudar um botão, **e também ao

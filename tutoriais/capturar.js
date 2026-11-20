@@ -14,7 +14,8 @@
  *
  * Segurança: o robô NUNCA clica em botões que gravam ou apagam dados
  * (Salvar, Excluir, Finalizar, Emitir, Enviar...). Esses botões só recebem a bolinha.
- * Um roteiro só pode passar disso se declarar `gravaDados: true` (use apenas na empresa de demonstração).
+ * Um roteiro só pode passar disso se declarar `gravaDados: true`, e só vale na empresa de demonstração (EMP_DEMOTHGE_STOR01):
+ * lá o robô salva de verdade, com dados fictícios (pedido do dono). Em outra empresa ele continua só marcando.
  */
 const fs = require('fs');
 const path = require('path');
@@ -28,6 +29,7 @@ const SESSAO = path.join(__dirname, '.sessao.json');
 const URL_BASE = (process.env.TUTORIAL_URL || 'https://melhorsistema.thiagoinformatica.com.br').replace(/\/$/, '');
 const BOTOES_PERIGOSOS = /salvar|gravar|cadastrar|excluir|apagar|remover|inativar|finalizar|emitir|emiss[aã]o|enviar|confirmar|cancelar venda|cancelar nota|estornar|inutilizar|pagar|baixar|transmitir|faturar|lan[cç]ar|faltam r\$|gerar|manifestar|arquivar|importar|reabrir|estornar|aplicar margem|substitui|restaurar|conectar|cancelar fila|pausar|encerrar|definir padr|imprimir teste|devolver|transformar em venda/i;
 // Dentro de uma janela (dialog), estes também gravam dados:
+const EMPRESA_DEMO = 'EMP_DEMOTHGE_STOR01'; // TH Gestor · Demonstração: a única onde o robô pode salvar dados
 const BOTOES_PERIGOSOS_JANELA = /abrir caixa|fechar caixa|continuar|ok$|sim$/i;
 
 function carregarRoteiros(filtro) {
@@ -305,7 +307,11 @@ async function executar(page, acao, roteiro) {
     const texto = (await el.innerText().catch(() => '')) + ' ' + (await el.getAttribute('aria-label').catch(() => '') || '');
     const naJanela = await el.evaluate(e => !!e.closest('[role="dialog"],[role="alertdialog"]')).catch(() => false);
     // `seguro: true` = botão que só abre uma janela de conferência (não grava nada sozinho).
-    if (!acao.seguro && (BOTOES_PERIGOSOS.test(texto) || (naJanela && BOTOES_PERIGOSOS_JANELA.test(texto.trim()))) && !roteiro.gravaDados) {
+    // `gravaDados: true` (pedido do dono, 20/11/2026): na empresa de DEMONSTRAÇÃO o robô salva de verdade, com dados
+    // fictícios, pra o vídeo ficar completo. Em qualquer outra empresa continua só marcando.
+    const podeGravar = roteiro.gravaDados && (process.env.TUTORIAL_VER_EMPRESA || '') === EMPRESA_DEMO;
+    if (roteiro.gravaDados && !podeGravar) console.log(`   (segurança) gravaDados só vale na empresa de demonstração (${EMPRESA_DEMO}).`);
+    if (!acao.seguro && (BOTOES_PERIGOSOS.test(texto) || (naJanela && BOTOES_PERIGOSOS_JANELA.test(texto.trim()))) && !podeGravar) {
       console.log(`   (segurança) não cliquei em "${texto.trim()}" — só marquei.`);
       return;
     }
