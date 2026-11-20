@@ -60,7 +60,7 @@ module.exports = {
         { alvo: { css: 'label:has-text("Motivo da quebra") select' }, legenda: 'Motivo' },
         { alvo: { papel: 'button', nome: 'Gerar balanço' }, legenda: 'Gera o ajuste' },
       ],
-      depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Continuar contando' }, seguro: true, espera: 1000 }],
+      depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Continuar contando', exato: true }, seguro: true, forcar: true, espera: 1000 }], // a legenda fica por cima: clique forçado
       dica: 'O balanço salva sozinho a cada contagem: dá pra parar e continuar depois.',
     },
     {
