@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Abertura de tutorial</title>
+<!-- Abertura animada dos vídeos explicativos (1920x1080), no mesmo estilo da apresentação aprovada:
+     câmera focando, dolly, retícula, flash, luz passando, grão e a tela do sistema num monitor 3D.
+     Recebe os dados pelo endereço (#{json}): titulo, grupo, resumo, img (caminho do print), fala, falaDur.
+     O video.js grava com o animar.js e cola depois da vinheta, antes do passo a passo. -->
+<style>
+  :root{--azul-0:#020823;--azul-3:#1f56c8;--ciano:#38bdf8;--vermelho:#e3262f;--ouro:#fbbf24}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--azul-0);font-family:"Inter",system-ui,sans-serif;color:#fff}
+  #fundo{position:fixed;inset:0;background:radial-gradient(1400px 900px at 30% 30%,#123a9c 0%,#071a55 45%,var(--azul-0) 100%)}
+  #part{position:fixed;inset:0}
+  .cam{position:fixed;inset:0;opacity:0}
+  .rodando .cam{animation:foco 1.1s cubic-bezier(.2,.8,.2,1) forwards, dolly 12s 1.1s linear forwards}
+  @keyframes foco{from{opacity:0;filter:blur(18px) brightness(1.4);transform:scale(1.22)}to{opacity:1;filter:none;transform:scale(1.03)}}
+  @keyframes dolly{from{transform:scale(1.03)}to{transform:scale(1.07)}}
+  .texto{position:absolute;left:140px;top:270px;width:720px}
+  .tag{display:inline-flex;align-items:center;gap:10px;font:800 24px/1 "Inter";letter-spacing:.14em;text-transform:uppercase;color:var(--ciano);background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.35);padding:12px 20px;border-radius:999px;opacity:0;transform:translateY(30px)}
+  .tag i{width:10px;height:10px;border-radius:50%;background:var(--vermelho);box-shadow:0 0 12px var(--vermelho)}
+  .rotulo{font:800 30px/1 "Inter";color:var(--ouro);margin-top:34px;letter-spacing:.06em;opacity:0}
+  h1{font:900 92px/1.02 "Inter";letter-spacing:-.02em;margin-top:14px;text-shadow:0 10px 40px rgba(0,0,0,.45)}
+  h1 span{display:inline-block;opacity:0;transform:translateY(40px) scale(.9);filter:blur(10px)}
+  .sub{font:500 32px/1.35 "Inter";opacity:0;margin-top:22px;max-width:720px}
+  .rodando .tag{animation:sobe .6s .5s cubic-bezier(.2,1.2,.4,1) forwards}
+  .rodando .rotulo{animation:sobe .6s .8s forwards}
+  .rodando h1 span{animation:palavra .7s cubic-bezier(.2,1.3,.4,1) forwards}
+  .rodando .sub{animation:sobe .7s forwards}
+  @keyframes sobe{to{opacity:1;transform:none}}
+  @keyframes palavra{60%{filter:none;text-shadow:5px 0 var(--vermelho),-5px 0 var(--ciano)}to{opacity:1;transform:none;filter:none}}
+  .monitor{position:absolute;left:900px;top:180px;width:940px;height:600px;border-radius:24px;overflow:hidden;background:#fff;opacity:0;
+    box-shadow:0 60px 120px rgba(0,0,0,.6),0 0 0 2px rgba(255,255,255,.25),0 0 80px rgba(56,189,248,.3);transform:perspective(2200px) rotateY(-14deg) rotateX(4deg)}
+  .monitor img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:left top;transform-origin:25% 25%}
+  .monitor::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.22) 0%,transparent 30%,transparent 70%,rgba(255,255,255,.08))}
+  .rodando .monitor{animation:monitor 1.3s .7s cubic-bezier(.2,1,.3,1) forwards}
+  .rodando .monitor img{animation:passeia 12s 1s ease-in-out forwards}
+  @keyframes monitor{from{opacity:0;transform:perspective(2200px) rotateY(-40deg) rotateX(10deg) translateX(300px) scale(.8)}to{opacity:1;transform:perspective(2200px) rotateY(-14deg) rotateX(4deg)}}
+  @keyframes passeia{to{transform:scale(1.2) translate(-3%,-2%)}}
+  .reticula{position:absolute;left:1000px;top:300px;width:420px;height:220px;opacity:0;z-index:5}
+  .reticula::before{content:"";position:absolute;inset:0;border:4px solid var(--ouro);border-radius:14px;
+    -webkit-mask:linear-gradient(#000 0 0) top left/44px 44px no-repeat,linear-gradient(#000 0 0) top right/44px 44px no-repeat,linear-gradient(#000 0 0) bottom left/44px 44px no-repeat,linear-gradient(#000 0 0) bottom right/44px 44px no-repeat;
+    mask:linear-gradient(#000 0 0) top left/44px 44px no-repeat,linear-gradient(#000 0 0) top right/44px 44px no-repeat,linear-gradient(#000 0 0) bottom left/44px 44px no-repeat,linear-gradient(#000 0 0) bottom right/44px 44px no-repeat}
+  .reticula b{position:absolute;left:0;top:-36px;font:800 18px/1 "Inter";color:var(--ouro);letter-spacing:.12em}
+  .rodando .reticula{animation:mira 1.3s 1.9s cubic-bezier(.2,1.3,.4,1) forwards}
+  @keyframes mira{0%{opacity:0;transform:scale(2)}60%{opacity:1;transform:scale(.92)}100%{opacity:1;transform:scale(1)}}
+  #marca{position:fixed;left:48px;top:40px;display:flex;align-items:center;gap:16px;opacity:0;z-index:20}
+  #marca img{height:62px;filter:drop-shadow(0 4px 12px rgba(0,0,0,.45))}
+  #marca span{font:700 20px/1.2 "Inter";opacity:.85;border-left:2px solid rgba(255,255,255,.3);padding-left:16px}
+  .rodando #marca{animation:sobe .6s .3s forwards}
+  #vinheta{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55) 100%);z-index:30}
+  #grao{position:fixed;inset:0;width:1920px;height:1080px;pointer-events:none;z-index:31;opacity:.07;mix-blend-mode:overlay}
+  #luz{position:fixed;inset:-20%;pointer-events:none;z-index:29;background:linear-gradient(100deg,transparent 35%,rgba(120,180,255,.18) 45%,rgba(255,220,160,.14) 50%,transparent 60%);transform:translateX(-100%)}
+  .rodando #luz{animation:luz 1.8s .2s ease-in-out}
+  @keyframes luz{to{transform:translateX(100%)}}
+  #flash{position:fixed;inset:0;background:#fff;opacity:0;z-index:40}
+  .rodando #flash{animation:flash .5s .15s ease-out}
+  @keyframes flash{0%{opacity:.85}100%{opacity:0}}
+  #saida{position:fixed;inset:0;background:var(--azul-0);opacity:0;z-index:45}
+  #saida.on{animation:apaga .5s forwards}
+  @keyframes apaga{to{opacity:1}}
+</style>
+</head>
+<body>
+<div id="fundo"></div>
+<canvas id="part" width="1920" height="1080"></canvas>
+<div class="cam">
+  <div class="texto">
+    <span class="tag"><i></i><b id="grupo">Tutorial</b></span>
+    <div class="rotulo">PASSO A PASSO</div>
+    <h1 id="titulo"></h1>
+    <p class="sub" id="resumo"></p>
+  </div>
+  <div class="monitor"><img id="tela" alt=""></div>
+  <div class="reticula"><b>OLHA AQUI</b></div>
+</div>
+<div id="marca"><img src="logo.png" alt=""><span>THGestor<br>Central de Ajuda</span></div>
+<div id="luz"></div><div id="vinheta"></div><canvas id="grao" width="480" height="270"></canvas><div id="flash"></div><div id="saida"></div>
+<script>
+  let d = {};
+  try { d = JSON.parse(decodeURIComponent(location.hash.slice(1))); } catch { d = {}; }
+  const titulo = d.titulo || 'Tutorial';
+  document.getElementById('grupo').textContent = d.grupo || 'Tutorial';
+  document.getElementById('resumo').textContent = d.resumo || '';
+  document.getElementById('titulo').innerHTML = titulo.split(/\s+/).map((w, i) => `<span style="animation-delay:${1.0 + i * .12}s">${w.replace(/[<>&]/g, '')}</span>`).join(' ');
+  document.querySelector('.sub').style.animationDelay = (1.2 + titulo.split(/\s+/).length * .12) + 's';
+  if (d.img) document.getElementById('tela').src = d.img; else document.querySelector('.monitor').remove();
+
+  const fala = d.falaDur || 0;
+  window.DURACAO = Math.max(5.2, fala + 1.6);
+  window.CAPA = Math.min(3.4, window.DURACAO - .6);
+  window.MUSICA = 'musica-apresentacao';
+  window.VOL_MUSICA = 0.2;
+  window.SONS = [{ t: 0.1, som: 'impacto', vol: 0.8 }, { t: 0.75, som: 'toque', vol: 0.8 }, { t: 1.95, som: 'camera', vol: 0.45 }, { t: 2.6, som: 'sino', vol: 0.6 }];
+  if (d.fala) window.SONS.push({ t: 0.8, fala: d.fala });
+
+  const cv = document.getElementById('part'), g = cv.getContext('2d');
+  const P = Array.from({ length: 110 }, () => ({ x: Math.random() * 1920, y: Math.random() * 1080, r: .8 + Math.random() * 2.6, v: .2 + Math.random() * .9, a: .15 + Math.random() * .5 }));
+  const gr = document.getElementById('grao'), gg = gr.getContext('2d'), ruido = gg.createImageData(480, 270);
+  (function quadro() {
+    g.clearRect(0, 0, 1920, 1080);
+    for (const p of P) { p.y -= p.v; if (p.y < -10) { p.y = 1090; p.x = Math.random() * 1920; } g.beginPath(); g.arc(p.x, p.y, p.r, 0, 6.283); g.fillStyle = `rgba(160,200,255,${p.a})`; g.fill(); }
+    for (let i = 0; i < ruido.data.length; i += 4) { const v = Math.random() * 255; ruido.data[i] = ruido.data[i + 1] = ruido.data[i + 2] = v; ruido.data[i + 3] = 255; }
+    gg.putImageData(ruido, 0, 0);
+    requestAnimationFrame(quadro);
+  })();
+  window.comecar = () => {
+    document.body.classList.add('rodando');
+    setTimeout(() => document.getElementById('saida').classList.add('on'), (window.DURACAO - .5) * 1000);
+  };
+</script>
+</body>
+</html>

@@ -228,7 +228,20 @@ async function gravar(r, s) {
   // O roteiro pode trazer `fala` (no tutorial ou no passo) para usar um texto próprio.
   const natural = t => String(t || '').replace(/CPF\/CNPJ/g, 'CPF ou CNPJ').replace(/\s*›\s*/g, ', depois em ').replace(/["“”]/g, '').replace(/\s+/g, ' ').trim();
   const minusc = t => t.charAt(0).toLowerCase() + t.slice(1);
-  const falaIntro = falar(r.fala || `Oi! Aqui é o Thiago, da Thiago Informática. Neste vídeo eu vou te mostrar como ${minusc(natural(r.titulo))}. ${natural(r.resumo)}`);
+  const textoIntro = r.fala || `Oi! Aqui é o Thiago, da Thiago Informática. Neste vídeo eu vou te mostrar como ${minusc(natural(r.titulo))}. ${natural(r.resumo)}`;
+  const falaIntro = falar(textoIntro);
+  // Abertura animada (efeitos da apresentação aprovada) com a fala de abertura: empolga antes do passo a passo.
+  const dirAbertura = fs.mkdtempSync(path.join(require('os').tmpdir(), 'abertura-'));
+  let abertura = null;
+  if (process.env.TUTORIAL_SEM_ABERTURA !== '1') {
+    const img = [path.join(__dirname, '.limpo', r.id, 'passo-1.png'), path.join(RAIZ, 'ajuda', 'img', r.id, 'passo-1.png')].find(f => fs.existsSync(f));
+    const dados = { titulo: r.titulo, grupo: r.grupo, resumo: r.resumo, img: img ? path.relative(path.join(__dirname, 'animacoes'), img) : '', fala: textoIntro, falaDur: falaIntro.dur };
+    try {
+      execFileSync('node', [path.join(__dirname, 'animar.js'), 'abertura-tutorial', JSON.stringify(dados), 'abertura'], { env: { ...process.env, ANIMAR_SAIDA: dirAbertura }, stdio: ['ignore', 'ignore', 'inherit'] });
+      abertura = path.join(dirAbertura, 'abertura.mp4');
+      console.log('   ✨ abertura animada pronta');
+    } catch (e) { console.log('   (sem abertura animada: ' + String(e.message).split('\n')[0] + ')'); }
+  }
   const LIGA = ['Primeiro', 'Agora', 'Depois', 'Em seguida', 'Agora', 'Depois', 'Em seguida', 'Agora', 'Depois'];
   const falas = r.passos.map((p, i) => falar(p.fala || [
     (i === r.passos.length - 1 && i > 0 ? 'E pra finalizar' : LIGA[i % LIGA.length]) + ', ' + minusc(natural(p.texto)),
@@ -262,11 +275,9 @@ async function gravar(r, s) {
     await cortina(page, true, r.titulo, r.resumo || '');
     // Nomes reais da empresa -> fictícios (a cortina cobre a tela enquanto carrega).
     if (r.precisaLogin !== false) await C.instalarNomes(context, page, await C.carregarNomesReais(page));
-    // Corta o tempo parado de carregamento: o vídeo começa ~1 s antes da fala de abertura.
-    corte = Math.max(0, agora() - 1);
-    som(s.transicao, 0.8); const ti = agora(); som(falaIntro.arquivo);
+    // A fala de abertura vai na abertura animada (antes); aqui o vídeo já começa no passo 1.
     await C.prepararTela(page);
-    await espera(Math.max(0, (falaIntro.dur + 0.4 - (agora() - ti)) * 1000));
+    corte = Math.max(0, agora() - 0.3);
 
     for (let i = 0; i < r.passos.length; i++) {
       const p = r.passos[i], n = i + 1, fala = falas[i];
@@ -349,10 +360,13 @@ async function gravar(r, s) {
   execFileSync('ffmpeg', args, { stdio: 'inherit' });
   // Vinheta da Thiago Informática antes do tutorial (se existir ajuda/videos/vinheta.mp4).
   const vinheta = path.join(SAIDA, 'vinheta.mp4');
-  if (fs.existsSync(vinheta) && process.env.TUTORIAL_SEM_VINHETA !== '1') {
+  const partes = [fs.existsSync(vinheta) && process.env.TUTORIAL_SEM_VINHETA !== '1' ? vinheta : null, abertura && fs.existsSync(abertura) ? abertura : null].filter(Boolean);
+  if (partes.length) {
     const junto = final.replace(/\.mp4$/, '.tmp.mp4');
-    execFileSync('ffmpeg', ['-y', '-v', 'error', '-i', vinheta, '-i', final, '-filter_complex',
-      `[0:v]scale=${W}:${H},fps=25,setsar=1[v0];[1:v]fps=25,setsar=1[v1];[0:a]aresample=44100[a0];[1:a]aresample=44100[a1];[v0][a0][v1][a1]concat=n=2:v=1:a=1[v][a]`,
+    const todas = [...partes, final];
+    const ent = todas.flatMap(f => ['-i', f]);
+    const fil = todas.map((_, k) => `[${k}:v]scale=${W}:${H},fps=25,setsar=1[v${k}];[${k}:a]aresample=44100[a${k}]`).join(';') + ';' + todas.map((_, k) => `[v${k}][a${k}]`).join('') + `concat=n=${todas.length}:v=1:a=1[v][a]`;
+    execFileSync('ffmpeg', ['-y', '-v', 'error', ...ent, '-filter_complex', fil,
       '-map', '[v]', '-map', '[a]', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '24', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '128k', '-movflags', '+faststart', junto], { stdio: 'inherit' });
     fs.renameSync(junto, final);
   }

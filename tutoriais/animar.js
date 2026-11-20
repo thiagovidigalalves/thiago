@@ -19,7 +19,7 @@ const { chromium } = require('playwright');
 const RAIZ = path.resolve(__dirname, '..');
 const PASTA = path.join(__dirname, 'animacoes');
 const SONS = path.join(__dirname, 'audio');
-const SAIDA = path.join(RAIZ, 'ajuda', 'videos');
+const SAIDA = process.env.ANIMAR_SAIDA ? path.resolve(process.env.ANIMAR_SAIDA) : path.join(RAIZ, 'ajuda', 'videos');
 let W = 1920, H = 1080; // a página pode pedir outro tamanho: <meta name="tamanho" content="1080x1920">
 const espera = ms => new Promise(r => setTimeout(r, ms));
 const duracao = f => Number(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', f]).toString().trim()) || 0;
@@ -37,6 +37,8 @@ function garantirSons() {
 
 (async () => {
   const nome = process.argv[2];
+  // Opcional: dados para a página (vão no #endereço) e nome do arquivo de saída. Ex.: abertura-tutorial '{"titulo":"..."}' abertura-x
+  const params = process.argv[3] || '', saidaNome = process.argv[4] || nome;
   const html = path.join(PASTA, `${nome}.html`);
   if (!nome || !fs.existsSync(html)) { console.log('Uso: node tutoriais/animar.js <nome>  (arquivo em tutoriais/animacoes/<nome>.html)'); process.exit(1); }
   garantirSons();
@@ -47,7 +49,8 @@ function garantirSons() {
   const context = await browser.newContext({ viewport: { width: W, height: H }, recordVideo: { dir: tmp, size: { width: W, height: H } } });
   const page = await context.newPage();
   const t0 = Date.now();
-  await page.goto('file://' + html, { waitUntil: 'load' });
+  await page.goto('file://' + html + (params ? '#' + encodeURIComponent(params) : ''), { waitUntil: 'load' });
+  await page.waitForLoadState('networkidle').catch(() => {});
   await page.evaluate(() => document.fonts.ready);
   await espera(600);
   const dur = await page.evaluate(() => window.DURACAO || 5);
@@ -60,7 +63,7 @@ function garantirSons() {
   if (capa != null) {
     await espera(capa * 1000);
     fs.mkdirSync(SAIDA, { recursive: true });
-    await page.screenshot({ path: path.join(SAIDA, `${nome}.png`) });
+    await page.screenshot({ path: path.join(SAIDA, `${saidaNome}.png`) });
     await espera(Math.max(0, (dur - capa) * 1000));
   } else await espera(dur * 1000);
   const video = page.video();
@@ -84,7 +87,7 @@ function garantirSons() {
     const k = ++nIn; entradas.push('-stream_loop', '-1', '-i', musica);
     filtros.push(`[${k}:a]volume=${volMusica},atrim=0:${dur},afade=t=out:st=${Math.max(0, dur - 1.5)}:d=1.5[mus]`); rotulos.push('[mus]');
   }
-  const saida = path.join(SAIDA, `${nome}.mp4`);
+  const saida = path.join(SAIDA, `${saidaNome}.mp4`);
   const args = ['-y', '-v', 'error', '-ss', inicio.toFixed(2), '-i', bruto, ...entradas];
   if (rotulos.length) {
     filtros.push(`${rotulos.join('')}amix=inputs=${rotulos.length}:normalize=0,apad[a]`);
