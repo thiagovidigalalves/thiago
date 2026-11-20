@@ -149,7 +149,7 @@ async function desfocarDados(page, passo = {}) {
 
 /** Roda dentro da página. Exportada para o vídeo aplicar o desfoque antes de cada quadro. */
 function desfocarNaPagina({ extras, tudo, campos, fantasia }) {
-    const ESTRUT = 'h1,h2,h3,th,thead,[role="columnheader"],label,button,[role="tab"],nav,[role="navigation"],aside,option,select';
+    const ESTRUT = 'h1,h2,h3,th,thead,[role="columnheader"],label,button,[role="tab"],nav,[role="navigation"],aside,option,select,[role="option"],[role="listbox"],[role="menuitem"],[role="combobox"]';
     // ---- Dados fictícios: troca o dado real por um inventado (sempre o mesmo para o mesmo original). ----
     const h = t => { let x = 2166136261; for (const c of String(t)) { x ^= c.charCodeAt(0); x = Math.imul(x, 16777619); } return Math.abs(x); };
     const PESSOAS = ['Ana Souza', 'Bruno Lima', 'Carla Mendes', 'Diego Rocha', 'Eduarda Alves', 'Felipe Costa', 'Gabriela Nunes', 'Henrique Dias', 'Isabela Martins', 'João Pereira', 'Karina Lopes', 'Lucas Ribeiro', 'Mariana Castro', 'Natália Freitas', 'Otávio Barros', 'Paula Gomes', 'Rafael Teixeira', 'Sofia Carvalho', 'Tiago Moreira', 'Vanessa Duarte', 'Wagner Pinto', 'Yasmin Correia'];
@@ -198,6 +198,8 @@ function desfocarNaPagina({ extras, tudo, campos, fantasia }) {
       for (const n of el.childNodes) {
         if (n.nodeType !== 3 || !n.textContent.trim()) continue;
         if (n.__falso === n.textContent) { trocou = true; continue; }
+        // Títulos numerados ("1. Numeração", "2. Cores") são da tela, não nomes.
+        if (/^\s*\d+[.)]\s/.test(n.textContent)) continue;
         // Cores da grade (Branco, Preto, Azul...) não são nomes de pessoas: ficam como estão.
         if (/^\s*(preto|branco|off white|nude|bege|caramelo|marrom|vermelho|vinho|rosa|laranja|amarelo|verde|azul|azul marinho|jeans|cinza|prata|dourado|champanhe|estampado)\s*$/i.test(n.textContent)) continue;
         const orig = n.textContent;

@@ -44,7 +44,7 @@ module.exports = {
       texto: 'Agora em Produtos, clique em Novo produto e, em Tipo do produto, escolha Com Grade. Repara que o estoque não fica mais no produto: ele fica em cada cor e numeração.',
       marcar: [
         { alvo: { campo: 'Tipo do produto', dentro: 'dialog' }, legenda: 'Com Grade' },
-        { alvo: { texto: 'Fica em cada cor e numeração' }, legenda: 'Estoque por cor e número' },
+        { alvo: { texto: 'Fica em cada cor e numeração', dentro: 'dialog' }, legenda: 'Estoque por cor e número' },
       ],
     },
     {

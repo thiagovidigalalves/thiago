@@ -57,7 +57,7 @@ function scriptDaPagina(logoDataUri) {
     window.__desfocar = ${C.desfocarNaPagina.toString()};
     window.__desfArgs = { extras: ${JSON.stringify(extras)}, tudo: true, campos: true, fantasia: ${process.env.TUTORIAL_FANTASIA !== '0'} }; // começa no modo mais rígido
     const css = \`
-      #__cortina{position:fixed;inset:0;z-index:2147483646;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+      #__cortina{position:fixed;inset:0;pointer-events:none;z-index:2147483646;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
         background:radial-gradient(circle at 30% 20%,#1c3a96,#0c1f5c 60%,#081440);color:#fff;font:600 22px/1.3 system-ui,sans-serif;transition:opacity .35s}
       #__cortina img{height:130px;filter:drop-shadow(0 6px 18px rgba(0,0,0,.35))}
       #__cortina b{font:800 40px/1.15 system-ui,sans-serif;max-width:900px;text-align:center}
@@ -296,7 +296,9 @@ async function gravar(r, s) {
         await legenda(page, n, p.titulo, p.texto);
         inicio = agora(); som(fala.arquivo);
         const foi = await andarNoMenu(page, menu1, som, s.clique);
-        if (!foi || !page.url().includes(p.ir.split('?')[0])) { await page.goto(C.URL_BASE + C.comEmpresa(p.ir), { waitUntil: 'load' }).catch(() => {}); await espera(p.espera || 3000); await cortina(page, false); }
+        // Super admin vendo a empresa de demonstração: o clique no menu perde o ?empresa=; recarrega na mesma tela.
+        const semEmpresa = process.env.TUTORIAL_VER_EMPRESA && !page.url().includes('empresa=');
+        if (!foi || semEmpresa || !page.url().includes(p.ir.split('?')[0])) { await page.goto(C.URL_BASE + C.comEmpresa(p.ir), { waitUntil: 'load' }).catch(() => {}); await espera(p.espera || 3000); await cortina(page, false); }
       }
       await semErroDeLimite(page);
       for (const a of p.antes || []) await C.executar(page, a, r);
@@ -384,7 +386,7 @@ async function gravar(r, s) {
   const s = sons();
   for (const r of roteiros) {
     console.log(`\n▶ Vídeo: ${r.titulo}`);
-    try { await gravar(r, s); } catch (e) { console.log('   ✖ ' + String(e.message).split('\n')[0]); }
+    try { await gravar(r, s); } catch (e) { console.log('   ✖ ' + String(e.message).split('\n').slice(0, 12).join(' | ')); }
     await espera(Number(process.env.TUTORIAL_PAUSA || 8000));
   }
 })();

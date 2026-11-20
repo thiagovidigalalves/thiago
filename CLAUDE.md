@@ -44,5 +44,7 @@ começar qualquer sessão neste repositório**, faça a conferência completa. N
   A apresentação (fala, cenas e efeitos) foi APROVADA pelo dono: é o padrão. Não mude as falas sem ele pedir.
   `apresentacao-status` é a mesma em pé (1080x1920) para o status do WhatsApp; corte em 2 partes (0-40 s e 40 s-fim)
   porque o status aceita vídeos curtos. Ao mudar uma, mude a outra igual.
-- O Thiaguinho (app, `src/lib/videosTutoriais.js`) mostra o vídeo da tela no "Me explica": ao publicar vídeos
-  novos, suba o mp4 como asset do app e acrescente na lista `VIDEOS_TUTORIAIS` (rotas, palavras, titulo, video, capa).
+- SEMPRE que um vídeo ficar pronto (pedido do dono): mande o arquivo pra ele aqui na conversa E publique sozinho:
+  `node tutoriais/publicar-video.js <id>` (sobe mp4/jpg e grava em Super Admin › Vídeos do Thiaguinho, com
+  `assunto: {chave, acoes, rotas}` do roteiro) + `node tutoriais/gerar-ajuda.js` e republique a Central.
+  O Thiaguinho mostra "🎬 Ver vídeo" junto de "Me explica" / "Faz comigo" quando a pergunta é do assunto.

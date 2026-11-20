@@ -18,7 +18,7 @@ const RAIZ = path.resolve(__dirname, '..');
 
 function token() {
   const s = JSON.parse(fs.readFileSync(C.SESSAO, 'utf8'));
-  for (const o of s.origins || []) for (const i of o.localStorage || []) if (/token/i.test(i.name) && i.value.length > 40) return i.value.replace(/^"|"$/g, '');
+  for (const o of s.origins || []) for (const i of o.localStorage || []) if (/token/i.test(i.name) && String(i.value || '').length > 40) return i.value.replace(/^"|"$/g, '');
   throw new Error('Sem sessão do robô (tutoriais/.sessao.json). Entre de novo com TUTORIAL_LINK.');
 }
 
@@ -42,7 +42,7 @@ async function api(metodo, rota, tok, corpo) {
   const ids = process.argv.slice(2);
   if (!ids.length) { console.log('Uso: node tutoriais/publicar-video.js <id> [<id> ...]'); process.exit(1); }
   const tok = token();
-  const roteiros = C.carregarRoteiros();
+  const roteiros = C.carregarRoteiros([]);
   const lista = await api('GET', 'SystemSettings?sort=-created_date&limit=1', tok);
   const cfg = (Array.isArray(lista) ? lista : lista.items || [])[0];
   if (!cfg) throw new Error('SystemSettings não encontrado.');
@@ -66,4 +66,4 @@ async function api(metodo, rota, tok, corpo) {
   }
   await api('PUT', `SystemSettings/${cfg.id}`, tok, { videos_tutoriais: videos });
   console.log(`Vídeos no Thiaguinho: ${videos.length}`);
-})().catch(e => { console.error('Erro: ' + e.message); process.exit(1); });
+})().catch(e => { console.error('Erro: ' + e.stack); process.exit(1); });
