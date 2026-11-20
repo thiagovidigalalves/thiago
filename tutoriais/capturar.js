@@ -321,7 +321,7 @@ async function executar(page, acao, roteiro) {
       console.log(`   (segurança) não cliquei em "${texto.trim()}" — só marquei.`);
       return;
     }
-    await el.click();
+    await el.click(acao.forcar ? { force: true } : undefined); // `forcar`: botão coberto pela legenda do vídeo
   } else if (acao.tipo === 'preencher') {
     await el.fill(acao.valor || '');
   } else if (acao.tipo === 'escolher') {

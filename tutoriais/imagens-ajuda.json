@@ -1038,5 +1038,101 @@
  "img-web/recorrencias/passo-6.webp": {
   "sha": "57d85cfd4d622277630c801a0ed842339fd9e5bc",
   "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/00c486f3a_passo-6.webp"
+ },
+ "img-web/funcionarios-advertencias/passo-1.webp": {
+  "sha": "058b31a81f3d615fd17acac1f3e58442bb0efece",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/36b9113ec_passo-1.webp"
+ },
+ "img-web/funcionarios-advertencias/passo-2.webp": {
+  "sha": "9ed9ebc9d496672639a2e3520422e09aa5eccf29",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/7e537f142_passo-2.webp"
+ },
+ "img-web/funcionarios-advertencias/passo-3.webp": {
+  "sha": "57a3cf0aeca5687a5b4d4f26a914cd9658920b93",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/4c4a27b67_passo-3.webp"
+ },
+ "img-web/funcionarios-advertencias/passo-4.webp": {
+  "sha": "612e5fb8bc6488e749a1fd91f0e90ad1f97d4b9b",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/dd6c593dd_passo-4.webp"
+ },
+ "img-web/funcionarios-advertencias/passo-5.webp": {
+  "sha": "a65ed3f6bcb8e62e0a4ba7408d161bb8cca73f52",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/56590f588_passo-5.webp"
+ },
+ "img-web/funcionarios-comissao/passo-1.webp": {
+  "sha": "fba903e0eedfff8b434348315bc677f782625d71",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/bfd5c62d5_passo-1.webp"
+ },
+ "img-web/funcionarios-comissao/passo-2.webp": {
+  "sha": "9acab91e846e2562ba44843bc6018a255acb60c7",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/677e9e380_passo-2.webp"
+ },
+ "img-web/funcionarios-comissao/passo-3.webp": {
+  "sha": "cd508dbab88bdb1bee5f8e0574967a953e855775",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/01436861a_passo-3.webp"
+ },
+ "img-web/funcionarios-relatorios-13-ferias/passo-1.webp": {
+  "sha": "e798bc5a237e8d8a1935eae57dd63b39515d5ff2",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/75ad9920a_passo-1.webp"
+ },
+ "img-web/funcionarios-relatorios-13-ferias/passo-2.webp": {
+  "sha": "0e7ebc3c1b977a0766c274ac2c1336c5e1bf29f2",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/4f9b6eadf_passo-2.webp"
+ },
+ "img-web/funcionarios-relatorios-13-ferias/passo-3.webp": {
+  "sha": "2b13971037a3dc6ec53a87e61c402c6b288a9109",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/005f4f7ab_passo-3.webp"
+ },
+ "img-web/funcionarios-relatorios-13-ferias/passo-4.webp": {
+  "sha": "7fa8626f66dbbd120d9298051d56cb9d493c68c6",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/07184c335_passo-4.webp"
+ },
+ "img-web/funcionarios-salario/passo-1.webp": {
+  "sha": "ac08e9d27ab62ebcf25d311c4afbcbb5681333e4",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/3f12edd30_passo-1.webp"
+ },
+ "img-web/funcionarios-salario/passo-2.webp": {
+  "sha": "dd3dc9957dd676a4b65c34cfed7b06c8de88987e",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/50c70527c_passo-2.webp"
+ },
+ "img-web/funcionarios-salario/passo-3.webp": {
+  "sha": "581c33201db051b4d65b53d16cd90f34a9297175",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/6f7a7014b_passo-3.webp"
+ },
+ "img-web/funcionarios-salario/passo-4.webp": {
+  "sha": "22809901b7d7cf42e0e5fc249044c4a8be353acc",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/caaf69e4e_passo-4.webp"
+ },
+ "img-web/funcionarios-salario/passo-5.webp": {
+  "sha": "9be8a744dfe4e0e4e743717d56a2424edd5458f5",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/2e175fff4_passo-5.webp"
+ },
+ "img-web/funcionarios-salario/passo-6.webp": {
+  "sha": "9edfd9236e6b45416cc92bf03c959d82b2c65227",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/9b6997b92_passo-6.webp"
+ },
+ "img-web/funcionarios-vale-acerto/passo-1.webp": {
+  "sha": "5d386527532feeee30dcddf9e3bb7047e5096076",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/173995cc7_passo-1.webp"
+ },
+ "img-web/funcionarios-vale-acerto/passo-2.webp": {
+  "sha": "a7c0b6fbd4b3398e3791fc7aa8a6fd9a62742bc6",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/c8235fb6f_passo-2.webp"
+ },
+ "img-web/funcionarios-vale-acerto/passo-3.webp": {
+  "sha": "4da005683495e558c76da004fab8e94dc51ca61b",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/d6c9916aa_passo-3.webp"
+ },
+ "img-web/funcionarios-vale-acerto/passo-4.webp": {
+  "sha": "6ba6e6b91d55a9f5484f9b1db3b88ede09bd7ad8",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/a8e3aac9f_passo-4.webp"
+ },
+ "img-web/funcionarios-vale-acerto/passo-5.webp": {
+  "sha": "261c5918d5e43087c47c926101b675f500fc8390",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/f62b396d8_passo-5.webp"
+ },
+ "img-web/funcionarios-vale-acerto/passo-6.webp": {
+  "sha": "b04b15d96881266d8835b6d57a6425657d3f8d26",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/a39c78b5e_passo-6.webp"
  }
 }

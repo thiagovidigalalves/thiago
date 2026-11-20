@@ -62,7 +62,7 @@ module.exports = {
         { alvo: { papel: 'button', nome: 'Imprimir recibo', dentro: JANELA }, legenda: 'Imprimir' },
         { alvo: { papel: 'button', nome: 'WhatsApp', exato: true, dentro: JANELA }, legenda: 'WhatsApp' },
       ],
-      depois: [{ tipo: 'clicar', alvo: { rotulo: 'Fechar', dentro: JANELA }, espera: 1200 }],
+      depois: [{ tipo: 'clicar', alvo: { rotulo: 'Fechar', dentro: JANELA }, forcar: true, espera: 1200 }],
     },
     {
       ir: '/funcionarios/pagamentos',
