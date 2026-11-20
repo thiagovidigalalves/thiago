@@ -36,12 +36,14 @@ module.exports = {
       ],
     },
     {
-      titulo: 'Desconto de INSS e comissão',
-      texto: 'Logo abaixo vem o desconto de INSS: no automático ele segue a tabela oficial, mas dá pra pôr um percentual, um valor fixo ou não descontar. O que for descontado vira a guia do INSS no Contas a pagar. E em Como recebe a comissão você escolhe se ela soma no salário, ou se o salário é o mínimo garantido e a comissão só entra no que passar dele.',
-      marcar: [
-        { alvo: { papel: 'button', nome: 'Automático (tabela oficial)', exato: true, dentro: 'dialog' }, legenda: 'INSS' },
-        { alvo: { campo: 'Como recebe a comissão', dentro: 'dialog' }, legenda: 'Comissão' },
-      ],
+      titulo: 'Desconto de INSS',
+      texto: 'Logo abaixo vem o desconto de INSS: no automático ele segue a tabela oficial, mas dá pra pôr um percentual, um valor fixo ou não descontar. O que for descontado vira a guia do INSS no Contas a pagar.',
+      marcar: [{ alvo: { papel: 'button', nome: 'Automático (tabela oficial)', exato: true, dentro: 'dialog' }, legenda: 'INSS' }],
+    },
+    {
+      titulo: 'Como recebe a comissão',
+      texto: 'E em Como recebe a comissão você escolhe se ela soma no salário, ou se o salário é o mínimo garantido e a comissão só entra no que passar dele.',
+      marcar: [{ alvo: { campo: 'Como recebe a comissão', dentro: 'dialog' }, legenda: 'Comissão' }],
     },
     {
       titulo: 'Bonificação do mês',
