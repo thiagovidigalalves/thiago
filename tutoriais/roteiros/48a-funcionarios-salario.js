@@ -43,7 +43,7 @@ module.exports = {
     {
       titulo: 'Como recebe a comissão',
       texto: 'E em Como recebe a comissão você escolhe se ela soma no salário, ou se o salário é o mínimo garantido e a comissão só entra no que passar dele.',
-      marcar: [{ alvo: { campo: 'Como recebe a comissão', dentro: 'dialog' }, legenda: 'Comissão' }],
+      marcar: [{ alvo: { css: 'label:has-text("Como recebe a comissão") select', dentro: 'dialog' }, legenda: 'Comissão' }],
     },
     {
       titulo: 'Bonificação do mês',
