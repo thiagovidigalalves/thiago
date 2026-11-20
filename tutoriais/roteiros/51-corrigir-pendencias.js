@@ -7,6 +7,7 @@ module.exports = {
   passos: [
     {
       ir: '/fiscal/erros',
+      espera: 9000, // espera a lista carregar antes do print
       titulo: 'Abra "Corrigir pendências"',
       texto: 'No menu, clique em Fiscal › Corrigir pendências. Cada cartão é uma venda cuja nota não foi autorizada.',
       marcar: [{ alvo: { papel: 'heading', nome: 'Corrigir pendências' } }],

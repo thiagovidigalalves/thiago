@@ -7,10 +7,11 @@ module.exports = {
   passos: [
     {
       ir: '/relatorios/trocas-devolucoes',
+      antes: [{ tipo: 'clicar', alvo: { papel: 'button', nome: '12 meses', exato: true }, espera: 4000 }],
       desfocarTudo: true,
       titulo: 'Abra "Trocas e devoluções"',
       texto: 'No menu, clique em Relatórios › Vendas › Trocas e devoluções. Escolha o período ("Este mês", "3 meses", "12 meses").',
-      marcar: [{ alvo: { papel: 'button', nome: '3 meses', exato: true } }],
+      marcar: [{ alvo: { papel: 'button', nome: '12 meses', exato: true } }],
     },
     {
       desfocarTudo: true,

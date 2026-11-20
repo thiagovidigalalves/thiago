@@ -7,10 +7,11 @@ module.exports = {
   passos: [
     {
       ir: '/relatorios/pos-venda',
+      antes: [{ tipo: 'clicar', alvo: { papel: 'button', nome: '30 dias', exato: true }, espera: 4000 }],
       desfocarTudo: true,
       titulo: 'Escolha o período',
       texto: 'Em Relatórios › Clientes › Pós-Venda, clique em "Hoje", "Ontem", "7 dias" ou "30 dias". Os cartões mostram quantas vendas já foram agradecidas e quantas faltam.',
-      marcar: [{ alvo: { papel: 'button', nome: 'Ontem', exato: true } }],
+      marcar: [{ alvo: { papel: 'button', nome: '30 dias', exato: true } }],
     },
     {
       desfocarTudo: true,

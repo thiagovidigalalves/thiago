@@ -8,6 +8,8 @@ module.exports = {
   passos: [
     {
       ir: '/relatorios/funcionarios/comissoes',
+      espera: 9000, // a tela calcula as comissões: espera terminar de carregar antes do print
+      antes: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Mês passado', exato: true }, espera: 6000 }],
       titulo: 'Escolha o período',
       texto: 'Em Relatórios › Funcionários › Comissões, clique em "Este mês" ou "Mês passado" (o mais comum para pagar a comissão).',
       marcar: [{ alvo: { papel: 'button', nome: 'Mês passado', exato: true } }],

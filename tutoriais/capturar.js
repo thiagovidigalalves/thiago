@@ -309,7 +309,7 @@ async function executar(page, acao, roteiro) {
     // `seguro: true` = botão que só abre uma janela de conferência (não grava nada sozinho).
     // `gravaDados: true` (pedido do dono, 20/11/2026): na empresa de DEMONSTRAÇÃO o robô salva de verdade, com dados
     // fictícios, pra o vídeo ficar completo. Em qualquer outra empresa continua só marcando.
-    const podeGravar = roteiro.gravaDados && (process.env.TUTORIAL_VER_EMPRESA || '') === EMPRESA_DEMO;
+    const podeGravar = roteiro.gravaDados && (process.env.TUTORIAL_VER_EMPRESA || '') === EMPRESA_DEMO && process.env.TUTORIAL_SEM_GRAVAR !== '1'; // TUTORIAL_SEM_GRAVAR=1: só prints, sem lançar de novo
     if (roteiro.gravaDados && !podeGravar) console.log(`   (segurança) gravaDados só vale na empresa de demonstração (${EMPRESA_DEMO}).`);
     if (!acao.seguro && (BOTOES_PERIGOSOS.test(texto) || (naJanela && BOTOES_PERIGOSOS_JANELA.test(texto.trim()))) && !podeGravar) {
       console.log(`   (segurança) não cliquei em "${texto.trim()}" — só marquei.`);
