@@ -39,7 +39,9 @@ async function api(metodo, rota, tok, corpo) {
 }
 
 (async () => {
-  const ids = process.argv.slice(2);
+  // --remover <id>: tira o vídeo do Thiaguinho (ex.: vídeo com erro, até sair a versão corrigida).
+  const remover = process.argv[2] === '--remover';
+  const ids = process.argv.slice(remover ? 3 : 2);
   if (!ids.length) { console.log('Uso: node tutoriais/publicar-video.js <id> [<id> ...]'); process.exit(1); }
   const tok = token();
   const roteiros = C.carregarRoteiros([]);
@@ -47,6 +49,12 @@ async function api(metodo, rota, tok, corpo) {
   const cfg = (Array.isArray(lista) ? lista : lista.items || [])[0];
   if (!cfg) throw new Error('SystemSettings não encontrado.');
   let videos = cfg.videos_tutoriais || [];
+  if (remover) {
+    videos = videos.filter(v => !ids.includes(String(v.id).replace(/^tut-/, '')));
+    await api('PUT', `SystemSettings/${cfg.id}`, tok, { videos_tutoriais: videos });
+    console.log(`🗑️ Removido(s) do Thiaguinho: ${ids.join(', ')} · ficam ${videos.length}`);
+    return;
+  }
   for (const id of ids) {
     const r = roteiros.find(x => x.id === id);
     const mp4 = path.join(RAIZ, 'ajuda', 'videos', id + '.mp4'), jpg = path.join(RAIZ, 'ajuda', 'videos', id + '.jpg');

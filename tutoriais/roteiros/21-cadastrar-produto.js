@@ -19,11 +19,11 @@ module.exports = {
       depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Novo produto' }, espera: 1500 }],
     },
     {
-      titulo: 'Código interno e nome',
-      texto: 'Preencha o Código interno e o Nome do produto. Esses dois são obrigatórios.',
+      titulo: 'Digite o nome do produto',
+      texto: 'Digite o Nome do produto. O Código interno você não precisa preencher: o sistema gera sozinho quando você salva.',
       marcar: [
-        { alvo: { campo: 'Código interno', dentro: 'dialog' }, legenda: 'Código' },
         { alvo: { campo: 'Nome do produto', dentro: 'dialog' }, legenda: 'Nome' },
+        { alvo: { campo: 'Código interno', dentro: 'dialog' }, legenda: 'Gerado sozinho' },
       ],
       depois: [{ tipo: 'preencher', alvo: { campo: 'Nome do produto', dentro: 'dialog' }, valor: 'Mouse sem fio' }],
     },
