@@ -24,8 +24,9 @@ try { execFileSync('python3', [path.join(__dirname, 'otimizar.py')], { stdio: 'i
 const dados = roteiros.map(r => ({
   id: r.id, grupo: r.grupo || 'Outros', titulo: r.titulo, resumo: r.resumo || '', antes: r.antesDeComecar || '',
   destaque: !!r.destaque,
-  video: fs.existsSync(path.join(RAIZ, 'ajuda', 'videos', r.id + '.mp4')) ? `videos/${r.id}.mp4` : '',
-  capa: fs.existsSync(path.join(RAIZ, 'ajuda', 'videos', r.id + '.jpg')) ? `videos/${r.id}.jpg` : '',
+  // Na Central vai a cópia leve (videos-web, cabe no limite da página e carrega rápido no celular).
+  video: fs.existsSync(path.join(RAIZ, 'ajuda', 'videos-web', r.id + '.mp4')) ? `videos-web/${r.id}.mp4` : '',
+  capa: fs.existsSync(path.join(RAIZ, 'ajuda', 'videos-web', r.id + '.jpg')) ? `videos-web/${r.id}.jpg` : '',
   passos: r.passos.map((p, i) => {
     const png = `img/${r.id}/passo-${i + 1}.png`, webp = `img-web/${r.id}/passo-${i + 1}.webp`;
     const img = web && fs.existsSync(path.join(RAIZ, 'ajuda', webp)) ? webp : png;

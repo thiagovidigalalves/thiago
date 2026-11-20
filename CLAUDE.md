@@ -46,5 +46,7 @@ começar qualquer sessão neste repositório**, faça a conferência completa. N
   porque o status aceita vídeos curtos. Ao mudar uma, mude a outra igual.
 - SEMPRE que um vídeo ficar pronto (pedido do dono): mande o arquivo pra ele aqui na conversa E publique sozinho:
   `node tutoriais/publicar-video.js <id>` (sobe mp4/jpg e grava em Super Admin › Vídeos do Thiaguinho, com
-  `assunto: {chave, acoes, rotas}` do roteiro) + `node tutoriais/gerar-ajuda.js` e republique a Central.
+  `assunto: {chave, acoes, rotas}` do roteiro) + cópia leve em `ajuda/videos-web/` (ffmpeg 1024 px, crf 30) +
+  `node tutoriais/gerar-ajuda.js` e republique a Central (ela só leva `videos-web/`: o limite da página é 256 MB).
+  Fila de tudo que falta: `bash tutoriais/gravar-todos.sh` (grava + publica no Thiaguinho; não publica se der erro).
   O Thiaguinho mostra "🎬 Ver vídeo" junto de "Me explica" / "Faz comigo" quando a pergunta é do assunto.
