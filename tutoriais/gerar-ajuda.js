@@ -15,6 +15,7 @@ const SAIDA = path.join(RAIZ, 'ajuda', 'index.html');
 
 const roteiros = fs.readdirSync(PASTA_ROTEIROS).filter(f => f.endsWith('.js'))
   .map(f => require(path.join(PASTA_ROTEIROS, f)))
+  .filter(r => !r.somente_admin) // vídeos do Super Admin não vão para a Central dos clientes
   .sort((a, b) => (a.ordem || 99) - (b.ordem || 99));
 
 // Cópias leves (WebP) para o celular; se o Python/Pillow não existir, usa os PNG originais.

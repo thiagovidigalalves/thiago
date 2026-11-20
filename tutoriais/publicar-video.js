@@ -136,6 +136,7 @@ async function api(metodo, rota, tok, corpo) {
       ...termos(r),
       palavras: (a.palavras || [r.titulo.toLowerCase()]).slice(0, 30),
       video, video_leve, capa, capa_mini, gerado_pelo_robo: true,
+      ...(r.somente_admin ? { somente_admin: true } : {}), // só o Super Admin vê (nunca as empresas)
     };
     videos = [...videos.filter(v => v.id !== item.id), item];
     console.log(`✅ ${id} → Thiaguinho (${item.rotas.join(', ')})`);

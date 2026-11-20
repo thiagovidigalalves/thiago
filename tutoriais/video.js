@@ -267,6 +267,8 @@ async function centro(page, alvo) {
 async function gravar(r, s) {
   // Roteiro pode pedir outra empresa (autorizada pelo dono), ex.: Entrada de NF-e usa a Thiago Informática.
   if (r.empresa) process.env.TUTORIAL_VER_EMPRESA = r.empresa;
+  // Tela do Super Admin (fora de qualquer empresa): grava sem abrir a Demonstração.
+  if (r.superAdmin) { process.env.TUTORIAL_VER_EMPRESA = ''; process.env.TUTORIAL_ADMIN = '1'; }
   const logo = ['logo.webp', 'logo.png'].map(f => path.join(RAIZ, 'ajuda', f)).find(f => fs.existsSync(f));
   const logoUri = logo ? `data:image/${logo.endsWith('png') ? 'png' : 'webp'};base64,${fs.readFileSync(logo).toString('base64')}` : '';
 
@@ -381,6 +383,8 @@ async function gravar(r, s) {
       for (const a of p.antes || []) await executarVisivel(page, a, r, som, s.clique);
       await C.prepararTela(page);
       await espera(400);
+      // Página recarregou sozinha no meio do passo (ex.: limite de acessos, tela que recarrega): tira a cortina.
+      if (inicio !== null) await cortina(page, false);
       if (inicio === null) {
         await cortina(page, false);
         await legenda(page, n, p.titulo, p.texto);

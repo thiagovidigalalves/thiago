@@ -339,13 +339,17 @@ async function executar(page, acao, roteiro) {
  */
 async function carregarNomesReais(page) {
   const emp = process.env.TUTORIAL_VER_EMPRESA;
-  if (!emp || process.env.TUTORIAL_FANTASIA === '0') return null;
+  const admin = !emp && process.env.TUTORIAL_ADMIN === '1'; // tela do Super Admin: nomes de clientes de todas as empresas
+  if ((!emp && !admin) || process.env.TUTORIAL_FANTASIA === '0') return null;
   const nomes = await page.evaluate(async (emp) => {
     const tok = localStorage.getItem('base44_access_token'), app = '6a8469ea2eec118b03c63b1e';
     const pegar = async (ent, campos, filtro) => { try {
       const q = encodeURIComponent(JSON.stringify(filtro)); const r = await fetch(`/api/apps/${app}/entities/${ent}?q=${q}&limit=20000&fields=${campos.join(',')}`, { headers: { 'X-App-Id': app, Authorization: 'Bearer ' + tok } });
       const l = await r.json(); return Array.isArray(l) ? l.flatMap(x => campos.map(c => x[c]).filter(Boolean)) : [];
     } catch { return []; } };
+    if (!emp) return [...await pegar('Company', ['name', 'nome', 'nome_fantasia'], {}), ...await pegar('SuporteGrupo', ['nome', 'company_nome'], {}),
+      ...await pegar('SuporteAtendimento', ['autor_nome', 'empresa_nome', 'grupo_nome', 'atendente_nome'], {}), ...await pegar('SuporteMensagem', ['autor_nome'], {}),
+      ...await pegar('Employee', ['nome', 'name'], { company_id: 'EMP_MT236D4F_KRZBER' })];
     return [...await pegar('Client', ['nome'], { company_id: emp }), ...await pegar('Supplier', ['nome'], { company_id: emp }),
       ...await pegar('Employee', ['nome', 'name'], { company_id: emp }), ...await pegar('User', ['full_name'], { 'data.company_id': emp }),
       // Emitentes das notas recebidas da SEFAZ (fornecedores que ainda não estão no cadastro).
