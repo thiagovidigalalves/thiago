@@ -47,6 +47,12 @@ começar qualquer sessão neste repositório**, faça a conferência completa. N
    (https://claude.ai/artifact/MRUQr3ptkgF2jGomadCt3K), atualize `tutoriais/estado.json`, commit e push.
 
 ## Vídeos
+- VÍDEOS INTERNOS DA EQUIPE (pedido do dono, 20/11/2026): telas do Super Admin (Suporte em grupos, Central de Atendimento...)
+  são SÓ para o Super Admin e a equipe da Thiago Informática. Roteiro com `somente_admin: true` e `superAdmin: true`
+  (grava fora de empresa, nomes fictícios, `borrar` para desfocar conversas/dados de cliente). Ficam em Super Admin ›
+  Suporte › Vídeos da equipe (/admin/videos-equipe) e no Thiaguinho só do Super Admin; NUNCA na Central dos clientes,
+  na Ajuda das empresas, no Thiaguinho do cliente nem no WhatsApp de cliente. O dono quer depois vídeos de TODAS as telas
+  do Super Admin para a equipe se virar sozinha.
 - Regras do dono para TODO vídeo: a voz é SEMPRE a dele: ElevenLabs, voz profissional **"Clone voz profissional"** (id `mbxPtQTaDkexDD8Ysw20`, modelo `eleven_v4`; aprovada; os clones rápidos ficaram robotizados). O botão "Ouvir" do Thiaguinho foi REMOVIDO a pedido do dono (gastava crédito): a voz dele fica só nos vídeos; "BI" se fala "bi-ai"; a logo da
   Thiago Informática NUNCA com fundo branco (logo transparente, só sombra); o passo 1 começa no início e mostra o
   caminho pelo menu (o robô descobre sozinho: grupo › subgrupo › item); voz natural na velocidade normal (1,1x ficou rápido e robotizado; nada de
