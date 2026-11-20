@@ -38,7 +38,11 @@ module.exports = {
         { alvo: { css: 'input[placeholder="0,00"]', dentro: JANELA }, legenda: 'Valor' },
         { alvo: { papel: 'button', nome: 'Lançar vale', exato: true, dentro: JANELA }, legenda: 'Lançar' },
       ],
-      depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Lançar vale', exato: true, dentro: JANELA }, espera: 3500 }],
+      depois: [
+        { tipo: 'clicar', alvo: { papel: 'button', nome: 'Lançar vale', exato: true, dentro: JANELA }, espera: 3500 },
+        // Regravando sem salvar (TUTORIAL_SEM_GRAVAR=1) a janela continua aberta: fecha aqui.
+        { tipo: 'clicar', alvo: { papel: 'button', nome: 'Cancelar', exato: true, dentro: JANELA }, seguro: true, espera: 1000 },
+      ],
     },
     {
       antes: [{ tipo: 'clicar', alvo: { papel: 'button', nome: '✔ Fazer o acerto' }, espera: 1800 }],

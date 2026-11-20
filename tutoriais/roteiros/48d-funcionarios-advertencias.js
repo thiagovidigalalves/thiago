@@ -33,7 +33,10 @@ module.exports = {
         { alvo: { css: 'textarea', dentro: JANELA }, legenda: 'O que aconteceu' },
         { alvo: { papel: 'button', nome: 'Lançar', exato: true, dentro: JANELA }, legenda: 'Lançar' },
       ],
-      depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Lançar', exato: true, dentro: JANELA }, espera: 3500 }],
+      depois: [
+        { tipo: 'clicar', alvo: { papel: 'button', nome: 'Lançar', exato: true, dentro: JANELA }, espera: 3500 },
+        { tipo: 'clicar', alvo: { papel: 'button', nome: 'Voltar', exato: true, dentro: JANELA }, seguro: true, espera: 1000 }, // sem salvar: fecha a janela
+      ],
     },
     {
       titulo: 'A bonificação cai sozinha',

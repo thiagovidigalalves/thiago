@@ -261,6 +261,8 @@ async function gravar(r, s) {
   });
   await context.addInitScript({ content: scriptDaPagina(logoUri) });
   const page = await context.newPage();
+  // Antes de abrir qualquer tela: o que o roteiro manda manter (nomes/valores da Demonstração) não vira dado inventado.
+  await C.instalarManter(context, page, r.manter, !!r.valoresReais);
   const t0 = Date.now();
   let corte = 0;
   const eventos = [];
@@ -279,7 +281,6 @@ async function gravar(r, s) {
     await cortina(page, true, r.titulo, r.resumo || '');
     // Nomes reais da empresa -> fictícios (a cortina cobre a tela enquanto carrega).
     if (r.precisaLogin !== false) await C.instalarNomes(context, page, await C.carregarNomesReais(page));
-    await C.instalarManter(context, page, r.manter, !!r.valoresReais); // dados fictícios do próprio roteiro ficam como estão
     // A fala de abertura vai na abertura animada (antes); aqui o vídeo já começa no passo 1.
     await C.prepararTela(page);
     corte = Math.max(0, agora() - 0.3);
