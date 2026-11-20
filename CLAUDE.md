@@ -31,6 +31,8 @@ começar qualquer sessão neste repositório**, faça a conferência completa. N
    `base44/shared/tutoriaisAjuda/p1..p4.js` (mesmo id do roteiro) + a tela em `rotas.js` (é por ela que o botão "Me ajuda nesta tela" do Thiaguinho acha o vídeo da tela; o "Ajuda desta tela" saiu das páginas)
    + o teste `tests/ajuda-central.test.mjs` (quantidade). O vídeo aparece sozinho no topo do tutorial (id `tut-<id>`)
    e na página Vídeos (`/ajuda?videos=1`). A grade tinha ficado de fora: não esquecer.
+   Prints novos também vão para a Ajuda do sistema: `node tutoriais/publicar-imagens-ajuda.js` (sobe só o que mudou)
+   e copie `tutoriais/imagens-ajuda.js` para o app em `base44/shared/tutoriaisAjuda/imagens.js`.
 6. `node tutoriais/gerar-ajuda.js`, republique a Central no MESMO link
    (https://claude.ai/artifact/MRUQr3ptkgF2jGomadCt3K), atualize `tutoriais/estado.json`, commit e push.
 
