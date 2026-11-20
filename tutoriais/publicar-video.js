@@ -4,6 +4,7 @@
  *
  * Uso: node tutoriais/publicar-video.js <id> [<id> ...]
  *   - sobe ajuda/videos/<id>.mp4 e <id>.jpg pelo envio de arquivos do próprio sistema (sessão do robô);
+ *   - sobe também a cópia leve (ajuda/videos-web) para o envio no WhatsApp; --leve completa as que faltam;
  *   - grava/atualiza o item em SystemSettings.videos_tutoriais: titulo, rotas, chave, acoes, palavras, video, capa.
  * Os termos que o Thiaguinho usa para achar o vídeo vêm do roteiro (`assunto: { chave, acoes, palavras }`).
  * Pedido do dono: todo vídeo novo vai automático para o Thiaguinho (e a Central de Ajuda é republicada à parte).
@@ -73,6 +74,19 @@ async function api(metodo, rota, tok, corpo) {
     for (const v of videos) console.log(`${v.id}: chave=${(v.chave || []).join(',')} | acoes=${(v.acoes || []).join(',')}`);
     return;
   }
+  // --leve [ids]: sobe a cópia leve (ajuda/videos-web) dos vídeos já publicados, para o envio no WhatsApp.
+  if (process.argv[2] === '--leve') {
+    const so = process.argv.slice(3);
+    for (const v of videos) {
+      const id = String(v.id).replace(/^tut-/, ''), web = path.join(RAIZ, 'ajuda', 'videos-web', id + '.mp4');
+      if ((so.length && !so.includes(id)) || (!so.length && v.video_leve) || !fs.existsSync(web)) continue;
+      v.video_leve = await subir(web, tok);
+      console.log(`✅ ${id}: leve (${(fs.statSync(web).size / 1048576).toFixed(1)} MB)`);
+    }
+    await api('PUT', `SystemSettings/${cfg.id}`, tok, { videos_tutoriais: videos });
+    console.log(`Com cópia leve: ${videos.filter(v => v.video_leve).length} de ${videos.length}`);
+    return;
+  }
   if (remover) {
     videos = videos.filter(v => !ids.includes(String(v.id).replace(/^tut-/, '')));
     await api('PUT', `SystemSettings/${cfg.id}`, tok, { videos_tutoriais: videos });
@@ -85,13 +99,17 @@ async function api(metodo, rota, tok, corpo) {
     if (!r || !fs.existsSync(mp4)) { console.log(`✘ ${id}: falta o roteiro ou o vídeo`); continue; }
     const video = await subir(mp4, tok);
     const capa = fs.existsSync(jpg) ? await subir(jpg, tok) : '';
+    // Cópia leve (1024 px, crf 30) para mandar no WhatsApp do cliente: gasta menos internet dele.
+    const web = path.join(RAIZ, 'ajuda', 'videos-web', id + '.mp4');
+    if (!fs.existsSync(web)) { fs.mkdirSync(path.dirname(web), { recursive: true }); require('child_process').execFileSync('ffmpeg', ['-y', '-v', 'error', '-i', mp4, '-vf', 'scale=1024:-2', '-c:v', 'libx264', '-crf', '30', '-preset', 'medium', '-c:a', 'aac', '-b:a', '96k', '-movflags', '+faststart', web]); }
+    const video_leve = await subir(web, tok);
     const a = r.assunto || {};
     const item = {
       id: 'tut-' + id, titulo: r.titulo, categoria: r.grupo,
       rotas: a.rotas || [...new Set(r.passos.map(p => p.ir).filter(Boolean).map(x => x.split('?')[0]))].slice(0, 4),
       ...termos(r),
       palavras: (a.palavras || [r.titulo.toLowerCase()]).slice(0, 30),
-      video, capa, gerado_pelo_robo: true,
+      video, video_leve, capa, gerado_pelo_robo: true,
     };
     videos = [...videos.filter(v => v.id !== item.id), item];
     console.log(`✅ ${id} → Thiaguinho (${item.rotas.join(', ')})`);
