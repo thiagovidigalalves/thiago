@@ -4,7 +4,7 @@ module.exports = {
   grupo: 'Relatórios',
   titulo: 'Comissões dos funcionários',
   resumo: 'Veja quanto cada vendedor e técnico vendeu e quanto ganhou de comissão.',
-  antesDeComecar: 'A porcentagem de comissão é definida no cadastro de cada funcionário (Cadastros › Usuários).',
+  antesDeComecar: 'A porcentagem de comissão é definida no cadastro de cada funcionário (Cadastros › Pessoas › Usuários).',
   passos: [
     {
       ir: '/relatorios/funcionarios/comissoes',

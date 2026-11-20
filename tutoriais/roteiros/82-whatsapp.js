@@ -19,12 +19,12 @@ module.exports = {
     },
     {
       titulo: 'Escolha o que sai automático',
-      texto: 'Em "Envio automático", diga se o comprovante de venda, a OS e o orçamento vão sozinhos para o cliente ou só quando você clicar.',
+      texto: 'Em "Envio automático", diga se o comprovante da venda e o orçamento vão sozinhos pro cliente ou só quando você clicar. O aviso da OS fica em WhatsApp › Ordem de serviço.',
       marcar: [{ alvo: { papel: 'heading', nome: 'Envio automático' } }],
     },
     {
       titulo: 'Edite as mensagens',
-      texto: 'Clique na aba do assunto (Comercial, Ordens de serviço, Cobranças, Relacionamento), mude o texto e clique em "Salvar mensagens".',
+      texto: 'Clique na aba do assunto (Fiscal e contador, Comercial e vendas, Cobranças, Relacionamento ou Pós-venda e avaliação), mude o texto e clique em "Salvar mensagens".',
       marcar: [{ alvo: { papel: 'tab', nome: /Comercial e vendas/ } }],
       dica: 'Abra "Campos disponíveis" para colocar o nome do cliente, valor e outros dados automáticos na mensagem.',
     },

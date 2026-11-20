@@ -9,7 +9,7 @@ module.exports = {
     {
       ir: '/cadastros/produtos',
       titulo: 'Abra a tela de Produtos',
-      texto: 'No menu, clique em Cadastros › Produtos.',
+      texto: 'No menu, clique em Cadastros › Produtos › Produtos.',
       marcar: [{ alvo: { papel: 'heading', nome: 'Produtos', exato: true } }],
     },
     {

@@ -8,20 +8,20 @@ module.exports = {
     {
       ir: '/cadastros/grupos',
       titulo: 'Grupos e subgrupos',
-      texto: 'Em Cadastros › Grupos e Subgrupos, clique em "Novo grupo" (ex.: Informática). Depois clique no nome do grupo e em "Novo subgrupo" (ex.: Mouses). Serve para filtrar produtos e ver relatórios por grupo.',
+      texto: 'Em Cadastros › Produtos › Grupos e Subgrupos, clique em "Novo grupo" (ex.: Informática). Depois clique no nome do grupo e em "Novo subgrupo" (ex.: Mouses). Serve para filtrar produtos e ver relatórios por grupo.',
       marcar: [{ alvo: { papel: 'button', nome: 'Novo grupo', exato: true } }],
     },
     {
       ir: '/cadastros/marcas',
       titulo: 'Marcas',
-      texto: 'Em Cadastros › Marcas, clique em "Nova marca", digite o nome e clique em "Salvar".',
+      texto: 'Em Cadastros › Produtos › Marcas, clique em "Nova marca", digite o nome e clique em "Salvar".',
       marcar: [{ alvo: { papel: 'button', nome: 'Nova marca' } }],
       dica: 'Também dá para criar a marca na hora, dentro do cadastro do produto: comece a digitar e clique em "+ Cadastrar".',
     },
     {
       ir: '/cadastros/unidades',
       titulo: 'Unidades de medida',
-      texto: 'Em Cadastros › Unidades, clique em "Nova unidade" e informe o nome e a sigla (ex.: Caixa, CX).',
+      texto: 'Em Cadastros › Produtos › Unidades, clique em "Nova unidade" e informe o nome e a sigla (ex.: Caixa, CX).',
       marcar: [{ alvo: { papel: 'button', nome: 'Nova unidade' } }],
     },
     {

@@ -27,7 +27,7 @@ module.exports = {
       titulo: 'Clique em "Entrar"',
       texto: 'Clique em "Entrar". Você verá só as telas que o administrador liberou para você.',
       marcar: [{ alvo: { papel: 'button', nome: 'Entrar', exato: true } }],
-      dica: 'Esqueceu a senha de funcionário? Peça ao administrador da empresa para criar uma nova em Cadastros › Usuários.',
+      dica: 'Esqueceu a senha de funcionário? Peça ao administrador da empresa para criar uma nova em Cadastros › Pessoas › Usuários.',
     },
   ],
 };

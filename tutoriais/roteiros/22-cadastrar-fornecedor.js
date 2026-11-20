@@ -8,7 +8,7 @@ module.exports = {
     {
       ir: '/cadastros/fornecedores',
       titulo: 'Clique em "Novo fornecedor"',
-      texto: 'No menu, clique em Cadastros › Fornecedores e depois em "Novo fornecedor".',
+      texto: 'No menu, clique em Cadastros › Pessoas › Fornecedores e depois em "Novo fornecedor".',
       marcar: [{ alvo: { papel: 'button', nome: 'Novo fornecedor' } }],
       depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Novo fornecedor' }, espera: 1500 }],
     },

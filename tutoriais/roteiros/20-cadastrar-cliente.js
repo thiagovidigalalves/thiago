@@ -9,7 +9,7 @@ module.exports = {
     {
       ir: '/cadastros/clientes',
       titulo: 'Abra a tela de Clientes',
-      texto: 'No menu, clique em Cadastros › Clientes. Aqui ficam todos os seus clientes.',
+      texto: 'No menu, clique em Cadastros › Pessoas › Clientes. Aqui ficam todos os seus clientes.',
       marcar: [{ alvo: { papel: 'heading', nome: 'Clientes', exato: true } }],
     },
     {

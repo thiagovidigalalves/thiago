@@ -26,7 +26,7 @@ module.exports = {
       titulo: 'Escolha o que fazer',
       texto: 'Clique em "Detalhes" para ver os produtos, "Imprimir / PDF" para reimprimir o comprovante ou "Enviar no WhatsApp" para mandar para o cliente.',
       marcar: [{ alvo: '[role="menu"]' }],
-      atencao: '"Excluir" manda a venda para a lixeira e devolve os produtos ao estoque. Use só se a venda foi feita errada.',
+      atencao: '"Excluir" desfaz a venda: devolve os produtos ao estoque e estorna o caixa e o financeiro. Ela não vai para a Lixeira e não dá para restaurar, então use só se a venda foi feita errada.',
     },
   ],
 };

@@ -4,7 +4,7 @@ module.exports = {
   grupo: 'Relatórios',
   titulo: 'Metas do mês por vendedor',
   resumo: 'Defina a meta de cada vendedor e acompanhe quanto falta por dia para bater.',
-  antesDeComecar: 'Os vendedores precisam estar cadastrados em Cadastros › Usuários.',
+  antesDeComecar: 'Os vendedores precisam estar cadastrados em Cadastros › Pessoas › Usuários.',
   passos: [
     {
       ir: '/relatorios/metas-vendedores',

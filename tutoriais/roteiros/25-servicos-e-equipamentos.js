@@ -8,7 +8,7 @@ module.exports = {
     {
       ir: '/cadastros/servicos',
       titulo: 'Cadastre os serviços',
-      texto: 'Em Cadastros › Serviços e Status, digite o nome do serviço (ex.: Formatação), o preço (se tiver preço fixo) e a comissão do técnico. Clique em "Cadastrar".',
+      texto: 'Em Cadastros › Serviços › Serviços e Status, digite o nome do serviço (ex.: Formatação), o preço (se tiver preço fixo) e a comissão do técnico. Clique em "Cadastrar".',
       marcar: [{ alvo: { placeholder: 'Nome do serviço' } }],
       dica: 'Sem preço, o valor é digitado na hora, em cada OS.',
     },
@@ -20,7 +20,7 @@ module.exports = {
     {
       ir: '/cadastros/veiculos',
       titulo: 'Equipamentos (ou veículos) dos clientes',
-      texto: 'Em Cadastros › Equipamentos, digite o equipamento e modelo, uma observação (nº de série, senha...), escolha o cliente e clique em "Cadastrar". Ele aparece na hora de abrir a OS.',
+      texto: 'Em Cadastros › Serviços › Equipamentos, digite o equipamento e modelo, uma observação (nº de série, senha...), escolha o cliente e clique em "Cadastrar". Ele aparece na hora de abrir a OS.',
       marcar: [{ alvo: { placeholder: /Equipamento e modelo|Marca e modelo/ } }],
     },
   ],

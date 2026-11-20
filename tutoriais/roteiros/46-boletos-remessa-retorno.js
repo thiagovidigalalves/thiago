@@ -10,7 +10,7 @@ module.exports = {
       ir: '/financeiro/boletos',
       desfocarTudo: true,
       titulo: 'Gere a remessa',
-      texto: 'Em Financeiro › Boletos, clique em "Gerar remessa" e envie o arquivo no internet banking da empresa.',
+      texto: 'Em Financeiro › Boletos (remessa e retorno), clique em "Gerar remessa" e envie o arquivo no internet banking da empresa.',
       marcar: [{ alvo: { papel: 'heading', nome: 'Boletos', exato: true } }],
     },
     {

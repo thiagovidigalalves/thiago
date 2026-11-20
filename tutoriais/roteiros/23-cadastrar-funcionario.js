@@ -9,7 +9,7 @@ module.exports = {
     {
       ir: '/cadastros/usuarios',
       titulo: 'Clique em "Novo usuário"',
-      texto: 'No menu, clique em Cadastros › Usuários e depois em "Novo usuário".',
+      texto: 'No menu, clique em Cadastros › Pessoas › Usuários e depois em "Novo usuário".',
       marcar: [{ alvo: { papel: 'button', nome: 'Novo usuário' } }],
       depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Novo usuário' }, espera: 1500 }],
     },

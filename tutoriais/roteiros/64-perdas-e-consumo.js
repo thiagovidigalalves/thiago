@@ -24,7 +24,7 @@ module.exports = {
       titulo: 'Confira e confirme',
       texto: 'Clique em "Conferir movimentação", veja o resumo e clique em "Confirmar baixa pelo custo". O estoque baixa e o custo entra no relatório.',
       marcar: [{ alvo: { papel: 'button', nome: 'Conferir movimentação', dentro: 'dialog' } }],
-      dica: 'Lançou errado? Abra a movimentação e use "Estornar": o estoque volta.',
+      dica: 'Lançou errado? Clique em "Excluir" na linha da movimentação, escreva o motivo e confirme: o estoque volta e o custo sai do relatório.',
     },
   ],
 };

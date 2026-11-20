@@ -28,7 +28,7 @@ module.exports = {
       titulo: 'Feche o caixa',
       texto: 'Clique em "Fechar caixa" (Ctrl+6). Conte o dinheiro, informe quanto vai retirar (se for levar para o cofre) e clique em "Fechar caixa".',
       marcar: [{ alvo: { papel: 'button', nome: /(Fechar|Abrir) caixa/ } }],
-      dica: 'Marque "Conferir cédulas e moedas" para contar nota por nota: o sistema soma para você.',
+      dica: 'Clique em "Contar cédulas e moedas" para contar nota por nota: o sistema soma para você.',
       atencao: 'Feche o caixa todo dia. No dia seguinte, abra de novo com o valor do troco.',
     },
     {

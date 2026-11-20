@@ -4,7 +4,7 @@ module.exports = {
   grupo: 'Comercial',
   titulo: 'Abrir uma ordem de serviço (OS)',
   resumo: 'Registre o conserto: cliente, veículo/equipamento, serviços, peças e fotos.',
-  antesDeComecar: 'Ter os serviços cadastrados (Cadastros › Serviços e Status) e os mecânicos/técnicos cadastrados como usuários. Os nomes dos campos mudam conforme o ramo: oficina mostra "Veículo/Placa/Mecânico"; assistência técnica mostra "Equipamento/Técnico".',
+  antesDeComecar: 'Ter os serviços cadastrados (Cadastros › Serviços › Serviços e Status) e os mecânicos/técnicos cadastrados como usuários. Os nomes dos campos mudam conforme o ramo: oficina mostra "Veículo/Placa/Mecânico"; assistência técnica mostra "Equipamento/Técnico".',
   passos: [
     {
       ir: '/comercial/ordens-servico',
@@ -20,7 +20,7 @@ module.exports = {
     },
     {
       titulo: 'Equipamento (obrigatório) e o defeito',
-      texto: 'Preencha o equipamento (ou veículo) e modelo: é o único campo obrigatório, por isso tem o asterisco. Ao lado vai a observação (ou placa). Escreva o defeito que o cliente relatou e, depois de olhar, o laudo técnico.',
+      texto: 'Preencha o equipamento (ou veículo) e modelo: junto com o cliente, é o que precisa pra salvar, por isso tem o asterisco. Ao lado vai a observação (ou placa). Escreva o defeito que o cliente relatou e, depois de olhar, o laudo técnico.',
       marcar: [{ alvo: { placeholder: /Veículo \(modelo\/marca\)|Equipamento e modelo/ } }],
     },
     {
@@ -30,7 +30,7 @@ module.exports = {
     },
     {
       titulo: 'Adicione as peças',
-      texto: 'Clique em "Adicionar produto" para incluir as peças usadas, com a quantidade. Elas saem do estoque.',
+      texto: 'Clique em "Adicionar produto" para incluir as peças usadas, com a quantidade. Elas saem do estoque quando você recebe a OS no caixa.',
       marcar: [{ alvo: { rotulo: 'Adicionar produto' } }],
       dica: 'Use "+ Adicionar fotos" para guardar fotos de antes, durante e depois do serviço. O equipamento pode ser opcional: mude em Configurações › Ordem de Serviço › Geral.',
     },

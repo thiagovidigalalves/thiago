@@ -29,7 +29,7 @@ module.exports = {
     {
       desfocarTudo: true,
       titulo: 'Clique em "Importar"',
-      texto: 'Na linha da nota, clique em "Importar". Confira os produtos (o sistema liga cada item ao seu cadastro) e clique em "Confirmar e importar". O estoque e o contas a pagar são atualizados.',
+      texto: 'Na linha da nota, clique em "Importar" (se pedir, confirme em "Confirmar e importar"). Depois é só seguir as etapas: fornecedor, produtos e financeiro. No final, o estoque e o contas a pagar são atualizados.',
       semPrint: true,
       dica: 'Use o ícone "Visualizar" para ver a nota antes de importar.',
     },
