@@ -198,6 +198,8 @@ function desfocarNaPagina({ extras, tudo, campos, fantasia }) {
       for (const n of el.childNodes) {
         if (n.nodeType !== 3 || !n.textContent.trim()) continue;
         if (n.__falso === n.textContent) { trocou = true; continue; }
+        // Cores da grade (Branco, Preto, Azul...) não são nomes de pessoas: ficam como estão.
+        if (/^\s*(preto|branco|off white|nude|bege|caramelo|marrom|vermelho|vinho|rosa|laranja|amarelo|verde|azul|azul marinho|jeans|cinza|prata|dourado|champanhe|estampado)\s*$/i.test(n.textContent)) continue;
         const orig = n.textContent;
         let f = falso(orig);
         // Nome do dono -> "Ana": o mais longo primeiro ("Thiago Vidigal Alves" antes de "Thiago"); saudações ("Olá,") ficam.
@@ -292,6 +294,7 @@ async function limparMarcas(page) {
 
 async function executar(page, acao, roteiro) {
   if (!acao) return;
+  if (acao.tipo === 'tecla') { await page.keyboard.press(acao.tecla); await page.waitForTimeout(acao.espera || 900); return; }
   const el = achar(page, acao.alvo);
   if (acao.clicar !== undefined || acao.tipo === 'clicar') {
     const texto = (await el.innerText().catch(() => '')) + ' ' + (await el.getAttribute('aria-label').catch(() => '') || '');
