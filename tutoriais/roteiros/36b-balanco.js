@@ -64,8 +64,8 @@ module.exports = {
       dica: 'O balanço salva sozinho a cada contagem: dá pra parar e continuar depois.',
     },
     {
-      ir: '/estoque/balanco',
-      espera: 4000,
+      // Volta para a lista pelo botão (o menu na mesma tela não sai da contagem).
+      antes: [{ tipo: 'clicar', alvo: { css: 'button[aria-label="Voltar"]' }, seguro: true, espera: 3000 }],
       titulo: 'Contar pelo celular',
       texto: 'E pra contar andando pela loja, abre o Balanço no celular: cada pessoa conta com o próprio celular e tudo cai aqui no mesmo balanço.',
       marcar: [{ alvo: { papel: 'link', nome: 'abrir o Balanço no celular' }, legenda: 'No celular' }],
