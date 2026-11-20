@@ -31,7 +31,7 @@ começar qualquer sessão neste repositório**, faça a conferência completa. N
    (https://claude.ai/artifact/MRUQr3ptkgF2jGomadCt3K), atualize `tutoriais/estado.json`, commit e push.
 
 ## Vídeos
-- Regras do dono para TODO vídeo: a voz é SEMPRE a dele: ElevenLabs, voz profissional **"Clone voz profissional"** (id `mbxPtQTaDkexDD8Ysw20`, modelo `eleven_v4`; aprovada; vale também para o Thiaguinho; os clones rápidos ficaram robotizados); "BI" se fala "bi-ai"; a logo da
+- Regras do dono para TODO vídeo: a voz é SEMPRE a dele: ElevenLabs, voz profissional **"Clone voz profissional"** (id `mbxPtQTaDkexDD8Ysw20`, modelo `eleven_v4`; aprovada; os clones rápidos ficaram robotizados). O botão "Ouvir" do Thiaguinho foi REMOVIDO a pedido do dono (gastava crédito): a voz dele fica só nos vídeos; "BI" se fala "bi-ai"; a logo da
   Thiago Informática NUNCA com fundo branco (logo transparente, só sombra); o passo 1 começa no início e mostra o
   caminho pelo menu (o robô descobre sozinho: grupo › subgrupo › item); voz natural na velocidade normal (1,1x ficou rápido e robotizado; nada de
   filtro forte na voz), pausas curtas e música de fundo baixinha. Grave os vídeos quando nenhuma captura estiver rodando (limite de acessos).
