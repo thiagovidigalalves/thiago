@@ -151,7 +151,7 @@ async function desfocarDados(page, passo = {}) {
 }
 
 /** Roda dentro da página. Exportada para o vídeo aplicar o desfoque antes de cada quadro. */
-function desfocarNaPagina({ extras, tudo, campos, fantasia, borrar }) {
+function desfocarNaPagina({ extras, tudo, campos, fantasia, borrar: borrarCss }) {
     const ESTRUT = 'h1,h2,h3,th,thead,[role="columnheader"],label,button,[role="tab"],nav,[role="navigation"],aside,option,select,[role="option"],[role="listbox"],[role="menuitem"],[role="combobox"]';
     // ---- Dados fictícios: troca o dado real por um inventado (sempre o mesmo para o mesmo original). ----
     const h = t => { let x = 2166136261; for (const c of String(t)) { x ^= c.charCodeAt(0); x = Math.imul(x, 16777619); } return Math.abs(x); };
@@ -285,7 +285,7 @@ function desfocarNaPagina({ extras, tudo, campos, fantasia, borrar }) {
       if (inteiro.length < 120 && el.children.length <= 4 && extra(inteiro)) { [el, ...el.querySelectorAll('*')].forEach(e => trocar(e, true)); if (!fantasia && extra(el.textContent || '')) el.setAttribute('data-tutorial-blur', ''); }
     });
     // `borrar` (seletor CSS do passo): sempre desfocado, mesmo com dados fictícios (ex.: texto das conversas da Central de Atendimento).
-    if (borrar) document.querySelectorAll(borrar).forEach(e => { if (!e.closest('#__tutorial_marcas,#__cortina,#__legenda,#__cursor')) e.setAttribute('data-tutorial-blur', ''); });
+    if (borrarCss) document.querySelectorAll(borrarCss).forEach(e => { if (!e.closest('#__tutorial_marcas,#__cortina,#__legenda,#__cursor')) e.setAttribute('data-tutorial-blur', ''); });
     if (!document.getElementById('__tutorial_blur')) {
       const st = document.createElement('style');
       st.id = '__tutorial_blur';
