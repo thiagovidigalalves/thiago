@@ -208,6 +208,8 @@ function desfocarNaPagina({ extras, tudo, campos, fantasia }) {
         // Nome do dono -> "Ana": o mais longo primeiro ("Thiago Vidigal Alves" antes de "Thiago"); saudações ("Olá,") ficam.
         for (const x of [...extras].filter(x => !/^(olá|oi|bom dia|boa tarde|boa noite)(?=[\s,!.]|$)/i.test(x)).sort((a, b) => b.length - a.length)) if (f.includes(x)) f = f.split(x).join(x.replace(/[!,.]$/, '').split(' ').length > 1 ? 'Ana Gestora' : 'Ana') + '';
         f = f.replace(/\bAna Gestora Gestora\b/g, 'Ana Gestora');
+        // Nome inteiro (ex.: "Filial MG Varejista - Loja X LTDA") troca de uma vez, antes de separar pelos traços.
+        if (f === orig && real(orig, el)) { const nucleo = orig.trim().replace(/^[^A-Za-zÀ-ÿ0-9]+|[^A-Za-zÀ-ÿ0-9…]+$/g, ''); f = orig.replace(nucleo, nomeFalso(nucleo)); }
         if (f === orig) f = f.split(/(\s[·•|]\s|\s-\s)/).map(seg => { if (/^\s[·•|-]\s$/.test(seg)) return seg; const nucleo = seg.trim().replace(/^[^A-Za-zÀ-ÿ0-9]+|[^A-Za-zÀ-ÿ0-9…]+$/g, ''); return nucleo && real(seg, el) ? seg.replace(nucleo, nomeFalso(nucleo.replace(/(…|\.\.\.)$/, ''))) : seg; }).join('');
         if (f === orig && forca && pareceNome(orig) && orig.trim().split(/\s+/).length >= 2 && orig.trim() !== orig.trim().toUpperCase() && !el.closest(ESTRUT)) { const nucleo = orig.trim().replace(/^[^A-Za-zÀ-ÿ0-9]+|[^A-Za-zÀ-ÿ0-9]+$/g, ''); f = orig.replace(nucleo, nomeFalso(nucleo)); }
         if (f !== orig) { n.textContent = f; n.__falso = f; trocou = true; } else if (/[A-Za-zÀ-ÿ]{3,}/.test(orig) && !UI.test(orig.trim())) sobrou = true;
@@ -333,12 +335,15 @@ async function carregarNomesReais(page) {
     } catch { return []; } };
     return [...await pegar('Client', ['nome'], { company_id: emp }), ...await pegar('Supplier', ['nome'], { company_id: emp }),
       ...await pegar('Employee', ['nome', 'name'], { company_id: emp }), ...await pegar('User', ['full_name'], { 'data.company_id': emp }),
+      // Emitentes das notas recebidas da SEFAZ (fornecedores que ainda não estão no cadastro).
+      ...await pegar('NfeRecebida', ['emitente_nome'], { company_id: emp }), ...await pegar('NFeImport', ['emitente_nome', 'fornecedor_nome', 'supplier_name'], { company_id: emp }),
       // Nomes escritos direto em contas, vendas, OS, orçamentos e recorrências (ex.: "Toninho" numa conta a pagar).
       ...(await Promise.all(['FinanceAccount', 'Sale', 'ServiceOrder', 'Quote', 'Recorrencia', 'Condicional', 'CommercialProposal'].map(ent =>
         pegar(ent, ['cliente_nome', 'client_name', 'fornecedor_nome', 'supplier_name', 'pessoa_nome', 'beneficiario', 'favorecido', 'nome_pessoa', 'vendedor_nome', 'tecnico_nome', 'nome'], { company_id: emp })))).flat()];
   }, emp).catch(() => []);
   const norm = t => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
-  const exatos = [...new Set(nomes.map(norm).filter(n => n.length >= 3))];
+  // Mesmo corte da tela: sem pontuação no começo/fim ("S.A." na nota vira "s.a", igual ao que real() compara).
+  const exatos = [...new Set(nomes.map(n => norm(String(n).replace(/^[^A-Za-zÀ-ÿ0-9]+|[^A-Za-zÀ-ÿ0-9]+$/g, ''))).filter(n => n.length >= 3))];
   console.log(`   (dados fictícios: ${exatos.length} nomes reais da empresa serão trocados)`);
   return exatos;
 }
@@ -424,7 +429,11 @@ async function main() {
   let logado = null;
   const relatorio = [];
 
+  const empPadrao = process.env.TUTORIAL_VER_EMPRESA;
   for (const r of roteiros) {
+    // Roteiro pode pedir outra empresa (autorizada pelo dono), ex.: Entrada de NF-e usa a Thiago Informática, que tem notas.
+    process.env.TUTORIAL_VER_EMPRESA = r.empresa || empPadrao || '';
+    if (r.empresa) await page.goto(URL_BASE + comEmpresa('/'), { waitUntil: 'load' }).then(async () => instalarNomes(context, page, await carregarNomesReais(page))).catch(() => {});
     console.log(`\n▶ ${r.titulo}`);
     if (r.precisaLogin !== false) {
       if (logado === null) { logado = await entrar(context, page); if (logado) { await page.goto(URL_BASE + comEmpresa('/'), { waitUntil: 'load' }).catch(() => {}); await page.waitForTimeout(3000); await instalarNomes(context, page, await carregarNomesReais(page)); } }

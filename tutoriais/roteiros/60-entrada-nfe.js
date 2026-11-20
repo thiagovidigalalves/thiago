@@ -4,6 +4,8 @@ module.exports = {
   grupo: 'Estoque',
   titulo: 'Dar entrada na nota do fornecedor (NF-e)',
   resumo: 'As notas de compra chegam sozinhas da SEFAZ: confira e importe no estoque.',
+  // Pedido do dono: este tutorial usa a THIAGO INFORMATICA (tem notas de verdade na SEFAZ); a demonstração não tem.
+  empresa: 'EMP_MT236D4F_KRZBER',
   antesDeComecar: 'Precisa do certificado digital cadastrado. Sem ele, use o botão "Importar XML" com o arquivo que o fornecedor mandou.',
   passos: [
     {
@@ -17,8 +19,8 @@ module.exports = {
     {
       desfocarTudo: true,
       titulo: 'Busque novas notas',
-      texto: 'Clique em "Atualizar agora" para buscar as notas mais recentes na SEFAZ.',
-      semPrint: true,
+      texto: 'Clique em "Atualizar agora" para buscar as notas mais recentes na SEFAZ. As notas novas aparecem na lista com o fornecedor, a data e o valor.',
+      marcar: [{ alvo: { papel: 'button', nome: /Atualizar agora/ } }],
     },
     {
       desfocarTudo: true,
@@ -30,7 +32,10 @@ module.exports = {
       desfocarTudo: true,
       titulo: 'Clique em "Importar"',
       texto: 'Na linha da nota, clique em "Importar" (se pedir, confirme em "Confirmar e importar"). Depois é só seguir as etapas: fornecedor, produtos e financeiro. No final, o estoque e o contas a pagar são atualizados.',
-      semPrint: true,
+      marcar: [
+        { alvo: { papel: 'button', nome: 'Importar', exato: true }, legenda: 'Importar' },
+        { alvo: { titulo: 'Visualizar' }, legenda: 'Ver a nota antes' },
+      ],
       dica: 'Use o ícone "Visualizar" para ver a nota antes de importar.',
     },
     {

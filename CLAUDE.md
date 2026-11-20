@@ -9,6 +9,8 @@ do sistema THGestor, para a Central de Ajuda dos clientes.
 - Prints e vídeos SEMPRE na empresa de demonstração **TH Gestor · Demonstração** (`EMP_DEMOTHGE_STOR01`),
   com **dados fictícios** (padrão do `capturar.js`): nomes, telefones, CPF/CNPJ, e-mails e valores reais viram
   inventados, sem nada borrado (pedido do dono). Nunca use empresa de cliente.
+  Exceção autorizada pelo dono: o tutorial **Entrada de NF-e** usa a THIAGO INFORMATICA (`EMP_MT236D4F_KRZBER`), que tem
+  notas da SEFAZ (campo `empresa` no roteiro); os emitentes das notas também viram nomes fictícios.
 
 ## REGRA PERMANENTE: o sistema mudou → conferir os tutoriais (pedido do dono)
 
