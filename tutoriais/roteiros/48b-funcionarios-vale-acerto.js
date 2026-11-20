@@ -41,7 +41,7 @@ module.exports = {
       depois: [
         { tipo: 'clicar', alvo: { papel: 'button', nome: 'Lançar vale', exato: true, dentro: JANELA }, espera: 3500 },
         // Regravando sem salvar (TUTORIAL_SEM_GRAVAR=1) a janela continua aberta: fecha aqui.
-        { tipo: 'clicar', alvo: { papel: 'button', nome: 'Cancelar', exato: true, dentro: JANELA }, seguro: true, espera: 1000 },
+        { tipo: 'clicar', alvo: { papel: 'button', nome: 'Cancelar', exato: true, dentro: JANELA }, seguro: true, soSemGravar: true, espera: 1000 },
       ],
     },
     {

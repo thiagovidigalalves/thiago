@@ -307,6 +307,7 @@ async function limparMarcas(page) {
 
 async function executar(page, acao, roteiro) {
   if (!acao) return;
+  if (acao.soSemGravar && process.env.TUTORIAL_SEM_GRAVAR !== '1') return; // só quando regrava sem salvar (ex.: fechar a janela)
   if (acao.tipo === 'tecla') { await page.keyboard.press(acao.tecla); await page.waitForTimeout(acao.espera || 900); return; }
   const el = achar(page, acao.alvo);
   if (acao.clicar !== undefined || acao.tipo === 'clicar') {

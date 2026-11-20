@@ -166,14 +166,20 @@ async function descobrirMenu(browser, rota, grupo) {
     const visiveis = async () => (await menu.locator('button:visible').allInnerTexts()).map(t => t.trim()).filter(Boolean);
     const nomeLink = async () => (await link().innerText()).trim().split('\n')[0];
     if (await link().isVisible().catch(() => false)) return [await nomeLink()];
-    const antes = new Set(await visiveis());
-    const g = menu.locator('button:visible').filter({ hasText: new RegExp('^\\s*' + grupo + '\\s*$') }).first();
-    await g.click(); await espera(700);
-    if (await link().isVisible().catch(() => false)) return [grupo, await nomeLink()];
-    for (const sub of (await visiveis()).filter(t => !antes.has(t))) {
-      const b = menu.locator('button:visible').filter({ hasText: new RegExp('^\\s*' + sub.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*$') }).first();
-      await b.click().catch(() => {}); await espera(600);
-      if (await link().isVisible().catch(() => false)) return [grupo, sub, await nomeLink()];
+    const esc = t => String(t).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const botao = t => menu.locator('button:visible').filter({ hasText: new RegExp('^\\s*' + esc(t) + '\\s*$') }).first();
+    // Tenta o grupo indicado e, se não achar a tela nele, cada grupo do menu (o texto do passo pode não dizer o caminho).
+    const grupos = [grupo, ...(await visiveis())].filter((g, k, l) => g && l.indexOf(g) === k && !/^(Modo escuro|Sair|Super Admin)$/i.test(g));
+    for (const gr of grupos) {
+      const antes = new Set(await visiveis());
+      if (!(await botao(gr).isVisible().catch(() => false))) continue;
+      await botao(gr).click().catch(() => {}); await espera(700);
+      if (await link().isVisible().catch(() => false)) return [gr, await nomeLink()];
+      for (const sub of (await visiveis()).filter(t => !antes.has(t))) {
+        await botao(sub).click().catch(() => {}); await espera(600);
+        if (await link().isVisible().catch(() => false)) return [gr, sub, await nomeLink()];
+      }
+      await botao(gr).click().catch(() => {}); await espera(500); // fecha e tenta o próximo
     }
     return null;
   } catch { return null; } finally { await ctx.close(); }
@@ -203,7 +209,7 @@ async function semErroDeLimite(page) {
   for (let k = 0; k < 4; k++) {
     const erro = await page.getByText(/Rate limit exceeded|Não foi possível conferir o acesso/i).first().isVisible().catch(() => false);
     if (!erro) return;
-    console.log('   (limite de acessos do sistema: espero e recarrego)');
+    console.log('   (limite de acessos do sistema: espero e recarrego)'); // aparece no log: vídeo fica com cortina
     await cortina(page, true);
     await espera(20000);
     await page.reload({ waitUntil: 'load' }).catch(() => {});
@@ -211,6 +217,34 @@ async function semErroDeLimite(page) {
     await C.prepararTela(page).catch(() => {});
     await cortina(page, false);
   }
+}
+
+/** Super Admin vendo a Demonstração: depois do clique no menu, a faixa "acessando: <empresa>" tem que continuar. */
+async function naEmpresaCerta(page) {
+  if (!process.env.TUTORIAL_VER_EMPRESA) return true;
+  if (page.url().includes('empresa=')) return true;
+  // O sistema guarda a empresa aberta pelo Super Admin no sessionStorage (a faixa "acessando" fica escondida no vídeo).
+  return page.evaluate((e) => sessionStorage.getItem('melhor-sistema:empresa-superadmin') === e, process.env.TUTORIAL_VER_EMPRESA).catch(() => false);
+}
+
+/** Ação do roteiro mostrada no vídeo: o cursor vai até o alvo, clique com som e onda; campo é digitado letra a letra. */
+async function executarVisivel(page, a, r, som, clique) {
+  if (a.soSemGravar && process.env.TUTORIAL_SEM_GRAVAR !== '1') return;
+  if (a.tipo === 'tecla' || !a.alvo) return C.executar(page, a, r);
+  const c = await centro(page, a.alvo).catch(() => null);
+  if (c) await moverCursor(page, c[0], c[1]);
+  if (a.tipo === 'clicar' || a.tipo === 'escolher' || a.tipo === 'preencher') { som(clique, 0.9); await onda(page); }
+  if (a.tipo === 'preencher' && c) {
+    try {
+      const el = C.achar(page, a.alvo);
+      await el.click({ force: true }).catch(() => {});
+      await el.fill('');
+      await el.pressSequentially(String(a.valor || ''), { delay: 55 });
+      await espera(a.espera || 600);
+      return;
+    } catch { /* cai no jeito normal */ }
+  }
+  return C.executar(page, a, r);
 }
 
 async function centro(page, alvo) {
@@ -273,9 +307,21 @@ async function gravar(r, s) {
     // 2) Abertura: logo + título enquanto a primeira tela carrega.
     await page.evaluate(([t, sub]) => { sessionStorage.setItem('__cortina_t', t); sessionStorage.setItem('__cortina_s', sub); }, [r.titulo, r.resumo || '']).catch(() => {});
     // Passo 1 "No menu, clique em X › Y": o vídeo começa no início e mostra o caminho pelo menu.
-    const dica1 = r.precisaLogin !== false && r.passos[0]?.ir ? caminhoDoMenu(r.passos[0].texto) : null;
-    const menu1 = dica1 ? await descobrirMenu(browser, r.passos[0].ir, dica1[0]) : null;
-    if (dica1) console.log('   menu: ' + (menu1 ? menu1.join(' › ') : 'não achei o caminho, abro direto'));
+    // Pedido do dono: TODO passo que muda de tela mostra o caminho pelo menu (cursor, clique visível), não só o 1º.
+    // Caminhos já descobertos ficam guardados (cada descoberta abre o sistema e gasta o limite de acessos).
+    const CACHE_MENU = path.join(__dirname, '.cache-menu.json');
+    const cacheMenu = fs.existsSync(CACHE_MENU) ? JSON.parse(fs.readFileSync(CACHE_MENU, 'utf8')) : {};
+    const menus = []; let descobriu = false;
+    for (const p of r.passos) {
+      if (r.precisaLogin === false || !p.ir || r.semMenu) { menus.push(null); continue; }
+      const rota = p.ir.split('?')[0];
+      if (!(rota in cacheMenu)) { const dica = caminhoDoMenu(p.texto); cacheMenu[rota] = await descobrirMenu(browser, p.ir, (dica && dica[0]) || r.grupo); descobriu = true; }
+      menus.push(cacheMenu[rota]);
+    }
+    fs.writeFileSync(CACHE_MENU, JSON.stringify(cacheMenu, null, 1));
+    if (descobriu) await espera(30000); // deixa o limite de acessos do sistema respirar antes de gravar
+    const menu1 = menus[0];
+    console.log('   menu: ' + menus.map((m, k) => r.passos[k].ir ? `${k + 1}: ${m ? m.join(' › ') : 'abre direto'}` : '').filter(Boolean).join(' | '));
     const primeira = menu1 ? '/' : (r.passos.find(p => p.ir)?.ir || '/');
     await page.goto(C.URL_BASE + (r.precisaLogin === false ? primeira : C.comEmpresa(primeira)), { waitUntil: 'load' }).catch(() => {});
     await cortina(page, true, r.titulo, r.resumo || '');
@@ -288,13 +334,28 @@ async function gravar(r, s) {
     for (let i = 0; i < r.passos.length; i++) {
       const p = r.passos[i], n = i + 1, fala = falas[i];
       await page.evaluate(a => { window.__desfArgs = a; }, { extras: C.lerExtrasPrivacidade(), tudo: !!p.desfocarTudo, campos: !!p.desfocarCampos, fantasia: process.env.TUTORIAL_FANTASIA !== '0' }).catch(() => {});
-      if (p.ir && i > 0) {
+      let inicio = null;
+      if (p.ir && i > 0 && menus[i]) {
+        // Fecha janela aberta (o menu fica atrás dela) e mostra o caminho pelo menu com a fala já começando.
+        await page.keyboard.press('Escape').catch(() => {}); await espera(300);
+        await tirarMarcas(page);
+        await legenda(page, n, p.titulo, p.texto);
+        inicio = agora(); som(fala.arquivo);
+        const foi = await andarNoMenu(page, menus[i], som, s.clique);
+        await espera(1500);
+        if (!foi || !(await naEmpresaCerta(page)) || !page.url().split('?')[0].endsWith(p.ir.split('?')[0])) {
+          // Recarrega rápido na tela certa (sem segurar a cortina enquanto a fala corre).
+          console.log(`   (passo ${n}: recarreguei a tela — ${!foi ? 'menu não abriu' : 'empresa/rota diferente'})`);
+          await page.goto(C.URL_BASE + C.comEmpresa(p.ir), { waitUntil: 'load' }).catch(() => {}); await espera(2500); await C.prepararTela(page).catch(() => {});
+          await cortina(page, false); // a página nova abre com a cortina de título: tira
+          await legenda(page, n, p.titulo, p.texto);
+        } else await espera(Math.min(p.espera || 3000, 4000));
+      } else if (p.ir && i > 0) {
         await legenda(page, '', '');
         await cortina(page, true, `Passo ${n}`, p.titulo); som(s.transicao, 0.7);
         await page.goto(C.URL_BASE + (r.precisaLogin === false ? p.ir : C.comEmpresa(p.ir)), { waitUntil: 'load' }).catch(() => {});
         await espera(p.espera || 3000);
       }
-      let inicio = null;
       if (i === 0 && menu1) {
         await C.prepararTela(page); await espera(400);
         await cortina(page, false);
@@ -302,11 +363,11 @@ async function gravar(r, s) {
         inicio = agora(); som(fala.arquivo);
         const foi = await andarNoMenu(page, menu1, som, s.clique);
         // Super admin vendo a empresa de demonstração: o clique no menu perde o ?empresa=; recarrega na mesma tela.
-        const semEmpresa = process.env.TUTORIAL_VER_EMPRESA && !page.url().includes('empresa=');
-        if (!foi || semEmpresa || !page.url().includes(p.ir.split('?')[0])) { await page.goto(C.URL_BASE + C.comEmpresa(p.ir), { waitUntil: 'load' }).catch(() => {}); await espera(p.espera || 3000); await cortina(page, false); }
+        await espera(1500);
+        if (!foi || !(await naEmpresaCerta(page)) || !page.url().split('?')[0].endsWith(p.ir.split('?')[0])) { await page.goto(C.URL_BASE + C.comEmpresa(p.ir), { waitUntil: 'load' }).catch(() => {}); await espera(p.espera || 3000); await cortina(page, false); }
       }
       await semErroDeLimite(page);
-      for (const a of p.antes || []) await C.executar(page, a, r);
+      for (const a of p.antes || []) await executarVisivel(page, a, r, som, s.clique);
       await C.prepararTela(page);
       await espera(400);
       if (inicio === null) {
@@ -327,10 +388,7 @@ async function gravar(r, s) {
       await espera(Math.max(900, (fala.dur + 0.6 - (agora() - inicio)) * 1000));
       await tirarMarcas(page);
       // Ações do passo (ex.: clicar em "Novo cliente"), com mouse e som de clique.
-      for (const a of p.depois || []) {
-        if (a.tipo === 'clicar') { const c = await centro(page, a.alvo).catch(() => null); if (c) await moverCursor(page, c[0], c[1]); som(s.clique, 0.9); await onda(page); }
-        await C.executar(page, a, r);
-      }
+      for (const a of p.depois || []) await executarVisivel(page, a, r, som, s.clique);
       console.log(`   🎬 passo ${n}: ${p.titulo}`);
     }
     // 3) Encerramento.

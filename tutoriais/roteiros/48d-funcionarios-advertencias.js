@@ -35,7 +35,7 @@ module.exports = {
       ],
       depois: [
         { tipo: 'clicar', alvo: { papel: 'button', nome: 'Lançar', exato: true, dentro: JANELA }, espera: 3500 },
-        { tipo: 'clicar', alvo: { papel: 'button', nome: 'Voltar', exato: true, dentro: JANELA }, seguro: true, espera: 1000 }, // sem salvar: fecha a janela
+        { tipo: 'clicar', alvo: { papel: 'button', nome: 'Voltar', exato: true, dentro: JANELA }, seguro: true, soSemGravar: true, espera: 1000 }, // sem salvar: fecha a janela
       ],
     },
     {
