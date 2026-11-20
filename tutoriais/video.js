@@ -77,15 +77,16 @@ function scriptDaPagina(logoDataUri) {
       #__tutorial_marcas > *{animation:__pop .35s cubic-bezier(.3,1.6,.5,1)}
       @keyframes __pop{from{transform:scale(.6);opacity:0}}
     \`;
-    let pend = false;
-    const tick = () => { pend = false; try {
+    let pend = false, livreEm = 0;
+    // Tela pesada (milhares de linhas): se uma passada demora, espera antes da próxima (não trava a página).
+    const tick = () => { pend = false; const t0 = performance.now(); if (t0 < livreEm) return; try {
       window.__desfocar(window.__desfArgs);
       // Esconde a faixa de Super Admin.
       const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
       for (let n; (n = w.nextNode());) { if (!/Modo superadmin/i.test(n.textContent)) continue; let el = n.parentElement;
         while (el.parentElement && el.parentElement !== document.body && el.parentElement.getBoundingClientRect().height < 140) el = el.parentElement;
         el.style.setProperty('display','none','important'); }
-    } catch (e) {} };
+    } catch (e) {} const d = performance.now() - t0; livreEm = d > 40 ? performance.now() + d * 6 : 0; };
     // MutationObserver roda antes da tela ser pintada: o dado novo já aparece desfocado.
     new MutationObserver(() => { if (!pend) { pend = true; queueMicrotask(tick); } })
       .observe(document, { childList: true, subtree: true, characterData: true });

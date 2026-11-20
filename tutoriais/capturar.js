@@ -193,7 +193,8 @@ function desfocarNaPagina({ extras, tudo, campos, fantasia }) {
       if (!fantasia || el.closest('#__tutorial_marcas,#__cortina,#__legenda,#__cursor')) return false;
       // Rodapé "Desenvolvido por" (logo + WhatsApp da Thiago Informática): é do dono, fica como está.
       for (let a = el, k = 0; a && k < 5; a = a.parentElement, k++) { const tx = a.textContent || ''; if (tx.length < 300 && /Desenvolvido por/i.test(tx)) return true; }
-      if (el.matches('input,textarea')) { const v = String(el.value || ''); if (!v.trim()) return true; const f = real(v, el) ? nomeFalso(v) : falso(v); if (f !== v) { el.value = f; el.dataset.tutorialFalso = '1'; return true; } return false; }
+      if (el.matches('input,textarea')) { const v = String(el.value || ''); if (!v.trim()) return true;
+        if (el.dataset.tutorialFalso === '1' && el.dataset.tutorialValor === v) return true; /* já trocado: não troca de novo */ const f = real(v, el) ? nomeFalso(v) : falso(v); if (f !== v) { el.value = f; el.dataset.tutorialFalso = '1'; el.dataset.tutorialValor = f; return true; } return false; }
       let trocou = false, sobrou = false;
       for (const n of el.childNodes) {
         if (n.nodeType !== 3 || !n.textContent.trim()) continue;
