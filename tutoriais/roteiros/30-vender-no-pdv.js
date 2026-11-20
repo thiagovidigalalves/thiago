@@ -3,6 +3,7 @@ module.exports = {
   ordem: 30,
   grupo: 'Comercial',
   titulo: 'Fazer uma venda no PDV (caixa)',
+  assunto: {"chave": ["venda", "vender", "vendo", "pdv", "caixa"], "acoes": ["fazer", "faço", "lançar", "registrar", "vender", "passar", "nova", "como", "pdv"], "rotas": ["/pdv"]}, // como o Thiaguinho acha o vídeo pela pergunta
   resumo: 'Abra o caixa, lance os produtos e receba o pagamento.',
   fala: 'Oi! Aqui é o Thiago, da Thiago Informática. Neste vídeo eu vou te mostrar como fazer uma venda no caixa, do começo ao fim: abrir o caixa, lançar os produtos e receber o pagamento.', // abertura do vídeo, no jeito de falar do Thiago
   antesDeComecar: 'Ter pelo menos um produto cadastrado. O PDV abre numa aba nova do navegador.',

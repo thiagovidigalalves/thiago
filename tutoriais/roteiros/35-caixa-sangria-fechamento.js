@@ -3,6 +3,7 @@ module.exports = {
   ordem: 35,
   grupo: 'Comercial',
   titulo: 'Sangria, suprimento e fechar o caixa',
+  assunto: {"chave": ["sangria", "suprimento", "caixa", "gaveta"], "acoes": ["fazer", "fechar", "fecho", "fechamento", "tirar", "retirar", "colocar", "sangria", "suprimento"]}, // como o Thiaguinho acha o vídeo pela pergunta
   resumo: 'Tire ou coloque dinheiro na gaveta e feche o caixa no fim do dia.',
   fala: 'Oi! Aqui é o Thiago, da Thiago Informática. Neste vídeo eu vou te mostrar como tirar ou colocar dinheiro na gaveta, e como fechar o caixa no fim do dia.', // abertura do vídeo, no jeito de falar do Thiago
   passos: [

@@ -185,7 +185,8 @@ async function andarNoMenu(page, caminho, som, clique) {
     const nome = caminho[k], ultimo = k === caminho.length - 1;
     const el = (ultimo ? menu.locator('a:visible') : menu.locator('button:visible')).filter({ hasText: nome }).first();
     if (!(await el.isVisible().catch(() => false))) { console.log(`   (menu: não achei "${nome}")`); return false; }
-    const proximo = !ultimo && await menu.getByText(caminho[k + 1], { exact: true }).first().isVisible().catch(() => false);
+    const ehUltimoProx = k + 1 === caminho.length - 1;
+    const proximo = !ultimo && await (ehUltimoProx ? menu.locator('a:visible') : menu.locator('button:visible')).filter({ hasText: caminho[k + 1] }).first().isVisible().catch(() => false);
     const b = await el.boundingBox(); if (!b) return false;
     await moverCursor(page, b.x + Math.min(40, b.width / 2), b.y + b.height / 2);
     if (proximo) { await espera(300); continue; } // grupo já aberto: só passa o mouse

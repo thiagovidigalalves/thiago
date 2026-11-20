@@ -3,6 +3,7 @@ module.exports = {
   ordem: 20,
   grupo: 'Cadastros',
   titulo: 'Cadastrar um cliente',
+  assunto: {"chave": ["cliente", "clientes"], "acoes": ["cadastrar", "cadastro", "cadastra", "novo", "nova", "incluir", "adicionar", "criar", "colocar", "registrar"]}, // como o Thiaguinho acha o vídeo pela pergunta
   resumo: 'Cadastre clientes com nome, CPF/CNPJ, WhatsApp e endereço.',
   passos: [
     {

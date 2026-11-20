@@ -3,6 +3,7 @@ module.exports = {
   ordem: 50,
   grupo: 'Fiscal',
   titulo: 'Emitir nota fiscal de uma venda',
+  assunto: {"chave": ["nota", "nfe", "nfce", "cupom", "fiscal"], "acoes": ["emitir", "emito", "emite", "gerar", "tirar", "fazer", "transformar", "mandar"]}, // como o Thiaguinho acha o vídeo pela pergunta
   resumo: 'Transforme uma venda em NF-e ou NFC-e (cupom fiscal).',
   fala: 'Oi! Aqui é o Thiago, da Thiago Informática. Neste vídeo eu vou te mostrar como transformar uma venda em nota fiscal, NF-e ou cupom fiscal, em poucos cliques.', // abertura do vídeo, no jeito de falar do Thiago
   antesDeComecar: 'A empresa precisa ter o fiscal configurado (certificado digital) e o produto com NCM preenchido.',

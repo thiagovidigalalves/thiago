@@ -3,6 +3,7 @@ module.exports = {
   ordem: 21,
   grupo: 'Cadastros',
   titulo: 'Cadastrar um produto',
+  assunto: {"chave": ["produto", "produtos", "mercadoria", "item"], "acoes": ["cadastrar", "cadastro", "cadastra", "novo", "nova", "incluir", "adicionar", "criar", "colocar", "registrar"], "rotas": ["/cadastros/produtos"]}, // como o Thiaguinho acha o vídeo pela pergunta
   resumo: 'Cadastre produtos com código, preço, estoque e código de barras.',
   passos: [
     {
