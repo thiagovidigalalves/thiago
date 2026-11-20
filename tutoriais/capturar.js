@@ -44,7 +44,8 @@ function carregarRoteiros(filtro) {
 function achar(page, alvo) {
   if (typeof alvo === 'string') return page.locator(alvo).first();
   // `dentro: 'dialog'` procura só dentro da janela aberta (evita achar o botão de trás).
-  const base = alvo.dentro === 'dialog' ? page.getByRole('dialog').last() : page;
+  // Outro texto em `dentro` é um seletor CSS (ex.: as janelas da área Funcionários: '.fixed.inset-0').
+  const base = alvo.dentro === 'dialog' ? page.getByRole('dialog').last() : alvo.dentro ? page.locator(alvo.dentro).last() : page;
   if (alvo.papel) return base.getByRole(alvo.papel, { name: alvo.nome, exact: !!alvo.exato }).first();
   if (alvo.rotulo) return base.getByLabel(alvo.rotulo, { exact: !!alvo.exato }).first();
   if (alvo.placeholder) return base.getByPlaceholder(alvo.placeholder, { exact: !!alvo.exato }).first();
@@ -164,8 +165,11 @@ function desfocarNaPagina({ extras, tudo, campos, fantasia }) {
     const falso = t => {
       let v = String(t);
       const zero = m => !/[1-9]/.test(m);
+      // `valoresReais: true` no roteiro: os valores são da Demonstração, fictícios e coerentes entre si; não mexe neles.
+      if (!window.__valoresReais) {
       v = v.replace(/R\$\s?-?[\d.,]+(\s?mil)?/g, m => zero(m) ? m : /mil/.test(m) ? `R$ ${(h(m) % 90) + 2},${h(m) % 10} mil` : `R$ ${((h(m) % 4800) + 35).toLocaleString('pt-BR')},${digitos(m, 2)}`);
       v = v.replace(/\b\d{1,3}(\.\d{3})*,\d{2}\b/g, m => zero(m) ? m : `${((h(m) % 4800) + 35).toLocaleString('pt-BR')},${digitos(m, 2)}`);
+      }
       v = v.replace(/\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}/g, m => { const d = digitos(m, 14); return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/0001-${d.slice(12, 14)}`; });
       v = v.replace(/\d{3}\.\d{3}\.\d{3}-\d{2}/g, m => { const d = digitos(m, 11); return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9, 11)}`; });
       v = v.replace(/\(\d{2}\)\s?9?\s?\d{4}-?\d{4}|\b\d{2}\s9?\d{4}-\d{4}\b|\b9?\d{4}-\d{4}\b/g, m => { const d = digitos(m, 8); return `(34) 9 ${d.slice(0, 4)}-${d.slice(4, 8)}`; });
@@ -365,8 +369,8 @@ async function instalarNomes(context, page, exatos) {
 }
 
 /** Textos que o fantasia NÃO troca (dados fictícios lançados pelo próprio roteiro: `manter: [...]`). */
-async function instalarManter(context, page, lista) {
-  const js = `window.__manter = ${JSON.stringify((lista || []).filter(Boolean))};`;
+async function instalarManter(context, page, lista, valoresReais = false) {
+  const js = `window.__manter = ${JSON.stringify((lista || []).filter(Boolean))}; window.__valoresReais = ${valoresReais ? 'true' : 'false'};`;
   await context.addInitScript({ content: js });
   await page.evaluate(js).catch(() => {});
 }
@@ -450,7 +454,7 @@ async function main() {
     process.env.TUTORIAL_VER_EMPRESA = r.empresa || empPadrao || '';
     if (r.empresa) await page.goto(URL_BASE + comEmpresa('/'), { waitUntil: 'load' }).then(async () => instalarNomes(context, page, await carregarNomesReais(page))).catch(() => {});
     console.log(`\n▶ ${r.titulo}`);
-    await instalarManter(context, page, r.manter);
+    await instalarManter(context, page, r.manter, !!r.valoresReais);
     if (r.precisaLogin !== false) {
       if (logado === null) { logado = await entrar(context, page); if (logado) { await page.goto(URL_BASE + comEmpresa('/'), { waitUntil: 'load' }).catch(() => {}); await page.waitForTimeout(3000); await instalarNomes(context, page, await carregarNomesReais(page)); } }
       if (!logado) { console.log('   pulado: precisa de login (defina TUTORIAL_EMAIL e TUTORIAL_SENHA, ou TUTORIAL_EMPRESA, TUTORIAL_USUARIO e TUTORIAL_SENHA).'); relatorio.push({ id: r.id, ok: false, motivo: 'sem login' }); continue; }

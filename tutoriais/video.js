@@ -279,7 +279,7 @@ async function gravar(r, s) {
     await cortina(page, true, r.titulo, r.resumo || '');
     // Nomes reais da empresa -> fictícios (a cortina cobre a tela enquanto carrega).
     if (r.precisaLogin !== false) await C.instalarNomes(context, page, await C.carregarNomesReais(page));
-    await C.instalarManter(context, page, r.manter); // dados fictícios do próprio roteiro ficam como estão
+    await C.instalarManter(context, page, r.manter, !!r.valoresReais); // dados fictícios do próprio roteiro ficam como estão
     // A fala de abertura vai na abertura animada (antes); aqui o vídeo já começa no passo 1.
     await C.prepararTela(page);
     corte = Math.max(0, agora() - 0.3);
