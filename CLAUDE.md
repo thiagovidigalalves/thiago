@@ -28,7 +28,7 @@ começar qualquer sessão neste repositório**, faça a conferência completa. N
    - **campo novo** numa tela que já tem tutorial → acrescente o passo/explicação no roteiro.
 4. Revise a privacidade de todo print novo (nenhum dado de cliente legível).
 5. Tutorial NOVO também entra na Ajuda de DENTRO do sistema (Utilitários › Ajuda, `/ajuda`): no app Base44,
-   `base44/shared/tutoriaisAjuda/p1..p4.js` (mesmo id do roteiro) + a tela em `rotas.js` (botão "Ajuda desta tela")
+   `base44/shared/tutoriaisAjuda/p1..p4.js` (mesmo id do roteiro) + a tela em `rotas.js` (é por ela que o botão "Me ajuda nesta tela" do Thiaguinho acha o vídeo da tela; o "Ajuda desta tela" saiu das páginas)
    + o teste `tests/ajuda-central.test.mjs` (quantidade). O vídeo aparece sozinho no topo do tutorial (id `tut-<id>`)
    e na página Vídeos (`/ajuda?videos=1`). A grade tinha ficado de fora: não esquecer.
 6. `node tutoriais/gerar-ajuda.js`, republique a Central no MESMO link
@@ -62,4 +62,5 @@ começar qualquer sessão neste repositório**, faça a conferência completa. N
   o link curto `https://thgestor.thiagoinformatica.com.br/v/<id>` (página pública, abre o vídeo sem login).
   No sistema: Super Admin › Vídeos do Thiaguinho (botão 📲 Enviar, com busca) e o pop-up do vídeo (botão Enviar no WhatsApp, só Super Admin).
   O Thiaguinho do Super Admin também envia: "manda o vídeo da grade para 34 99999-0000" (ou "... pra Maria 34...").
-  O vídeo vai com a capa ▶ (`capa_mini`, `tutoriais/capa-mini.py`) para não chegar em branco.
+  POR ENQUANTO vai só a mensagem com o link (pedido do dono). A chave "Mandar o arquivo do vídeo junto"
+  (Super Admin › Vídeos do Thiaguinho, `SystemSettings.videos_whatsapp_com_arquivo`) liga o vídeo + capa ▶ (`capa_mini`).
