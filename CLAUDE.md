@@ -53,3 +53,7 @@ começar qualquer sessão neste repositório**, faça a conferência completa. N
   `node tutoriais/gerar-ajuda.js` e republique a Central (ela só leva `videos-web/`: o limite da página é 256 MB).
   Fila de tudo que falta: `bash tutoriais/gravar-todos.sh` (grava + publica no Thiaguinho; não publica se der erro).
   O Thiaguinho mostra "🎬 Ver vídeo" junto de "Me explica" / "Faz comigo" quando a pergunta é do assunto.
+- MANDAR VÍDEO PRO CLIENTE (só quando o dono pedir, com o número que ele der):
+  `node tutoriais/enviar-video.js <id> <telefone> ["Nome"]` envia pelo WhatsApp do suporte (número do Super Admin)
+  o link curto `https://thgestor.thiagoinformatica.com.br/v/<id>` (página pública, abre o vídeo sem login).
+  No sistema: Super Admin › Vídeos do Thiaguinho (botão 📲 Enviar) e o pop-up do vídeo (botão Enviar no WhatsApp, só Super Admin).
