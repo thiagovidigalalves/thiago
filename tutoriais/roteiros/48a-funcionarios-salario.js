@@ -29,10 +29,18 @@ module.exports = {
     },
     {
       titulo: 'Salário e dia de pagamento',
-      texto: 'Coloca o salário fixo e o dia de pagamento. Se deixar em branco, vale o padrão da empresa, que é dia cinco.',
+      texto: 'Coloca o salário da carteira, o valor bruto, e o dia de pagamento. Se deixar o dia em branco, vale o padrão da empresa, que é dia cinco.',
       marcar: [
-        { alvo: { campo: 'Salário fixo (R$)', dentro: 'dialog' }, legenda: 'Salário' },
+        { alvo: { campo: 'Salário da carteira (bruto, R$)', dentro: 'dialog' }, legenda: 'Salário bruto' },
         { alvo: { campo: 'Dia de pagamento', dentro: 'dialog' }, legenda: 'Dia (padrão dia 5)' },
+      ],
+    },
+    {
+      titulo: 'Desconto de INSS e comissão',
+      texto: 'Logo abaixo vem o desconto de INSS: no automático ele segue a tabela oficial, mas dá pra pôr um percentual, um valor fixo ou não descontar. O que for descontado vira a guia do INSS no Contas a pagar. E em Como recebe a comissão você escolhe se ela soma no salário, ou se o salário é o mínimo garantido e a comissão só entra no que passar dele.',
+      marcar: [
+        { alvo: { papel: 'button', nome: 'Automático (tabela oficial)', exato: true, dentro: 'dialog' }, legenda: 'INSS' },
+        { alvo: { campo: 'Como recebe a comissão', dentro: 'dialog' }, legenda: 'Comissão' },
       ],
     },
     {

@@ -13,8 +13,9 @@ module.exports = {
     {
       ir: '/funcionarios',
       espera: 6000,
+      antes: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Próximo pagamento', exato: true }, seguro: true, espera: 4000 }],
       titulo: 'Comissão do mês até agora',
-      texto: 'No Painel dos funcionários, olha esse quadro verde: é a comissão do mês até agora. Ela soma sozinha pelas vendas e pelas ordens de serviço, com a mesma conta do relatório de comissões.',
+      texto: 'No Painel dos funcionários, no próximo pagamento, olha esse quadro verde: é a comissão do mês até agora. Ela soma sozinha pelas vendas e pelas ordens de serviço, com a mesma conta do relatório de comissões.',
       marcar: [{ alvo: { texto: /Comissão de .* até agora/ }, legenda: 'Soma sozinha' }],
     },
     {

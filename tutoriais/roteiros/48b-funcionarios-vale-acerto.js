@@ -57,10 +57,11 @@ module.exports = {
     {
       antes: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Ver tudo / recibo' }, espera: 1800 }],
       titulo: 'Recibo',
-      texto: 'Em Ver tudo e recibo aparece cada conta do mês. Dá pra imprimir o recibo pro funcionário assinar ou mandar no WhatsApp dele.',
+      texto: 'Em Ver tudo e recibo aparece cada conta do mês e a linha do tempo, com vales, pagamentos e advertências. Dá pra imprimir o recibo, mandar um link pro funcionário assinar pelo celular, ou mandar no WhatsApp dele com o recibo pra assinar.',
       marcar: [
         { alvo: { papel: 'button', nome: 'Imprimir recibo', dentro: JANELA }, legenda: 'Imprimir' },
-        { alvo: { papel: 'button', nome: 'WhatsApp', exato: true, dentro: JANELA }, legenda: 'WhatsApp' },
+        { alvo: { papel: 'button', nome: /Link para assinar/, dentro: JANELA }, legenda: 'Link pra assinar' },
+        { alvo: { papel: 'button', nome: /WhatsApp \+ recibo/, dentro: JANELA }, legenda: 'WhatsApp' },
       ],
       depois: [{ tipo: 'clicar', alvo: { rotulo: 'Fechar', dentro: JANELA }, forcar: true, espera: 1200 }],
     },
