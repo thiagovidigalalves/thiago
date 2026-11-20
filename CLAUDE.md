@@ -38,6 +38,7 @@ começar qualquer sessão neste repositório**, faça a conferência completa. N
 - JEITO DE FALAR (aprovado pelo dono, guardado como padrão de TODOS os vídeos): voz profissional `eleven_v4`,
   velocidade 1.0, stability 0.4, similarity 0.8, style 0.25 (`tutoriais/video-voz.js`); frases curtas de conversa,
   como o Thiago explicando para um cliente ("Aqui tem...", "é só...", "pra você"), nada de texto lido de manual.
+  Final dos vídeos explicativos: "Qualquer dúvida, é só chamar no grupo de suporte." (NÃO mandar chamar no WhatsApp).
 - DOIS FORMATOS (o dono diz qual quer): **explicativo** = deitado, tela de computador 1366x768, como os tutoriais
   (`video.js`); **status** = em pé 1080x1920 para o status do WhatsApp (animação `-status`, cortada em partes de ~40 s).
 - Tutorial com narração: `node tutoriais/video.js <id>` → `ajuda/videos/<id>.mp4` (vinheta + passos + voz ElevenLabs).

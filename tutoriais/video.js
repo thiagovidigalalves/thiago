@@ -251,7 +251,7 @@ async function gravar(r, s) {
     (i === r.passos.length - 1 && i > 0 ? 'E pra finalizar' : LIGA[i % LIGA.length]) + ', ' + minusc(natural(p.texto)),
     p.dica ? 'Uma dica: ' + minusc(natural(p.dica)) : '',
   ].filter(Boolean).join(' ')));
-  const falaFim = falar('Pronto! Viu como é fácil? Qualquer dúvida, é só chamar a gente no WhatsApp da Thiago Informática.');
+  const falaFim = falar('Pronto! Viu como é fácil? Qualquer dúvida, é só chamar no grupo de suporte.');
 
   const dirTmp = fs.mkdtempSync(path.join(require('os').tmpdir(), 'video-'));
   const browser = await chromium.launch();
@@ -333,7 +333,7 @@ async function gravar(r, s) {
     }
     // 3) Encerramento.
     await legenda(page, '', '');
-    await cortina(page, true, 'Pronto! ✅', 'Ficou com dúvida? Fale com o suporte da Thiago Informática.');
+    await cortina(page, true, 'Pronto! ✅', 'Ficou com dúvida? É só chamar no grupo de suporte.');
     som(s.transicao, 0.7); som(falaFim.arquivo);
     await espera((falaFim.dur + 0.8) * 1000);
   } finally {
