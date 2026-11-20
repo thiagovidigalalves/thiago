@@ -21,7 +21,7 @@ module.exports = {
     {
       titulo: 'Fecha sozinha no fim do mês',
       texto: 'No fim do mês ela fecha sozinha e cai no Contas a pagar, no plano Comissões, vencendo no dia do pagamento. Se uma venda for cancelada depois, vira um ajuste no mês seguinte.',
-      marcar: [{ alvo: { texto: /em andamento/ }, legenda: 'Entra no Contas a pagar' }],
+      marcar: [{ alvo: { texto: /entra no dia 1º/ }, legenda: 'Entra no Contas a pagar' }],
     },
     {
       ir: '/funcionarios/configuracoes',
