@@ -224,9 +224,17 @@ async function gravar(r, s) {
   const logoUri = logo ? `data:image/${logo.endsWith('png') ? 'png' : 'webp'};base64,${fs.readFileSync(logo).toString('base64')}` : '';
 
   // 1) Narração antes de gravar: assim cada passo fica na tela o tempo exato da fala.
-  const falaIntro = falar(`${r.titulo}. ${r.resumo || ''}`);
-  const falas = r.passos.map((p, i) => falar(`Passo ${i + 1}. ${p.titulo}. ${p.texto}${p.dica ? ' Dica: ' + p.dica : ''}`));
-  const falaFim = falar('Pronto! Ficou com dúvida? Fale com o suporte da Thiago Informática.');
+  // Jeito de falar aprovado pelo dono: conversa, como o Thiago explicando para o cliente (nada de "Passo 1.").
+  // O roteiro pode trazer `fala` (no tutorial ou no passo) para usar um texto próprio.
+  const natural = t => String(t || '').replace(/CPF\/CNPJ/g, 'CPF ou CNPJ').replace(/\s*›\s*/g, ', depois em ').replace(/["“”]/g, '').replace(/\s+/g, ' ').trim();
+  const minusc = t => t.charAt(0).toLowerCase() + t.slice(1);
+  const falaIntro = falar(r.fala || `Oi! Aqui é o Thiago, da Thiago Informática. Neste vídeo eu vou te mostrar como ${minusc(natural(r.titulo))}. ${natural(r.resumo)}`);
+  const LIGA = ['Primeiro', 'Agora', 'Depois', 'Em seguida', 'Agora', 'Depois', 'Em seguida', 'Agora', 'Depois'];
+  const falas = r.passos.map((p, i) => falar(p.fala || [
+    (i === r.passos.length - 1 && i > 0 ? 'E pra finalizar' : LIGA[i % LIGA.length]) + ', ' + minusc(natural(p.texto)),
+    p.dica ? 'Uma dica: ' + minusc(natural(p.dica)) : '',
+  ].filter(Boolean).join(' ')));
+  const falaFim = falar('Pronto! Viu como é fácil? Qualquer dúvida, é só chamar a gente no WhatsApp da Thiago Informática.');
 
   const dirTmp = fs.mkdtempSync(path.join(require('os').tmpdir(), 'video-'));
   const browser = await chromium.launch();

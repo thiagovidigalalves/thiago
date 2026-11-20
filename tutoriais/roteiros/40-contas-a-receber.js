@@ -4,6 +4,7 @@ module.exports = {
   grupo: 'Financeiro',
   titulo: 'Contas a receber: lançar e dar baixa',
   resumo: 'Lance o que o cliente vai te pagar e registre quando ele pagar.',
+  fala: 'Oi! Aqui é o Thiago, da Thiago Informática. Neste vídeo eu vou te mostrar como lançar uma conta a receber e como dar baixa quando o cliente pagar.', // abertura do vídeo, no jeito de falar do Thiago
   passos: [
     {
       ir: '/financeiro/contas-receber',
