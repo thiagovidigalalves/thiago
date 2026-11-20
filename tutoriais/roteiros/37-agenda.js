@@ -60,7 +60,7 @@ module.exports = {
       texto: 'Escolha o tipo, escreva o assunto, o horário de início e de fim, com quem é e quem é o responsável. Depois é só clicar em Salvar, e ele aparece em roxo na agenda.',
       marcar: [
         { alvo: { placeholder: 'Ex.: Reunião com o fornecedor' }, legenda: 'Assunto' },
-        { alvo: { campo: 'Início', dentro: 'dialog' }, legenda: 'Horário' },
+        { alvo: { css: 'input[type="time"]', dentro: 'dialog' }, legenda: 'Horário' },
         { alvo: { papel: 'button', nome: 'Salvar', exato: true, dentro: 'dialog' }, legenda: 'Salvar' },
       ],
       depois: [{ tipo: 'tecla', tecla: 'Escape', espera: 900 }],
