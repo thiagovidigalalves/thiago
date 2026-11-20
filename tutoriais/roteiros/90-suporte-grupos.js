@@ -8,6 +8,8 @@ module.exports = {
   titulo: 'Suporte em grupos com IA',
   somente_admin: true,
   superAdmin: true,
+  // Nomes dos grupos (clientes) e da equipe: sempre desfocados (o fictício não pega todos os nomes de grupo).
+  borrar: 'div.grid > div.rounded-2xl b.truncate, div.grid > div.rounded-2xl p, section label b.truncate, div.mt-1.flex.flex-wrap > button, input[placeholder="Nome"], input[placeholder="WhatsApp com DDD"]',
   assunto: { chave: ['suporte em grupos', 'grupo de suporte', 'grupos', 'ia do suporte', 'thiaguinho no grupo'], acoes: ['configurar', 'ligar', 'usar', 'funciona', 'como'], rotas: ['/admin/suporte-grupos'] },
   resumo: 'O Thiaguinho responde as dúvidas do sistema nos grupos de WhatsApp que você ligar, manda o vídeo e pergunta se a pessoa conseguiu.',
   fala: 'Oi! Aqui é o Thiago. Neste vídeo eu vou te mostrar o Suporte em grupos: o Thiaguinho respondendo as dúvidas dos clientes direto nos grupos de WhatsApp do suporte. Bora lá!',
@@ -32,7 +34,7 @@ module.exports = {
       texto: 'Em cada grupo você marca IA responde aqui e escolhe a empresa daquele grupo. Os outros grupos e as conversas no privado nunca são lidos.',
       marcar: [
         { alvo: { texto: 'IA responde aqui' }, legenda: 'Liga a IA' },
-        { alvo: { campo: 'Empresa do grupo' }, legenda: 'Empresa' },
+        { alvo: { css: 'label:has-text("Empresa do grupo") select' }, legenda: 'Empresa' },
       ],
     },
     {
@@ -51,7 +53,7 @@ module.exports = {
       texto: 'Aqui você põe o horário que ela responde e o que ela aceita abrir: áudio, foto ou vídeo. Cada um gasta crédito de IA, e o vídeo é o que mais gasta.',
       desfocarCampos: true,
       marcar: [
-        { alvo: { campo: 'Responde das (h)' }, legenda: 'Horário' },
+        { alvo: { css: 'label:has-text("Responde das (h)") input' }, legenda: 'Horário' },
         { alvo: { texto: 'O que a IA aceita abrir' }, legenda: 'Áudio, foto, vídeo' },
       ],
     },
@@ -68,10 +70,7 @@ module.exports = {
       titulo: 'Mensagens prontas',
       texto: 'E as mensagens prontas da Central de Atendimento: a de quando você clica em Atender, a de encerramento e o pedido de avaliação. Dá pra mudar o texto, e também escolher o que vai por padrão ao finalizar.',
       desfocarCampos: true,
-      marcar: [
-        { alvo: { texto: /Mensagens prontas da Central de Atendimento/ }, legenda: 'Textos prontos' },
-        { alvo: { campo: 'Ao finalizar, o padrão é' }, legenda: 'Ao finalizar' },
-      ],
+      marcar: [{ alvo: { css: 'label:has-text("Ao clicar em Atender") textarea' }, legenda: 'Textos prontos' }],
     },
     {
       titulo: 'Quem a IA não responde e quem atende',
