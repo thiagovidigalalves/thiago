@@ -195,11 +195,13 @@ function desfocarNaPagina({ extras, tudo, campos, fantasia }) {
       if (!fantasia || el.closest('#__tutorial_marcas,#__cortina,#__legenda,#__cursor')) return false;
       // Rodapé "Desenvolvido por" (logo + WhatsApp da Thiago Informática): é do dono, fica como está.
       for (let a = el, k = 0; a && k < 5; a = a.parentElement, k++) { const tx = a.textContent || ''; if (tx.length < 300 && /Desenvolvido por/i.test(tx)) return true; }
-      if (el.matches('input,textarea')) { const v = String(el.value || ''); if (!v.trim()) return true;
+      if (el.matches('input,textarea')) { const v = String(el.value || ''); if (!v.trim()) return true; if ((window.__manter || []).some((m) => v.includes(m))) return true;
         if (el.dataset.tutorialFalso === '1' && el.dataset.tutorialValor === v) return true; /* já trocado: não troca de novo */ const f = real(v, el) ? nomeFalso(v) : falso(v); if (f !== v) { el.value = f; el.dataset.tutorialFalso = '1'; el.dataset.tutorialValor = f; return true; } return false; }
       let trocou = false, sobrou = false;
       for (const n of el.childNodes) {
         if (n.nodeType !== 3 || !n.textContent.trim()) continue;
+        // Dados fictícios que o próprio roteiro lançou na Demonstração (`manter`): ficam como estão.
+        if ((window.__manter || []).some((m) => n.textContent.includes(m))) continue;
         if (n.__falso === n.textContent) { trocou = true; continue; }
         // Títulos numerados ("1. Numeração", "2. Cores") são da tela, não nomes.
         if (/^\s*\d+[.)]\s/.test(n.textContent)) continue;
@@ -310,7 +312,7 @@ async function executar(page, acao, roteiro) {
     // `gravaDados: true` (pedido do dono, 20/11/2026): na empresa de DEMONSTRAÇÃO o robô salva de verdade, com dados
     // fictícios, pra o vídeo ficar completo. Em qualquer outra empresa continua só marcando.
     const podeGravar = roteiro.gravaDados && (process.env.TUTORIAL_VER_EMPRESA || '') === EMPRESA_DEMO && process.env.TUTORIAL_SEM_GRAVAR !== '1'; // TUTORIAL_SEM_GRAVAR=1: só prints, sem lançar de novo
-    if (roteiro.gravaDados && !podeGravar) console.log(`   (segurança) gravaDados só vale na empresa de demonstração (${EMPRESA_DEMO}).`);
+    if (roteiro.gravaDados && !podeGravar && process.env.TUTORIAL_SEM_GRAVAR !== '1') console.log(`   (segurança) gravaDados só vale na empresa de demonstração (${EMPRESA_DEMO}).`);
     if (!acao.seguro && (BOTOES_PERIGOSOS.test(texto) || (naJanela && BOTOES_PERIGOSOS_JANELA.test(texto.trim()))) && !podeGravar) {
       console.log(`   (segurança) não cliquei em "${texto.trim()}" — só marquei.`);
       return;
@@ -358,6 +360,13 @@ async function carregarNomesReais(page) {
 async function instalarNomes(context, page, exatos) {
   if (!exatos) return;
   const js = `window.__nomesReais = (() => { const e = new Set(${JSON.stringify(exatos)}); const d = new Set(); for (const n of e) { const w = n.split(' '); if (w.length >= 2) d.add(w.slice(0, 2).join(' ')); } return { exatos: e, dois: d }; })();`;
+  await context.addInitScript({ content: js });
+  await page.evaluate(js).catch(() => {});
+}
+
+/** Textos que o fantasia NÃO troca (dados fictícios lançados pelo próprio roteiro: `manter: [...]`). */
+async function instalarManter(context, page, lista) {
+  const js = `window.__manter = ${JSON.stringify((lista || []).filter(Boolean))};`;
   await context.addInitScript({ content: js });
   await page.evaluate(js).catch(() => {});
 }
@@ -441,6 +450,7 @@ async function main() {
     process.env.TUTORIAL_VER_EMPRESA = r.empresa || empPadrao || '';
     if (r.empresa) await page.goto(URL_BASE + comEmpresa('/'), { waitUntil: 'load' }).then(async () => instalarNomes(context, page, await carregarNomesReais(page))).catch(() => {});
     console.log(`\n▶ ${r.titulo}`);
+    await instalarManter(context, page, r.manter);
     if (r.precisaLogin !== false) {
       if (logado === null) { logado = await entrar(context, page); if (logado) { await page.goto(URL_BASE + comEmpresa('/'), { waitUntil: 'load' }).catch(() => {}); await page.waitForTimeout(3000); await instalarNomes(context, page, await carregarNomesReais(page)); } }
       if (!logado) { console.log('   pulado: precisa de login (defina TUTORIAL_EMAIL e TUTORIAL_SENHA, ou TUTORIAL_EMPRESA, TUTORIAL_USUARIO e TUTORIAL_SENHA).'); relatorio.push({ id: r.id, ok: false, motivo: 'sem login' }); continue; }
@@ -492,5 +502,5 @@ async function main() {
   console.log('\nPronto. Agora rode: node tutoriais/gerar-ajuda.js');
 }
 
-module.exports = { carregarNomesReais, instalarNomes, URL_BASE, SESSAO, BOTOES_PERIGOSOS, BOTOES_PERIGOSOS_JANELA, carregarRoteiros, achar, marcar, desfocarDados, desfocarNaPagina, lerExtrasPrivacidade, limparMarcas, executar, comEmpresa, prepararTela, entrar };
+module.exports = { carregarNomesReais, instalarNomes, instalarManter, URL_BASE, SESSAO, BOTOES_PERIGOSOS, BOTOES_PERIGOSOS_JANELA, carregarRoteiros, achar, marcar, desfocarDados, desfocarNaPagina, lerExtrasPrivacidade, limparMarcas, executar, comEmpresa, prepararTela, entrar };
 if (require.main === module) main();

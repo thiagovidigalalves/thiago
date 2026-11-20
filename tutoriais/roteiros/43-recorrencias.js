@@ -6,6 +6,7 @@ module.exports = {
   grupo: 'Financeiro',
   titulo: 'Contas que se repetem todo mês',
   gravaDados: true,
+  manter: ['Imobiliária Exemplo', 'Aluguel da loja', '1.800,00', '1800'], // o que o robô lança: não vira nome/valor inventado
   resumo: 'Aluguel, salário, internet: cadastre uma vez e o sistema lança os próximos 12 meses.',
   passos: [
     {
@@ -54,10 +55,13 @@ module.exports = {
     },
     {
       ir: '/financeiro/contas-pagar',
-      antes: [{ tipo: 'preencher', alvo: { placeholder: 'Nome' }, valor: 'Aluguel da loja', espera: 2500 }],
+      antes: [
+        { tipo: 'clicar', alvo: { papel: 'button', nome: 'Todas', exato: true }, espera: 1500 },
+        { tipo: 'preencher', alvo: { placeholder: 'Nome' }, valor: 'Imobiliária Exemplo', espera: 3000 },
+      ],
       titulo: 'As contas já estão lançadas',
       texto: 'Olha aí em Contas a Pagar: uma conta pra cada mês, com o vencimento certinho. Quando pagar, é só dar baixa.',
-      marcar: [{ alvo: { texto: /Aluguel da loja/ }, legenda: 'Uma por mês' }],
+      marcar: [{ alvo: { css: 'tbody tr' }, legenda: 'Uma por mês' }],
     },
   ],
 };
