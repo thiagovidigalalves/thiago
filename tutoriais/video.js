@@ -219,6 +219,15 @@ async function semErroDeLimite(page) {
   }
 }
 
+/** Espera a tela terminar de carregar (some o "Carregando…"), até ~25 s, antes de narrar. */
+async function esperarCarregar(page) {
+  for (let k = 0; k < 50; k++) {
+    const carregando = await page.getByText(/^\s*Carregando/i).first().isVisible().catch(() => false);
+    if (!carregando) return;
+    await espera(500);
+  }
+}
+
 /** Super Admin vendo a Demonstração: depois do clique no menu, a faixa "acessando: <empresa>" tem que continuar. */
 async function naEmpresaCerta(page) {
   if (!process.env.TUTORIAL_VER_EMPRESA) return true;
@@ -339,8 +348,7 @@ async function gravar(r, s) {
         // Fecha janela aberta (o menu fica atrás dela) e mostra o caminho pelo menu com a fala já começando.
         await page.keyboard.press('Escape').catch(() => {}); await espera(300);
         await tirarMarcas(page);
-        await legenda(page, n, p.titulo, p.texto);
-        inicio = agora(); som(fala.arquivo);
+        await legenda(page, '', '');
         const foi = await andarNoMenu(page, menus[i], som, s.clique);
         await espera(1500);
         if (!foi || !(await naEmpresaCerta(page)) || !page.url().split('?')[0].endsWith(p.ir.split('?')[0])) {
@@ -348,8 +356,10 @@ async function gravar(r, s) {
           console.log(`   (passo ${n}: recarreguei a tela — ${!foi ? 'menu não abriu' : 'empresa/rota diferente'})`);
           await page.goto(C.URL_BASE + C.comEmpresa(p.ir), { waitUntil: 'load' }).catch(() => {}); await espera(2500); await C.prepararTela(page).catch(() => {});
           await cortina(page, false); // a página nova abre com a cortina de título: tira
-          await legenda(page, n, p.titulo, p.texto);
-        } else await espera(Math.min(p.espera || 3000, 4000));
+        }
+        await esperarCarregar(page); await espera(800);
+        await legenda(page, n, p.titulo, p.texto);
+        inicio = agora(); som(fala.arquivo);
       } else if (p.ir && i > 0) {
         await legenda(page, '', '');
         await cortina(page, true, `Passo ${n}`, p.titulo); som(s.transicao, 0.7);
@@ -367,6 +377,7 @@ async function gravar(r, s) {
         if (!foi || !(await naEmpresaCerta(page)) || !page.url().split('?')[0].endsWith(p.ir.split('?')[0])) { await page.goto(C.URL_BASE + C.comEmpresa(p.ir), { waitUntil: 'load' }).catch(() => {}); await espera(p.espera || 3000); await cortina(page, false); }
       }
       await semErroDeLimite(page);
+      await esperarCarregar(page);
       for (const a of p.antes || []) await executarVisivel(page, a, r, som, s.clique);
       await C.prepararTela(page);
       await espera(400);
