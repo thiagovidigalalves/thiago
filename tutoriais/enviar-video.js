@@ -28,7 +28,7 @@ function token() {
   const primeiro = String(nome).trim().split(/\s+/)[0];
   const texto = [`Olá${primeiro ? ', ' + primeiro : ''}! 👋`, '', 'Separei um vídeo rapidinho pra te ajudar:', `🎬 *${v.titulo}*`, '', 'Qualquer dúvida, é só chamar no grupo de suporte. 😉', '_Thiago Informática_ 💙', '', link].join('\n');
   const empresa = ss.whatsapp_admin_sessao_empresa || ss.whatsapp_admin_empresa;
-  const r = await fetch(`${API}/functions/whatsappApi`, { method: 'POST', headers: h, body: JSON.stringify({ action: 'enviar', company_id: empresa, numero, texto, video: v.video_leve || v.video, origem: 'Vídeo tutorial (suporte)', tipo: 'suporte', cliente: nome }) });
+  const r = await fetch(`${API}/functions/whatsappApi`, { method: 'POST', headers: h, body: JSON.stringify({ action: 'enviar', company_id: empresa, numero, texto, video: v.video_leve || v.video, capa: v.capa_mini, origem: 'Vídeo tutorial (suporte)', tipo: 'suporte', cliente: nome }) });
   const d = await r.json().catch(() => ({}));
   if (d.enviado) console.log(`✅ Enviado para ${numero}: ${v.titulo} (${link})`);
   else console.log(`✘ Não enviou pelo sistema (${r.status} ${d.error || (d.habilitado === false ? 'WhatsApp do sistema desligado' : '')}). Link para mandar na mão: ${link}`);

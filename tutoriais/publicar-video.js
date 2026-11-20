@@ -5,6 +5,7 @@
  * Uso: node tutoriais/publicar-video.js <id> [<id> ...]
  *   - sobe ajuda/videos/<id>.mp4 e <id>.jpg pelo envio de arquivos do próprio sistema (sessão do robô);
  *   - sobe também a cópia leve (ajuda/videos-web) para o envio no WhatsApp; --leve completa as que faltam;
+ *   - e a capa pequena com ▶ (capa_mini) que o WhatsApp mostra enquanto o vídeo carrega; --capas completa as que faltam;
  *   - grava/atualiza o item em SystemSettings.videos_tutoriais: titulo, rotas, chave, acoes, palavras, video, capa.
  * Os termos que o Thiaguinho usa para achar o vídeo vêm do roteiro (`assunto: { chave, acoes, palavras }`).
  * Pedido do dono: todo vídeo novo vai automático para o Thiaguinho (e a Central de Ajuda é republicada à parte).
@@ -50,6 +51,15 @@ async function subir(arquivo, tok) {
   return j.file_url;
 }
 
+// Capa pequena (640x360, com ▶) em ajuda/videos-web/<id>-mini.jpg, feita da capa do vídeo.
+function capaMini(id, titulo) {
+  const jpg = path.join(RAIZ, 'ajuda', 'videos', id + '.jpg'), mini = path.join(RAIZ, 'ajuda', 'videos-web', id + '-mini.jpg');
+  if (!fs.existsSync(jpg)) return null;
+  fs.mkdirSync(path.dirname(mini), { recursive: true });
+  require('child_process').execFileSync('python3', [path.join(__dirname, 'capa-mini.py'), jpg, mini, titulo || '']);
+  return mini;
+}
+
 async function api(metodo, rota, tok, corpo) {
   const r = await fetch(`${API}/entities/${rota}`, { method: metodo, headers: { Authorization: 'Bearer ' + tok, 'X-App-Id': APP, 'Content-Type': 'application/json' }, body: corpo ? JSON.stringify(corpo) : undefined });
   const j = await r.json().catch(() => ({}));
@@ -87,6 +97,21 @@ async function api(metodo, rota, tok, corpo) {
     console.log(`Com cópia leve: ${videos.filter(v => v.video_leve).length} de ${videos.length}`);
     return;
   }
+  // --capas [ids]: gera e sobe a capa pequena com ▶ (capa_mini), que o WhatsApp mostra enquanto o vídeo carrega.
+  if (process.argv[2] === '--capas') {
+    const so = process.argv.slice(3);
+    for (const v of videos) {
+      const id = String(v.id).replace(/^tut-/, '');
+      if ((so.length && !so.includes(id)) || (!so.length && v.capa_mini)) continue;
+      const mini = capaMini(id, v.titulo);
+      if (!mini) { console.log(`✘ ${id}: sem capa`); continue; }
+      v.capa_mini = await subir(mini, tok);
+      console.log(`✅ ${id}: capa ▶ (${Math.round(fs.statSync(mini).size / 1024)} KB)`);
+    }
+    await api('PUT', `SystemSettings/${cfg.id}`, tok, { videos_tutoriais: videos });
+    console.log(`Com capa ▶: ${videos.filter(v => v.capa_mini).length} de ${videos.length}`);
+    return;
+  }
   if (remover) {
     videos = videos.filter(v => !ids.includes(String(v.id).replace(/^tut-/, '')));
     await api('PUT', `SystemSettings/${cfg.id}`, tok, { videos_tutoriais: videos });
@@ -103,13 +128,14 @@ async function api(metodo, rota, tok, corpo) {
     const web = path.join(RAIZ, 'ajuda', 'videos-web', id + '.mp4');
     if (!fs.existsSync(web)) { fs.mkdirSync(path.dirname(web), { recursive: true }); require('child_process').execFileSync('ffmpeg', ['-y', '-v', 'error', '-i', mp4, '-vf', 'scale=1024:-2', '-c:v', 'libx264', '-crf', '30', '-preset', 'medium', '-c:a', 'aac', '-b:a', '96k', '-movflags', '+faststart', web]); }
     const video_leve = await subir(web, tok);
+    const mini = capaMini(id, r.titulo), capa_mini = mini ? await subir(mini, tok) : '';
     const a = r.assunto || {};
     const item = {
       id: 'tut-' + id, titulo: r.titulo, categoria: r.grupo,
       rotas: a.rotas || [...new Set(r.passos.map(p => p.ir).filter(Boolean).map(x => x.split('?')[0]))].slice(0, 4),
       ...termos(r),
       palavras: (a.palavras || [r.titulo.toLowerCase()]).slice(0, 30),
-      video, video_leve, capa, gerado_pelo_robo: true,
+      video, video_leve, capa, capa_mini, gerado_pelo_robo: true,
     };
     videos = [...videos.filter(v => v.id !== item.id), item];
     console.log(`✅ ${id} → Thiaguinho (${item.rotas.join(', ')})`);
