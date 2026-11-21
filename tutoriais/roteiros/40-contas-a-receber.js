@@ -48,7 +48,7 @@ module.exports = {
       antes: [{ tipo: 'preencher', alvo: { placeholder: 'Nome do cliente' }, valor: 'Mariana Exemplo', espera: 4000 }],
       titulo: 'A conta já está lançada',
       texto: 'Pronto, a conta está aqui, em aberto. Quando o cliente vier pagar, a baixa é feita no caixa.',
-      marcar: [{ alvo: { texto: 'Conserto de notebook', exato: true }, legenda: 'Em aberto' }],
+      marcar: [{ alvo: { texto: 'Mariana Exemplo', exato: true }, legenda: 'Em aberto' }],
     },
     {
       ir: '/pdv',
@@ -63,7 +63,7 @@ module.exports = {
       marcar: [{ alvo: { texto: 'Conserto de notebook', exato: true, dentro: 'dialog' }, legenda: 'A conta dele' }],
     },
     {
-      antes: [{ tipo: 'clicar', alvo: { css: 'label:has-text("Marcar todas as parcelas") input[type=checkbox]', dentro: 'dialog' }, seguro: true, espera: 1000 }],
+      antes: [{ tipo: 'clicar', alvo: { papel: 'checkbox', nome: /Marcar todas as parcelas/, dentro: 'dialog' }, seguro: true, forcar: true, espera: 1200 }],
       titulo: 'Marque e envie ao caixa',
       texto: 'Marca a parcela que ele está pagando e clica em Enviar ao caixa.',
       marcar: [{ alvo: { papel: 'button', nome: /Enviar ao caixa/, dentro: 'dialog' }, legenda: 'Enviar ao caixa' }],
@@ -91,7 +91,7 @@ module.exports = {
       ],
       titulo: 'A conta ficou paga',
       texto: 'E voltando em Contas a Receber, na aba Pagas, a conta já aparece paga, e o dinheiro entrou no caixa do dia.',
-      marcar: [{ alvo: { texto: 'Conserto de notebook', exato: true }, legenda: 'Paga' }],
+      marcar: [{ alvo: { texto: 'Mariana Exemplo', exato: true }, legenda: 'Paga' }],
       dica: 'Recebeu na hora, junto com o lançamento? Ligue "Já foi recebido agora" e informe a forma de pagamento.',
     },
   ],
