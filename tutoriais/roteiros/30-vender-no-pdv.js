@@ -8,7 +8,7 @@ module.exports = {
   titulo: 'Fazer uma venda no PDV (caixa)',
   gravaDados: true,
   valoresReais: true, // R$ 90, 100 e 10 de troco: a conta tem que fechar
-  manter: ['FONE DE OUVIDO SEM FIO TWS M25', 'Emenda Rj45 8×8 Cat5 Cat6 1 Gbps Emenda Cabo De Rede 1 Uni', 'Emenda Rj45 8x8 Cat5 Cat6 1 Gbps Emenda Cabo De Rede 1 Uni'],
+  manter: ['25153507', '2*7896442302382', '7896442302382', 'FONE DE OUVIDO SEM FIO TWS M25', 'Emenda Rj45 8×8 Cat5 Cat6 1 Gbps Emenda Cabo De Rede 1 Uni', 'Emenda Rj45 8x8 Cat5 Cat6 1 Gbps Emenda Cabo De Rede 1 Uni'],
   assunto: {"chave": ["venda", "vender", "vendo", "pdv", "caixa"], "acoes": ["fazer", "faço", "lançar", "registrar", "vender", "passar", "nova", "como", "pdv"], "rotas": ["/pdv"]}, // como o Thiaguinho acha o vídeo pela pergunta
   resumo: 'Lance os produtos, receba o pagamento e veja o troco: a venda inteira, do começo ao fim.',
   fala: 'Oi! Aqui é o Thiago, da Thiago Informática. Neste vídeo eu vou fazer uma venda no caixa de verdade, do começo ao fim: lançar os produtos, receber e dar o troco. Bora lá!',
@@ -66,13 +66,6 @@ module.exports = {
       texto: 'Pronto, venda feita! Agora ele pergunta do comprovante: imprimir em A4, na bobina, não imprimir, ou mandar pelo WhatsApp do cliente.',
       marcar: [{ alvo: { texto: 'Imprimir comprovante?', exato: true }, legenda: 'Comprovante' }],
       depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: /Não imprimir/ }, seguro: true, espera: 2000 }],
-    },
-    {
-      antes: [{ tipo: 'tecla', tecla: 'F4', espera: 4000 }],
-      titulo: 'A venda já está lá',
-      texto: 'Apertando F4 você vê as vendas: a que eu acabei de fazer já está aqui, e o estoque e o caixa já foram atualizados.',
-      marcar: [{ alvo: { texto: /^Venda #\d+$/ }, legenda: 'A venda que acabei de fazer' }],
-      depois: [{ tipo: 'tecla', tecla: 'Escape', espera: 1000 }],
     },
   ],
 };
