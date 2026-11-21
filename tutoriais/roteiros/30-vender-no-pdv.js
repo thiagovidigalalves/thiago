@@ -71,7 +71,7 @@ module.exports = {
       antes: [{ tipo: 'tecla', tecla: 'F4', espera: 4000 }],
       titulo: 'A venda já está lá',
       texto: 'Apertando F4 você vê as vendas: a que eu acabei de fazer já está aqui, e o estoque e o caixa já foram atualizados.',
-      marcar: [{ alvo: { texto: /R\$\s?90,00/ }, legenda: 'Venda de R$ 90' }],
+      marcar: [{ alvo: { texto: /^Venda #\d+$/ }, legenda: 'A venda que acabei de fazer' }],
       depois: [{ tipo: 'tecla', tecla: 'Escape', espera: 1000 }],
     },
   ],
