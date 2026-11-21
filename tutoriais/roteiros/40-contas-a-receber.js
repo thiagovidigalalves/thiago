@@ -63,7 +63,7 @@ module.exports = {
       marcar: [{ alvo: { texto: 'Conserto de notebook', exato: true, dentro: 'dialog' }, legenda: 'A conta dele' }],
     },
     {
-      antes: [{ tipo: 'clicar', alvo: { papel: 'checkbox', nome: /Marcar todas as parcelas/, dentro: 'dialog' }, seguro: true, forcar: true, espera: 1200 }],
+      antes: [{ tipo: 'clicar', alvo: { css: 'div:has(> span:text("Marcar todas as parcelas")) input[type=checkbox]', dentro: 'dialog' }, seguro: true, forcar: true, espera: 1200 }],
       titulo: 'Marque e envie ao caixa',
       texto: 'Marca a parcela que ele está pagando e clica em Enviar ao caixa.',
       marcar: [{ alvo: { papel: 'button', nome: /Enviar ao caixa/, dentro: 'dialog' }, legenda: 'Enviar ao caixa' }],
