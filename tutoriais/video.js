@@ -221,11 +221,22 @@ async function semErroDeLimite(page) {
 
 /** Espera a tela terminar de carregar (some o "Carregando…"), até ~25 s, antes de narrar. */
 async function esperarCarregar(page) {
-  for (let k = 0; k < 50; k++) {
-    const carregando = await page.getByText(/^\s*Carregando/i).first().isVisible().catch(() => false);
-    if (!carregando) return;
-    await espera(500);
-  }
+  // Espera a tela abrir de verdade: nenhum "Carregando…" VISÍVEL, nem "demorando para responder", nem tela em branco.
+  // Precisa ficar livre duas vezes seguidas (o PDV carrega em duas etapas).
+  const ocupada = () => page.evaluate(() => {
+    const txt = (document.body?.innerText || '').trim();
+    if (txt.length < 40) return true;
+    for (const el of document.querySelectorAll('body *')) {
+      const proprio = [...el.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent).join(' ').trim();
+      if (!/^Carregando|demorando para responder/i.test(proprio)) continue;
+      if (el.closest('#__cortina,#__legenda')) continue;
+      const r = el.getBoundingClientRect(), st = getComputedStyle(el);
+      if (r.width > 0 && r.height > 0 && st.visibility !== 'hidden' && st.display !== 'none' && Number(st.opacity) > 0.05) return true;
+    }
+    return false;
+  }).catch(() => false);
+  let livre = 0;
+  for (let k = 0; k < 90 && livre < 2; k++) { livre = (await ocupada()) ? 0 : livre + 1; await espera(500); }
 }
 
 /** Super Admin vendo a Demonstração: depois do clique no menu, a faixa "acessando: <empresa>" tem que continuar. */
