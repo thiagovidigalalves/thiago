@@ -8,7 +8,7 @@ module.exports = {
   titulo: 'Dica da semana no WhatsApp',
   somente_admin: true,
   superAdmin: true,
-  borrar: 'div.divide-y span[class*="text-[11px]"], div.divide-y b.truncate, table tbody td, p[class*="text-[11px]"]:has-text("Para:")',
+  borrar: 'div.divide-y span[class*="text-[11px]"], div.divide-y b.truncate, table tbody td, section p[class*="text-[11px]"]',
   assunto: { chave: ['dica da semana', 'dica', 'dicas'], acoes: ['configurar', 'ligar', 'usar', 'funciona', 'como', 'mandar'], rotas: ['/admin/dica-semana'] },
   resumo: 'Uma dica curta do THGestor com o vídeo, toda semana, no WhatsApp das empresas que você marcar.',
   fala: 'Oi! Aqui é o Thiago. Neste vídeo eu vou te mostrar a Dica da semana: uma dica curta do sistema, com o vídeo, que chega no WhatsApp das empresas toda semana. Bora lá!',
@@ -18,7 +18,7 @@ module.exports = {
       espera: 6000,
       titulo: 'Abra a Dica da semana',
       texto: 'No Super Admin, vai em Suporte, Dica da semana. Aqui em cima você liga ou desliga o envio.',
-      marcar: [{ alvo: { texto: /^(Ligada|Desligada)$/ }, legenda: 'Liga e desliga' }],
+      marcar: [{ alvo: { css: 'label.rounded-2xl:has(input[type="checkbox"])' }, legenda: 'Liga e desliga' }],
     },
     {
       titulo: 'Dia e hora',
@@ -36,7 +36,7 @@ module.exports = {
     },
     {
       antes: [
-        { tipo: 'preencher', alvo: { placeholder: 'Buscar empresa' }, valor: 'Demonstração', espera: 1200 },
+        { tipo: 'preencher', alvo: { placeholder: 'Buscar empresa' }, valor: 'TH Gestor', espera: 1200 },
         { tipo: 'clicar', alvo: { papel: 'button', nome: 'Ver prévia', exato: true }, seguro: true, espera: 4000 },
       ],
       titulo: 'Como chega no WhatsApp',
