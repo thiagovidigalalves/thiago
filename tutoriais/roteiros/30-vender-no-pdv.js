@@ -1,48 +1,78 @@
+// Venda no PDV feita DE VERDADE na Demonstração (pedido do dono, 21/11/2026): lança dois produtos, recebe em dinheiro,
+// mostra o troco e conclui. A Demonstração não tem emissão fiscal configurada: nenhuma nota é emitida.
+// No fim escolhe "Não imprimir" (não manda WhatsApp para ninguém).
 module.exports = {
   id: 'vender-no-pdv',
   ordem: 30,
   grupo: 'Comercial',
   titulo: 'Fazer uma venda no PDV (caixa)',
+  gravaDados: true,
+  valoresReais: true, // R$ 90, 100 e 10 de troco: a conta tem que fechar
+  manter: ['FONE DE OUVIDO SEM FIO TWS M25', 'Emenda Rj45 8×8 Cat5 Cat6 1 Gbps Emenda Cabo De Rede 1 Uni', 'Emenda Rj45 8x8 Cat5 Cat6 1 Gbps Emenda Cabo De Rede 1 Uni'],
   assunto: {"chave": ["venda", "vender", "vendo", "pdv", "caixa"], "acoes": ["fazer", "faço", "lançar", "registrar", "vender", "passar", "nova", "como", "pdv"], "rotas": ["/pdv"]}, // como o Thiaguinho acha o vídeo pela pergunta
-  resumo: 'Abra o caixa, lance os produtos e receba o pagamento.',
-  fala: 'Oi! Aqui é o Thiago, da Thiago Informática. Neste vídeo eu vou te mostrar como fazer uma venda no caixa, do começo ao fim: abrir o caixa, lançar os produtos e receber o pagamento.', // abertura do vídeo, no jeito de falar do Thiago
-  antesDeComecar: 'Ter pelo menos um produto cadastrado. O PDV abre numa aba nova do navegador.',
+  resumo: 'Lance os produtos, receba o pagamento e veja o troco: a venda inteira, do começo ao fim.',
+  fala: 'Oi! Aqui é o Thiago, da Thiago Informática. Neste vídeo eu vou fazer uma venda no caixa de verdade, do começo ao fim: lançar os produtos, receber e dar o troco. Bora lá!',
+  antesDeComecar: 'Ter pelo menos um produto cadastrado e o caixa aberto.',
   passos: [
     {
       ir: '/pdv',
-      espera: 4000,
+      espera: 12000,
       titulo: 'Abra o PDV',
-      texto: 'No menu, clique em Comercial › PDV. Ele abre numa aba nova, com os atalhos do caixa.',
-      marcar: [{ alvo: { papel: 'button', nome: /Nova venda/ } }],
+      texto: 'No menu, clica em Comercial, PDV. Lá em cima mostra que o caixa está aberto. No começo do dia, é por aqui que você abre o caixa, com o troco da gaveta.',
+      marcar: [
+        { alvo: { texto: /Caixa aberto/ }, legenda: 'Caixa aberto' },
+        { alvo: { papel: 'button', nome: /Nova venda/ }, legenda: 'Nova venda' },
+      ],
     },
     {
-      titulo: 'Abra o caixa (início do dia)',
-      texto: 'No começo do dia, clique em "Abrir caixa", digite o valor do troco que tem na gaveta e confirme em "Abrir caixa". Com o caixa aberto, esse mesmo botão vira "Fechar caixa".',
-      marcar: [{ alvo: { papel: 'button', nome: /(Abrir|Fechar) caixa/ } }],
-      dica: 'Atalho: Ctrl+6. Se o caixa já estiver aberto, pule este passo.',
+      antes: [
+        { tipo: 'clicar', alvo: { papel: 'button', nome: /Nova venda/ }, seguro: true, espera: 1500 },
+        { tipo: 'preencher', alvo: { placeholder: 'Código ou produto' }, valor: '25153507' },
+        { tipo: 'tecla', tecla: 'Enter', espera: 2000 },
+      ],
+      titulo: 'Bipe o produto',
+      texto: 'Clica em Nova venda e bipa o código de barras, ou digita o código e aperta Enter. O produto entra na venda.',
+      marcar: [{ alvo: { texto: 'FONE DE OUVIDO SEM FIO TWS M25', exato: true }, legenda: 'Produto lançado' }],
     },
     {
-      titulo: 'Clique em "Nova venda"',
-      texto: 'Clique em "Nova venda" (ou aperte Enter).',
-      marcar: [{ alvo: { papel: 'button', nome: /Nova venda/ } }],
-      depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: /Nova venda/ }, espera: 2000 }],
+      antes: [
+        { tipo: 'preencher', alvo: { placeholder: 'Código ou produto' }, valor: '2*7896442302382' },
+        { tipo: 'tecla', tecla: 'Enter', espera: 2000 },
+      ],
+      titulo: 'Mais de uma unidade',
+      texto: 'Pra lançar várias unidades, digita a quantidade, um asterisco e o código. Aqui eu lancei duas. O total já aparece do lado.',
+      marcar: [
+        { alvo: { texto: /^Emenda Rj45/ }, legenda: '2 unidades' },
+        { alvo: { texto: 'TOTAL A RECEBER', exato: true }, legenda: 'Total' },
+      ],
     },
     {
-      titulo: 'Lance os produtos',
-      texto: 'Passe o leitor de código de barras ou digite o nome/código do produto e aperte Enter. Repita para cada produto.',
-      marcar: [{ alvo: { placeholder: 'Código ou produto' } }],
-      dica: 'Para lançar várias unidades, digite a quantidade e um asterisco antes: 3*123 lança 3 unidades do produto 123.',
+      antes: [
+        { tipo: 'tecla', tecla: 'F9', espera: 2000 },
+        { tipo: 'preencher', alvo: { css: 'input[data-payment-amount]' }, valor: '100' },
+        { tipo: 'clicar', alvo: { papel: 'button', nome: /Dinheiro/ }, seguro: true, espera: 1500 },
+      ],
+      titulo: 'Receba o pagamento',
+      texto: 'Aperta F9. Digita quanto o cliente deu, cem reais, e escolhe Dinheiro. O sistema já mostra o troco de dez reais.',
+      marcar: [
+        { alvo: { texto: /TROCO A DEVOLVER/ }, legenda: 'Troco' },
+        { alvo: { papel: 'button', nome: /Confirmar/ }, legenda: 'Confirmar (Enter)' },
+      ],
+      depois: [{ tipo: 'tecla', tecla: 'Enter', espera: 4500 }],
+      dica: 'Pix, cartão e crediário também ficam aqui; dá pra dividir o pagamento em mais de uma forma.',
     },
     {
-      titulo: 'Clique em "Finalizar venda" (F9)',
-      texto: 'Com todos os produtos lançados, clique em "Finalizar venda" ou aperte F9.',
-      marcar: [{ alvo: { papel: 'button', nome: /Finalizar venda/ } }],
+      titulo: 'Venda concluída',
+      texto: 'Pronto, venda feita! Agora ele pergunta do comprovante: imprimir em A4, na bobina, não imprimir, ou mandar pelo WhatsApp do cliente.',
+      marcar: [{ alvo: { texto: 'Imprimir comprovante?', exato: true }, legenda: 'Comprovante' }],
+      depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: /Não imprimir/ }, seguro: true, espera: 2000 }],
     },
     {
-      titulo: 'Escolha a forma de pagamento e confirme',
-      texto: 'Na janela "Formas de pagamento", clique na forma (Dinheiro, Pix, Cartão...), digite quanto recebeu e aperte Enter. Quando "Falta pagar" zerar, aperte Enter de novo para concluir. O troco aparece na tela.',
-      atencao: 'Se errar um pagamento, aperte Delete para desfazer antes de confirmar.',
-      dica: 'Atalhos do caixa: F1 Recebimentos · F2 Orçamentos · F3 Produtos · F4 Vendas · F6 Desconto · F7 Em espera · F8 Devolução · F10 Cliente.',
+      antes: [{ tipo: 'tecla', tecla: 'F4', espera: 4000 }],
+      titulo: 'A venda já está lá',
+      texto: 'Apertando F4 você vê as vendas: a que eu acabei de fazer já está aqui, e o estoque e o caixa já foram atualizados.',
+      marcar: [{ alvo: { texto: /R\$\s?90,00/ }, legenda: 'Venda de R$ 90' }],
+      depois: [{ tipo: 'tecla', tecla: 'Escape', espera: 1000 }],
     },
   ],
 };
