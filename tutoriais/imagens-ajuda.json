@@ -1170,5 +1170,29 @@
  "img-web/funcionarios-relatorios-13-ferias/passo-3.webp": {
   "sha": "94948a737400d906b4b1b57f0806ec1d67f1358c",
   "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/a078a01eb_passo-3.webp"
+ },
+ "img-web/modo-treino-pdv/passo-1.webp": {
+  "sha": "31a8cd967dd60d4cf872c3ec09b6b6981ba492d4",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/1dbf2d82f_passo-1.webp"
+ },
+ "img-web/modo-treino-pdv/passo-2.webp": {
+  "sha": "d9c832b2344147225d2d0bfb9d34c9d55b7381e6",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/6324bffed_passo-2.webp"
+ },
+ "img-web/modo-treino-pdv/passo-3.webp": {
+  "sha": "c171e957b84b46feef133da771ca7cee6fb60974",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/6aa4a6bd9_passo-3.webp"
+ },
+ "img-web/modo-treino-pdv/passo-4.webp": {
+  "sha": "b3a936ef563d02dde3f6909ec79ea0637144fb52",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/db59caee8_passo-4.webp"
+ },
+ "img-web/modo-treino-pdv/passo-5.webp": {
+  "sha": "a2240fa90aa8a03789a0b120e668f857e94e1980",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/61c0585ff_passo-5.webp"
+ },
+ "img-web/modo-treino-pdv/passo-6.webp": {
+  "sha": "2cc08fa631e9d3db454e12b43091b42932a4da69",
+  "url": "https://base44.app/api/apps/6a8469ea2eec118b03c63b1e/files/mp/public/6a8469ea2eec118b03c63b1e/31bd67c01_passo-6.webp"
  }
 }
