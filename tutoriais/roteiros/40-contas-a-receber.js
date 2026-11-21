@@ -48,11 +48,11 @@ module.exports = {
       antes: [{ tipo: 'preencher', alvo: { placeholder: 'Nome do cliente' }, valor: 'Mariana Exemplo', espera: 4000 }],
       titulo: 'A conta já está lançada',
       texto: 'Pronto, a conta está aqui, em aberto. Quando o cliente vier pagar, a baixa é feita no caixa.',
-      marcar: [{ alvo: { texto: 'Mariana Exemplo', exato: true }, legenda: 'Em aberto' }],
+      marcar: [{ alvo: { css: 'tbody tr:has-text("Mariana Exemplo")' }, legenda: 'Em aberto' }],
     },
     {
       ir: '/pdv',
-      espera: 12000,
+      espera: 20000,
       antes: [
         { tipo: 'tecla', tecla: 'F1', espera: 3500 },
         { tipo: 'preencher', alvo: { placeholder: 'Nome, telefone, CPF/CNPJ ou endereço...', dentro: 'dialog' }, valor: 'Mariana Exemplo', espera: 3000 },
@@ -91,7 +91,7 @@ module.exports = {
       ],
       titulo: 'A conta ficou paga',
       texto: 'E voltando em Contas a Receber, na aba Pagas, a conta já aparece paga, e o dinheiro entrou no caixa do dia.',
-      marcar: [{ alvo: { texto: 'Mariana Exemplo', exato: true }, legenda: 'Paga' }],
+      marcar: [{ alvo: { css: 'tbody tr:has-text("Mariana Exemplo")' }, legenda: 'Paga' }],
       dica: 'Recebeu na hora, junto com o lançamento? Ligue "Já foi recebido agora" e informe a forma de pagamento.',
     },
   ],
