@@ -7,7 +7,7 @@ ids="$*"
 for id in $ids; do
   echo "=== $id"
   saida=$(TUTORIAL_VER_EMPRESA=EMP_DEMOTHGE_STOR01 TUTORIAL_PAUSA=0 node tutoriais/video.js $id 2>&1)
-  echo "$saida" | grep -E "✅|✖|não achei|segurança"
+  echo "$saida" | grep -E "✅|✖|não achei|segurança|✂|relógio"
   if echo "$saida" | grep -q "✅" && ! echo "$saida" | grep -q "✖"; then
     rm -f ajuda/videos-web/$id.mp4  # cópia leve antiga: o publicar refaz a partir do vídeo novo
     node tutoriais/publicar-video.js $id 2>&1 | grep -E "✅|✘|Erro"
