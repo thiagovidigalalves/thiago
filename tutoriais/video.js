@@ -383,8 +383,7 @@ async function gravar(r, s) {
       if (i === 0 && menu1) {
         await C.prepararTela(page); await espera(400);
         await cortina(page, false);
-        await legenda(page, n, p.titulo, p.texto);
-        inicio = agora(); som(fala.arquivo);
+        // Caminho pelo menu com o som dos cliques; a fala do passo 1 só começa com a tela já aberta (a espera é cortada).
         const foi = await andarNoMenu(page, menu1, som, s.clique);
         // Super admin vendo a empresa de demonstração: o clique no menu perde o ?empresa=; recarrega na mesma tela.
         await cortarEspera(async () => {

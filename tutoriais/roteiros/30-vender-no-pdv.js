@@ -18,7 +18,7 @@ module.exports = {
       ir: '/pdv',
       espera: 12000,
       titulo: 'Abra o PDV',
-      texto: 'No menu, clica em Comercial, PDV. Lá em cima mostra que o caixa está aberto. No começo do dia, é por aqui que você abre o caixa, com o troco da gaveta.',
+      texto: 'Esse é o PDV, o caixa, que fica em Comercial, PDV. Lá em cima mostra que o caixa está aberto. No começo do dia, é por aqui que você abre o caixa, com o troco da gaveta.',
       marcar: [
         { alvo: { texto: /Caixa aberto/ }, legenda: 'Caixa aberto' },
         { alvo: { papel: 'button', nome: /Nova venda/ }, legenda: 'Nova venda' },
