@@ -306,6 +306,8 @@ async function gravar(r, s) {
   });
   await context.addInitScript({ content: scriptDaPagina(logoUri) });
   const page = await context.newPage();
+  // Pergunta do navegador ("Tem certeza?"): só aceita se o roteiro pedir (ex.: ligar o Modo treino do PDV).
+  page.on('dialog', d => (r.aceitarConfirmacao ? d.accept() : d.dismiss()).catch(() => {}));
   // Antes de abrir qualquer tela: o que o roteiro manda manter (nomes/valores da Demonstração) não vira dado inventado.
   await C.instalarManter(context, page, r.manter, !!r.valoresReais);
   const t0 = Date.now();

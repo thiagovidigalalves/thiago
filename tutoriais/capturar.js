@@ -452,6 +452,9 @@ async function main() {
     ...(fs.existsSync(SESSAO) ? { storageState: SESSAO } : {}),
   });
   const page = await context.newPage();
+  // Pergunta do navegador ("Tem certeza?"): só aceita se o roteiro pedir (`aceitarConfirmacao`); senão recusa.
+  let aceitarConfirmacao = false;
+  page.on('dialog', d => (aceitarConfirmacao ? d.accept() : d.dismiss()).catch(() => {}));
   let logado = null;
   const relatorio = [];
 
@@ -461,6 +464,7 @@ async function main() {
     process.env.TUTORIAL_VER_EMPRESA = r.empresa || empPadrao || '';
     if (r.empresa) await page.goto(URL_BASE + comEmpresa('/'), { waitUntil: 'load' }).then(async () => instalarNomes(context, page, await carregarNomesReais(page))).catch(() => {});
     console.log(`\n▶ ${r.titulo}`);
+    aceitarConfirmacao = !!r.aceitarConfirmacao;
     await instalarManter(context, page, r.manter, !!r.valoresReais);
     if (r.precisaLogin !== false) {
       if (logado === null) { logado = await entrar(context, page); if (logado) { await page.goto(URL_BASE + comEmpresa('/'), { waitUntil: 'load' }).catch(() => {}); await page.waitForTimeout(3000); await instalarNomes(context, page, await carregarNomesReais(page)); } }
