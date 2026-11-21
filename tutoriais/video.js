@@ -315,6 +315,11 @@ async function gravar(r, s) {
   const eventos = [];
   const agora = () => (Date.now() - t0) / 1000;
   const som = (arquivo, vol = 1) => arquivo && eventos.push({ t: agora(), arquivo, vol });
+  // Tela demorando para abrir: a espera é cortada do vídeo (pedido do dono). Só corta o que passa do fim da fala,
+  // para a voz nunca ser cortada; os sons depois do corte andam junto (a voz sempre bate com a tela).
+  const cortes = [];
+  const cortarEspera = async (fn, livreDesde = 0, manter = 0.4) => { const a = agora(); await fn(); const b = agora(); const ini = Math.max(a + manter, livreDesde); if (b - 0.2 - ini > 1) cortes.push([ini, b - 0.2]); };
+  const fimDaFala = (inicio, fala) => (inicio === null ? 0 : inicio + fala.dur + 0.3);
 
   try {
     // 2) Abertura: logo + título enquanto a primeira tela carrega.
@@ -354,21 +359,26 @@ async function gravar(r, s) {
         await tirarMarcas(page);
         await legenda(page, '', '');
         const foi = await andarNoMenu(page, menus[i], som, s.clique);
-        await espera(1500);
-        if (!foi || !(await naEmpresaCerta(page)) || !page.url().split('?')[0].endsWith(p.ir.split('?')[0])) {
-          // Recarrega rápido na tela certa (sem segurar a cortina enquanto a fala corre).
-          console.log(`   (passo ${n}: recarreguei a tela — ${!foi ? 'menu não abriu' : 'empresa/rota diferente'})`);
-          await page.goto(C.URL_BASE + C.comEmpresa(p.ir), { waitUntil: 'load' }).catch(() => {}); await espera(2500); await C.prepararTela(page).catch(() => {});
-          await cortina(page, false); // a página nova abre com a cortina de título: tira
-        }
-        await esperarCarregar(page); await espera(800);
+        await cortarEspera(async () => {
+          await espera(1500);
+          if (!foi || !(await naEmpresaCerta(page)) || !page.url().split('?')[0].endsWith(p.ir.split('?')[0])) {
+            // Recarrega rápido na tela certa (sem segurar a cortina enquanto a fala corre).
+            console.log(`   (passo ${n}: recarreguei a tela — ${!foi ? 'menu não abriu' : 'empresa/rota diferente'})`);
+            await page.goto(C.URL_BASE + C.comEmpresa(p.ir), { waitUntil: 'load' }).catch(() => {}); await espera(2500); await C.prepararTela(page).catch(() => {});
+            await cortina(page, false); // a página nova abre com a cortina de título: tira
+          }
+          await esperarCarregar(page);
+        }, 0, 0.6);
+        await espera(800);
         await legenda(page, n, p.titulo, p.texto);
         inicio = agora(); som(fala.arquivo);
       } else if (p.ir && i > 0) {
         await legenda(page, '', '');
         await cortina(page, true, `Passo ${n}`, p.titulo); som(s.transicao, 0.7);
-        await page.goto(C.URL_BASE + (r.precisaLogin === false ? p.ir : C.comEmpresa(p.ir)), { waitUntil: 'load' }).catch(() => {});
-        await espera(p.espera || 3000);
+        await cortarEspera(async () => {
+          await page.goto(C.URL_BASE + (r.precisaLogin === false ? p.ir : C.comEmpresa(p.ir)), { waitUntil: 'load' }).catch(() => {});
+          await espera(p.espera || 3000); await esperarCarregar(page);
+        }, 0, 1.5);
       }
       if (i === 0 && menu1) {
         await C.prepararTela(page); await espera(400);
@@ -377,21 +387,24 @@ async function gravar(r, s) {
         inicio = agora(); som(fala.arquivo);
         const foi = await andarNoMenu(page, menu1, som, s.clique);
         // Super admin vendo a empresa de demonstração: o clique no menu perde o ?empresa=; recarrega na mesma tela.
-        await espera(1500);
-        if (!foi || !(await naEmpresaCerta(page)) || !page.url().split('?')[0].endsWith(p.ir.split('?')[0])) { await page.goto(C.URL_BASE + C.comEmpresa(p.ir), { waitUntil: 'load' }).catch(() => {}); await espera(p.espera || 3000); await cortina(page, false); }
+        await cortarEspera(async () => {
+          await espera(1500);
+          if (!foi || !(await naEmpresaCerta(page)) || !page.url().split('?')[0].endsWith(p.ir.split('?')[0])) { await page.goto(C.URL_BASE + C.comEmpresa(p.ir), { waitUntil: 'load' }).catch(() => {}); await espera(p.espera || 3000); await cortina(page, false); }
+          await esperarCarregar(page);
+        }, fimDaFala(inicio, fala), 0.6);
       }
-      await semErroDeLimite(page);
-      await esperarCarregar(page);
-      for (const a of p.antes || []) await executarVisivel(page, a, r, som, s.clique);
-      await C.prepararTela(page);
-      await espera(400);
-      // Página recarregou sozinha no meio do passo (ex.: limite de acessos, tela que recarrega): tira a cortina.
-      if (inicio !== null) await cortina(page, false);
+      await cortarEspera(async () => { await semErroDeLimite(page); await esperarCarregar(page); }, fimDaFala(inicio, fala));
+      // A fala começa ANTES das ações do passo: o que a voz diz acontece na tela ao mesmo tempo (pedido do dono).
       if (inicio === null) {
         await cortina(page, false);
         await legenda(page, n, p.titulo, p.texto);
         inicio = agora(); som(fala.arquivo);
       }
+      for (const a of p.antes || []) await executarVisivel(page, a, r, som, s.clique);
+      await C.prepararTela(page);
+      await espera(400);
+      // Página recarregou sozinha no meio do passo (ex.: limite de acessos, tela que recarrega): tira a cortina.
+      await cortina(page, false);
       // Mouse até o primeiro alvo, depois as bolinhas.
       const marcas = (p.marcar || []).map((m, j) => ({ ...m, numero: p.marcar.length > 1 ? `${n}${String.fromCharCode(97 + j)}` : n }));
       if (marcas.length) {
@@ -414,6 +427,7 @@ async function gravar(r, s) {
     som(s.transicao, 0.7); som(falaFim.arquivo);
     await espera((falaFim.dur + 0.8) * 1000);
   } finally {
+    var fimWall = agora();
     const video = page.video();
     await context.close(); await browser.close();
     var bruto = await video.path();
@@ -422,12 +436,21 @@ async function gravar(r, s) {
   // 4) Junta vídeo + narração + efeitos + música (ffmpeg).
   fs.mkdirSync(SAIDA, { recursive: true });
   const final = path.join(SAIDA, `${r.id}.mp4`);
-  const total = duracao(bruto) - corte;
-  const args = ['-y', '-v', 'error', '-ss', corte.toFixed(2), '-i', bruto];
-  const filtros = [], rotulos = [];
+  // A gravação do navegador perde quadros quando a tela trava: o vídeo é esticado para o relógio real
+  // (k), e as esperas longas são cortadas. Cada som anda junto com o corte: a voz sempre bate com a tela.
+  const durBruto = duracao(bruto), k = fimWall > 0 && durBruto > 0 ? fimWall / durBruto : 1;
+  const cortesOk = cortes.map(([a, b]) => [Math.max(a, corte), b]).filter(([a, b]) => b - a > 0.5);
+  const cortado = cortesOk.reduce((t, [a, b]) => t + (b - a), 0);
+  const novoT = t => { let x = t - corte; for (const [a, b] of cortesOk) { if (t >= b) x -= (b - a); else if (t > a) x -= (t - a); } return Math.max(0, x); };
+  const total = fimWall - corte - cortado;
+  if (Math.abs(k - 1) > 0.01) console.log(`   (relógio: vídeo esticado ${(k * 100 - 100).toFixed(1)}%)`);
+  if (cortesOk.length) console.log(`   ✂ ${cortesOk.length} espera(s) cortada(s): ${cortado.toFixed(1)} s`);
+  const sel = cortesOk.length ? `,select='not(${cortesOk.map(([a, b]) => `between(t,${(a - corte).toFixed(2)},${(b - corte).toFixed(2)})`).join('+')})',setpts=N/25/TB` : '';
+  const args = ['-y', '-v', 'error', '-i', bruto];
+  const filtros = [`[0:v]setpts=(PTS-STARTPTS)*${k.toFixed(5)},fps=25,trim=start=${corte.toFixed(2)},setpts=PTS-STARTPTS${sel}[vout]`], rotulos = [];
   eventos.forEach((e, k) => {
     args.push('-i', e.arquivo);
-    const ms = Math.max(0, Math.round((e.t - corte) * 1000));
+    const ms = Math.round(novoT(e.t) * 1000);
     filtros.push(`[${k + 1}:a]adelay=${ms}|${ms},volume=${e.vol}[a${k}]`); rotulos.push(`[a${k}]`);
   });
   if (s.musica) {
@@ -437,8 +460,8 @@ async function gravar(r, s) {
   }
   if (rotulos.length) {
     filtros.push(`${rotulos.join('')}amix=inputs=${rotulos.length}:normalize=0:dropout_transition=0,apad[aout]`);
-    args.push('-filter_complex', filtros.join(';'), '-map', '0:v', '-map', '[aout]', '-c:a', 'aac', '-b:a', '128k');
-  } else args.push('-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=stereo', '-map', '0:v', '-map', '1:a', '-c:a', 'aac');
+    args.push('-filter_complex', filtros.join(';'), '-map', '[vout]', '-map', '[aout]', '-c:a', 'aac', '-b:a', '128k');
+  } else { args.push('-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=stereo', '-filter_complex', filtros.join(';'), '-map', '[vout]', '-map', '1:a', '-c:a', 'aac'); }
   args.push('-t', total.toFixed(2), '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '24', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', final);
   execFileSync('ffmpeg', args, { stdio: 'inherit' });
   // Vinheta da Thiago Informática antes do tutorial (se existir ajuda/videos/vinheta.mp4).
