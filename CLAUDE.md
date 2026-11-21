@@ -21,6 +21,10 @@ do sistema THGestor, para a Central de Ajuda dos clientes.
 - Antes de gravar: se a tela estiver vazia na Demonstração, PRIMEIRO cadastre dados fictícios pra ela parecer uma loja real
   funcionando (ex.: compromissos na Agenda, produtos com grade, vendas, contas). Deixe esses dados lá pros próximos vídeos.
 - Nunca use dados reais de cliente e nunca salve nada em empresa de cliente.
+- (Pedido do dono, 21/11/2026) Vídeo NÃO é só explicação: faz o passo a passo COMPLETO de verdade na Demonstração,
+  digitando cada campo e salvando (ex.: venda no caixa de verdade até o fim, conta a pagar/receber digitada e lançada,
+  cadastro preenchido e salvo). Refazer nesse padrão os vídeos que hoje só mostram a tela. Sempre deixar dados
+  fictícios na Demonstração para o dono mostrar às pessoas. Nota fiscal de verdade continua proibida (só mostrar).
 
 ## REGRA PERMANENTE: o sistema mudou → conferir os tutoriais (pedido do dono)
 
