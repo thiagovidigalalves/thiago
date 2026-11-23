@@ -15,8 +15,8 @@ module.exports = {
     {
       ir: '/configuracoes/whatsapp',
       espera: 6000,
-      titulo: 'Abra o WhatsApp nas Configurações',
-      texto: 'No menu, clica em Configurações, WhatsApp. Aqui em cima tem sete cartões: Conexão e envio, Vendas, Cobranças, Relacionamento, Pós-venda e avaliação, Fiscal e contador, e Exceções.',
+      titulo: 'Abra Configurações e mensagens',
+      texto: 'No menu, clica em WhatsApp, Configurações e mensagens. Aqui em cima tem sete cartões: Conexão e envio, Vendas, Cobranças, Relacionamento, Pós-venda e avaliação, Fiscal e contador, e Exceções.',
       marcar: [{ alvo: { css: '[role=tablist]' }, legenda: '7 abas' }],
     },
     {
