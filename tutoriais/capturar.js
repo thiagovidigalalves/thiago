@@ -325,6 +325,8 @@ async function executar(page, acao, roteiro) {
       return;
     }
     await el.click(acao.forcar ? { force: true } : undefined); // `forcar`: botão coberto pela legenda do vídeo
+    // `aguardarFechar`: salvar demora ("Salvando..."); espera a janela fechar antes do próximo passo.
+    if (acao.aguardarFechar) await page.waitForFunction(() => ![...document.querySelectorAll('[role="dialog"]')].some(d => d.getBoundingClientRect().height > 0), null, { timeout: 60000 }).catch(() => console.log('   (a janela não fechou depois de salvar)'));
   } else if (acao.tipo === 'preencher') {
     await el.fill(acao.valor || '');
   } else if (acao.tipo === 'escolher') {
@@ -343,7 +345,10 @@ async function carregarNomesReais(page) {
   const emp = process.env.TUTORIAL_VER_EMPRESA;
   const admin = !emp && process.env.TUTORIAL_ADMIN === '1'; // tela do Super Admin: nomes de clientes de todas as empresas
   if ((!emp && !admin) || process.env.TUTORIAL_FANTASIA === '0') return null;
-  const nomes = await page.evaluate(async (emp) => {
+  let nomes = [];
+  for (let tentativa = 1; tentativa <= 5 && !nomes.length; tentativa++) {
+  if (tentativa > 1) { console.log('   (não consegui ler os nomes reais — limite de acessos? — espero e tento de novo)'); await page.waitForTimeout(25000); }
+  nomes = await page.evaluate(async (emp) => {
     const tok = localStorage.getItem('base44_access_token'), app = '6a8469ea2eec118b03c63b1e';
     const pegar = async (ent, campos, filtro) => { try {
       const q = encodeURIComponent(JSON.stringify(filtro)); const r = await fetch(`/api/apps/${app}/entities/${ent}?q=${q}&limit=20000&fields=${campos.join(',')}`, { headers: { 'X-App-Id': app, Authorization: 'Bearer ' + tok } });
@@ -360,6 +365,9 @@ async function carregarNomesReais(page) {
       ...(await Promise.all(['FinanceAccount', 'Sale', 'ServiceOrder', 'Quote', 'Recorrencia', 'Condicional', 'CommercialProposal'].map(ent =>
         pegar(ent, ['cliente_nome', 'client_name', 'fornecedor_nome', 'supplier_name', 'pessoa_nome', 'beneficiario', 'favorecido', 'nome_pessoa', 'vendedor_nome', 'tecnico_nome', 'nome'], { company_id: emp })))).flat()];
   }, emp).catch(() => []);
+  }
+  // Segurança (privacidade): sem a lista de nomes, nomes reais apareceriam no vídeo/print. Para tudo.
+  if (!nomes.length) throw new Error('não consegui ler os nomes reais para trocar por fictícios: gravação cancelada (privacidade)');
   const norm = t => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
   // Mesmo corte da tela: sem pontuação no começo/fim ("S.A." na nota vira "s.a", igual ao que real() compara).
   const exatos = [...new Set(nomes.map(n => norm(String(n).replace(/^[^A-Za-zÀ-ÿ0-9]+|[^A-Za-zÀ-ÿ0-9]+$/g, ''))).filter(n => n.length >= 3))];

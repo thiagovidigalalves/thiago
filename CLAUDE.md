@@ -65,6 +65,10 @@ começar qualquer sessão neste repositório**, faça a conferência completa. N
   começa junto com as ações (o que a voz diz acontece na tela na mesma hora); tela demorando para abrir (PDV, recarga,
   limite de acessos) é cortada do vídeo, sem cortar a voz; o vídeo é esticado para o relógio real (a gravação do navegador
   perde quadros). Feito no `video.js` (cortarEspera, fimWall/k). Conferir sempre a sincronia antes de mandar.
+- CLIQUE JUNTO COM A PALAVRA (pedido do dono, 23/11/2026): quando a voz diz "clica em Cadastros, Produtos", o clique em
+  Cadastros acontece na hora em que ela diz "Cadastros" (nada de clicar primeiro e falar depois). O `video.js` pega o tempo
+  de cada palavra pelo alinhamento do ElevenLabs (`alinhar` em `video-voz.js`, cache `-alinha.json`) e espera a palavra para
+  clicar no menu e nos botões citados na fala. Salvar que demora: `aguardarFechar: true` (a espera é cortada).
 - JEITO DE FALAR (aprovado pelo dono, guardado como padrão de TODOS os vídeos): voz profissional `eleven_v4`,
   velocidade 1.0, stability 0.4, similarity 0.8, style 0.25 (`tutoriais/video-voz.js`); frases curtas de conversa,
   como o Thiago explicando para um cliente ("Aqui tem...", "é só...", "pra você"), nada de texto lido de manual.

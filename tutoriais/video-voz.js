@@ -52,7 +52,20 @@ function falar(texto) {
     try { execFileSync('ffmpeg', ['-y', '-v', 'error', '-i', arq, '-af', 'highpass=f=75,loudnorm=I=-16:TP=-1.5', '-ar', '44100', '-b:a', '160k', limpo]); }
     catch { return { arquivo: arq, dur: duracao(arq) }; }
   }
-  return { arquivo: limpo, dur: duracao(limpo) };
+  return { arquivo: limpo, dur: duracao(limpo), falado: texto };
+}
+
+/** Em que segundo a voz fala cada letra do texto (ElevenLabs forced alignment). Guarda ao lado do áudio. */
+function alinhar(arquivo, texto) {
+  if (!arquivo) return null;
+  const arq = arquivo.replace(/\.mp3$/, '-alinha.json');
+  if (!fs.existsSync(arq)) {
+    try {
+      execFileSync('curl', ['-sS', '-f', '-X', 'POST', 'https://api.elevenlabs.io/v1/forced-alignment', '-H', 'xi-api-key: x',
+        '-F', 'file=@' + arquivo, '--form-string', 'text=' + texto, '-o', arq], { stdio: ['ignore', 'ignore', 'pipe'] });
+    } catch (e) { fs.rmSync(arq, { force: true }); console.log('   (sem alinhamento da voz: ' + String(e.stderr || e.message).split('\n')[0] + ')'); return null; }
+  }
+  try { const c = JSON.parse(fs.readFileSync(arq, 'utf8')).characters; return Array.isArray(c) && c.length ? c : null; } catch { return null; }
 }
 
 /** Efeito sonoro gerado pelo ElevenLabs (texto em inglês descreve melhor o som). Salva em tutoriais/audio/<nome>.mp3. */
@@ -65,4 +78,4 @@ function efeito(nome, descricao, segundos) {
   return arq;
 }
 
-module.exports = { falar, efeito, VOZ, MODELO, duracao };
+module.exports = { falar, alinhar, efeito, VOZ, MODELO, duracao };

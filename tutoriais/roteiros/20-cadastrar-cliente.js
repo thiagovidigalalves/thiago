@@ -56,7 +56,7 @@ module.exports = {
       titulo: 'Clique em Cadastrar',
       texto: 'Confere e clica em Cadastrar. Pronto, a cliente está salva.',
       marcar: [{ alvo: { papel: 'button', nome: 'Cadastrar', exato: true, dentro: 'dialog' }, legenda: 'Cadastrar' }],
-      depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Cadastrar', exato: true, dentro: 'dialog' }, espera: 4000 }],
+      depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Cadastrar', exato: true, dentro: 'dialog' }, aguardarFechar: true, espera: 2500 }],
     },
     {
       antes: [{ tipo: 'preencher', alvo: { placeholder: 'Buscar nome, CPF/CNPJ ou telefone' }, valor: 'Joana Exemplo', espera: 3500 }],

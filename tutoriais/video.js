@@ -185,12 +185,40 @@ async function descobrirMenu(browser, rota, grupo) {
   } catch { return null; } finally { await ctx.close(); }
 }
 
+const normFala = x => String(x || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+/** Segundo (dentro da fala) em que a voz diz a letra i do texto: pelo alinhamento do ElevenLabs, ou estimado. */
+function tempoDaLetra(fala, i) {
+  const c = fala.alinha && fala.alinha[i];
+  if (c && typeof c.start === 'number') return c.start;
+  return fala.dur * (i / Math.max(1, String(fala.falado || fala.texto || '').length));
+}
+/** Procura a palavra na fala a partir de `pos`: { t: segundo em que é dita, fim: posição depois dela } ou null. */
+function quandoDiz(fala, palavra, pos = 0) {
+  if (!palavra || typeof palavra !== 'string' || palavra.length < 3) return null;
+  const i = normFala(fala.falado || fala.texto).indexOf(normFala(palavra), pos);
+  return i < 0 ? null : { t: tempoDaLetra(fala, i), fim: i + palavra.length };
+}
+/** Em que segundo a fala diz cada nome do caminho do menu (o clique acontece junto com a palavra). */
+function temposDoMenu(fala, caminho, inicio) {
+  let pos = 0, ult = inicio + 0.3; const out = [];
+  for (const nome of caminho) {
+    const q = quandoDiz(fala, nome, pos);
+    let tt = q ? inicio + q.t + 0.15 : ult + 0.9;
+    if (q) pos = q.fim;
+    tt = Math.max(tt, ult + 0.6); out.push(tt); ult = tt;
+  }
+  return out;
+}
+
 /** Mostra no vídeo o caminho pelo menu lateral: o cursor vai em cada nível e clica. */
-async function andarNoMenu(page, caminho, som, clique) {
+async function andarNoMenu(page, caminho, som, clique, tempos, agora) {
   const menu = page.locator('aside').first();
   for (let k = 0; k < caminho.length; k++) {
+    // Clica junto com a voz: espera a hora em que a fala diz o nome do item (pedido do dono, 23/11/2026).
+    if (tempos && agora && tempos[k] != null) { const falta = tempos[k] - 0.7 - agora(); if (falta > 0) await espera(falta * 1000); }
     const nome = caminho[k], ultimo = k === caminho.length - 1;
     const el = (ultimo ? menu.locator('a:visible') : menu.locator('button:visible')).filter({ hasText: nome }).first();
+    await el.waitFor({ state: 'visible', timeout: k ? 5000 : 15000 }).catch(() => {});
     if (!(await el.isVisible().catch(() => false))) { console.log(`   (menu: não achei "${nome}")`); return false; }
     const ehUltimoProx = k + 1 === caminho.length - 1;
     const proximo = !ultimo && await (ehUltimoProx ? menu.locator('a:visible') : menu.locator('button:visible')).filter({ hasText: caminho[k + 1] }).first().isVisible().catch(() => false);
@@ -199,7 +227,7 @@ async function andarNoMenu(page, caminho, som, clique) {
     if (proximo) { await espera(300); continue; } // grupo já aberto: só passa o mouse
     som(clique, 0.9); await onda(page);
     await el.click().catch(() => {});
-    await espera(ultimo ? 1800 : 650);
+    await espera(ultimo ? 1800 : 250);
   }
   return true;
 }
@@ -303,10 +331,10 @@ async function gravar(r, s) {
     } catch (e) { console.log('   (sem abertura animada: ' + String(e.message).split('\n')[0] + ')'); }
   }
   const LIGA = ['Primeiro', 'Agora', 'Depois', 'Em seguida', 'Agora', 'Depois', 'Em seguida', 'Agora', 'Depois'];
-  const falas = r.passos.map((p, i) => falar(p.fala || [
+  const falas = r.passos.map((p, i) => { const t = p.fala || [
     (i === r.passos.length - 1 && i > 0 ? 'E pra finalizar' : LIGA[i % LIGA.length]) + ', ' + minusc(natural(p.texto)),
     p.dica ? 'Uma dica: ' + minusc(natural(p.dica)) : '',
-  ].filter(Boolean).join(' ')));
+  ].filter(Boolean).join(' '); const f = { ...falar(t), texto: t }; f.alinha = require('./video-voz.js').alinhar(f.arquivo, f.falado || t); return f; });
   const falaFim = falar('Pronto! Viu como é fácil? Qualquer dúvida, é só chamar no grupo de suporte.');
 
   const dirTmp = fs.mkdtempSync(path.join(require('os').tmpdir(), 'video-'));
@@ -368,8 +396,10 @@ async function gravar(r, s) {
         // Fecha janela aberta (o menu fica atrás dela) e mostra o caminho pelo menu com a fala já começando.
         await page.keyboard.press('Escape').catch(() => {}); await espera(300);
         await tirarMarcas(page);
-        await legenda(page, '', '');
-        const foi = await andarNoMenu(page, menus[i], som, s.clique);
+        // A fala começa junto com o caminho pelo menu: "clica em Cadastros" e o clique em Cadastros na mesma hora.
+        await legenda(page, n, p.titulo, p.texto);
+        inicio = agora(); som(fala.arquivo);
+        const foi = await andarNoMenu(page, menus[i], som, s.clique, temposDoMenu(fala, menus[i], inicio), agora);
         await cortarEspera(async () => {
           await espera(1500);
           if (!foi || !(await naEmpresaCerta(page)) || !page.url().split('?')[0].endsWith(p.ir.split('?')[0])) {
@@ -379,10 +409,7 @@ async function gravar(r, s) {
             await cortina(page, false); // a página nova abre com a cortina de título: tira
           }
           await esperarCarregar(page);
-        }, 0, 0.6);
-        await espera(800);
-        await legenda(page, n, p.titulo, p.texto);
-        inicio = agora(); som(fala.arquivo);
+        }, fimDaFala(inicio, fala), 0.6);
       } else if (p.ir && i > 0) {
         await legenda(page, '', '');
         await cortina(page, true, `Passo ${n}`, p.titulo); som(s.transicao, 0.7);
@@ -392,11 +419,13 @@ async function gravar(r, s) {
         }, 0, 1.5);
       }
       if (i === 0 && menu1) {
-        await cortarEspera(async () => { await C.prepararTela(page); await esperarCarregar(page); }, 0, 1.2); // primeira tela abrindo atrás da capa
+        await cortarEspera(async () => { await C.prepararTela(page); await esperarCarregar(page); await page.locator('aside button:visible').first().waitFor({ timeout: 40000 }).catch(() => {}); await espera(600); }, 0, 1.2); // primeira tela abrindo atrás da capa
         await espera(400);
         await cortina(page, false);
-        // Caminho pelo menu com o som dos cliques; a fala do passo 1 só começa com a tela já aberta (a espera é cortada).
-        const foi = await andarNoMenu(page, menu1, som, s.clique);
+        // Caminho pelo menu junto com a fala: cada clique acontece quando a voz diz o nome (pedido do dono, 23/11/2026).
+        await legenda(page, n, p.titulo, p.texto);
+        inicio = agora(); som(fala.arquivo);
+        const foi = await andarNoMenu(page, menu1, som, s.clique, temposDoMenu(fala, menu1, inicio), agora);
         // Super admin vendo a empresa de demonstração: o clique no menu perde o ?empresa=; recarrega na mesma tela.
         await cortarEspera(async () => {
           await espera(1500);
@@ -411,7 +440,14 @@ async function gravar(r, s) {
         await legenda(page, n, p.titulo, p.texto);
         inicio = agora(); som(fala.arquivo);
       }
-      for (const a of p.antes || []) await executarVisivel(page, a, r, som, s.clique);
+      let posFala = 0;
+      for (const a of p.antes || []) {
+        // Clique junto com a voz: se a fala diz o nome do botão ("clica em Nova conta"), espera essa hora (no máx. 6 s).
+        const nomeAlvo = a.tipo === 'clicar' && a.alvo && typeof a.alvo.nome === 'string' ? a.alvo.nome : null;
+        const q = nomeAlvo ? quandoDiz(fala, nomeAlvo, posFala) : null;
+        if (q) { posFala = q.fim; const falta = inicio + q.t - 0.6 - agora(); if (falta > 0) await espera(Math.min(6, falta) * 1000); }
+        await executarVisivel(page, a, r, som, s.clique);
+      }
       await C.prepararTela(page);
       await espera(400);
       // Página recarregou sozinha no meio do passo (ex.: limite de acessos, tela que recarrega): tira a cortina.
@@ -429,7 +465,11 @@ async function gravar(r, s) {
       await espera(Math.max(900, (fala.dur + 0.6 - (agora() - inicio)) * 1000));
       await tirarMarcas(page);
       // Ações do passo (ex.: clicar em "Novo cliente"), com mouse e som de clique.
-      for (const a of p.depois || []) await executarVisivel(page, a, r, som, s.clique);
+      for (const a of p.depois || []) {
+        // Salvar que demora: a espera da janela fechar é cortada do vídeo.
+        if (a.aguardarFechar) await cortarEspera(() => executarVisivel(page, a, r, som, s.clique), fimDaFala(inicio, fala), 1.5);
+        else await executarVisivel(page, a, r, som, s.clique);
+      }
       console.log(`   🎬 passo ${n}: ${p.titulo}`);
     }
     // 3) Encerramento.
