@@ -242,7 +242,7 @@ function desfocarNaPagina({ extras, tudo, campos, fantasia, borrar: borrarCss })
       const v = String(i.value || '');
       // Valores fictícios digitados pelos próprios tutoriais continuam legíveis.
       const DEMO = ['Maria da Silva', 'maria@minhaloja.com.br', 'Mouse sem fio', 'senha1234', 'contas'];
-      if (DEMO.includes(v.trim())) return;
+      if (v.trim() && DEMO.some((d) => d.startsWith(v.trim()))) return; // também enquanto ainda está digitando
       // Dado real em campo: desfoca mesmo que seja o campo marcado (a bolinha e o contorno continuam nítidos).
       if (i.dataset.tutorialFalso) return;
       if (campos ? v.trim() : (SENSIVEL.test(v) || /\d{8,}/.test(v.replace(/\D/g, '')))) { if (!trocar(i, true) && !fantasia) i.setAttribute('data-tutorial-blur', ''); }
