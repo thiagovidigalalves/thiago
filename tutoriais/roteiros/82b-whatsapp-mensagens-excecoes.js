@@ -1,5 +1,5 @@
 // WhatsApp: mensagens e exceções (versão 2026.11.23.860). Gravado na Demonstração: o campo inserido na mensagem NÃO é
-// salvo (no fim clica em Restaurar padrão); a exceção é salva de verdade na cliente fictícia "Mariana Exemplo" (sem
+// salvo (no fim clica em Restaurar padrão); a exceção é salva de verdade na cliente fictícia "Joana Exemplo" (sem
 // telefone) e depois tirada pela lixeira, para a Demonstração ficar como estava. Nenhum WhatsApp é enviado.
 module.exports = {
   id: 'whatsapp-mensagens-excecoes',
@@ -7,7 +7,7 @@ module.exports = {
   grupo: 'WhatsApp',
   titulo: 'WhatsApp: mensagens e exceções',
   gravaDados: true,
-  manter: ['Mariana Exemplo'],
+  manter: ['Joana Exemplo'],
   assunto: { chave: ['mensagem do whatsapp', 'mensagens do whatsapp', 'exceção', 'exceções', 'excecao', 'não receber', 'nao receber', 'não mandar', 'relatório das mensagens', 'falharam'], acoes: ['editar', 'mudar', 'alterar', 'tirar', 'bloquear', 'parar', 'como', 'ver'], rotas: ['/configuracoes/whatsapp', '/whatsapp/cobrancas'] },
   resumo: 'Edite as mensagens vendo como o cliente recebe, escolha quem não recebe mensagem automática e veja o relatório do que chegou.',
   fala: 'Oi! Aqui é o Thiago, da Thiago Informática. Neste vídeo eu vou te mostrar as mensagens do WhatsApp, como deixar um cliente de fora das mensagens automáticas, e o relatório do que chegou. Bora lá!',
@@ -53,15 +53,15 @@ module.exports = {
     {
       antes: [
         { tipo: 'clicar', alvo: { papel: 'tab', nome: /Exceções/ }, seguro: true, espera: 3500 },
-        { tipo: 'preencher', alvo: { placeholder: 'Procurar cliente pelo nome ou telefone' }, valor: 'Mariana Exemplo', espera: 4000 },
+        { tipo: 'preencher', alvo: { placeholder: 'Procurar cliente pelo nome ou telefone' }, valor: 'Joana Exemplo', espera: 4000 },
       ],
       titulo: 'Exceções: procure o cliente',
       texto: 'Agora a aba Exceções. Aqui você escolhe quem não recebe mensagem automática. Procura o cliente pelo nome.',
-      marcar: [{ alvo: { css: 'button:has(b:text-is("Mariana Exemplo"))' }, legenda: 'Cliente' }],
+      marcar: [{ alvo: { css: 'button:has(b:text-is("Joana Exemplo"))' }, legenda: 'Cliente' }],
     },
     {
       antes: [
-        { tipo: 'clicar', alvo: { css: 'button:has(b:text-is("Mariana Exemplo"))' }, seguro: true, espera: 1500 },
+        { tipo: 'clicar', alvo: { css: 'button:has(b:text-is("Joana Exemplo"))' }, seguro: true, espera: 1500 },
         { tipo: 'clicar', alvo: { css: 'button[aria-pressed]:has-text("Aniversário")' }, seguro: true, espera: 900 },
       ],
       titulo: 'Marque o que ele não recebe',
@@ -73,16 +73,16 @@ module.exports = {
       depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Salvar exceção' }, espera: 5000 }],
     },
     {
-      antes: [{ tipo: 'clicar', alvo: { css: 'li:has-text("Mariana Exemplo") button:has-text("Pós-venda")' }, espera: 5000 }],
+      antes: [{ tipo: 'clicar', alvo: { css: 'li:has-text("Joana Exemplo") button:has-text("Pós-venda")' }, espera: 5000 }],
       titulo: 'Clientes em exceção',
       texto: 'Pronto, ela aparece em Clientes em exceção. Tocando no selo, liga ou desliga cada mensagem. Isso vale pro envio automático, pro envio em lote e pra Central de cobrança, onde ela aparece com o selo Exceção e fica fora do lote.',
-      marcar: [{ alvo: { css: 'li:has-text("Mariana Exemplo")' }, legenda: 'Em exceção' }],
+      marcar: [{ alvo: { css: 'li:has-text("Joana Exemplo")' }, legenda: 'Em exceção' }],
     },
     {
       titulo: 'Lixeira: volta a receber tudo',
       texto: 'E se ela puder receber tudo de novo, é só clicar na lixeira.',
-      marcar: [{ alvo: { css: 'button[aria-label="Tirar Mariana Exemplo das exceções"]' }, legenda: 'Voltar a receber' }],
-      depois: [{ tipo: 'clicar', alvo: { css: 'button[aria-label="Tirar Mariana Exemplo das exceções"]' }, espera: 5000 }],
+      marcar: [{ alvo: { css: 'button[aria-label="Tirar Joana Exemplo das exceções"]' }, legenda: 'Voltar a receber' }],
+      depois: [{ tipo: 'clicar', alvo: { css: 'button[aria-label="Tirar Joana Exemplo das exceções"]' }, espera: 5000 }],
     },
     {
       ir: '/whatsapp/cobrancas',
