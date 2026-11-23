@@ -1,55 +1,68 @@
+// Cadastro de cliente feito DE VERDADE na Demonstração (pedido do dono, 21/11/2026): cliente fictícia
+// "Joana Exemplo", sem telefone (nada vai para WhatsApp de ninguém), endereço pelo CEP, salva e aparece na lista.
 module.exports = {
   id: 'cadastrar-cliente',
   ordem: 20,
   grupo: 'Cadastros',
   titulo: 'Cadastrar um cliente',
+  gravaDados: true,
+  aceitarConfirmacao: true, // "já existe cliente com esse nome": é a mesma cliente fictícia de outras gravações
+  manter: ['Joana Exemplo', '38140000', '38140-000', 'Rua das Flores', 'Centro', 'Prata'],
   assunto: {"chave": ["cliente", "clientes"], "acoes": ["cadastrar", "cadastro", "cadastra", "novo", "nova", "incluir", "adicionar", "criar", "colocar", "registrar"]}, // como o Thiaguinho acha o vídeo pela pergunta
   resumo: 'Cadastre clientes com nome, CPF/CNPJ, WhatsApp e endereço.',
+  fala: 'Oi! Aqui é o Thiago, da Thiago Informática. Neste vídeo eu vou cadastrar um cliente de verdade, do começo ao fim. Bora lá!',
   passos: [
     {
       ir: '/cadastros/clientes',
+      espera: 6000,
       titulo: 'Abra a tela de Clientes',
-      texto: 'No menu, clique em Cadastros › Pessoas › Clientes. Aqui ficam todos os seus clientes.',
-      marcar: [{ alvo: { papel: 'heading', nome: 'Clientes', exato: true } }],
+      texto: 'No menu, clica em Cadastros, Pessoas, Clientes. Aqui ficam todos os seus clientes. Pra cadastrar um novo, é no botão Novo cliente.',
+      marcar: [{ alvo: { papel: 'button', nome: 'Novo cliente' }, legenda: 'Novo cliente' }],
     },
     {
-      titulo: 'Clique em "Novo cliente"',
-      texto: 'Clique no botão "Novo cliente", no alto da tela.',
-      marcar: [{ alvo: { papel: 'button', nome: 'Novo cliente' } }],
-      depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Novo cliente' }, espera: 1500 }],
+      antes: [
+        { tipo: 'clicar', alvo: { papel: 'button', nome: 'Novo cliente' }, seguro: true, espera: 1800 },
+        { tipo: 'preencher', alvo: { campo: 'Nome', dentro: 'dialog' }, valor: 'Joana Exemplo' },
+      ],
+      titulo: 'Digite o nome',
+      texto: 'O único campo obrigatório é o nome. O código é criado sozinho quando você salva.',
+      marcar: [{ alvo: { campo: 'Nome', dentro: 'dialog' }, legenda: 'Nome' }],
     },
     {
-      titulo: 'Digite o nome (obrigatório)',
-      texto: 'O único campo obrigatório é o Nome. O Código é criado sozinho quando você salva.',
-      marcar: [{ alvo: { campo: 'Nome', dentro: 'dialog' } }],
-      depois: [{ tipo: 'preencher', alvo: { campo: 'Nome', dentro: 'dialog' }, valor: 'Maria da Silva' }],
-    },
-    {
-      titulo: 'CPF ou CNPJ',
-      texto: 'Digite o CPF ou CNPJ. Se for CNPJ, clique na lupa ao lado: o sistema busca e preenche os dados da empresa sozinho.',
+      titulo: 'CPF, WhatsApp e e-mail',
+      texto: 'Coloca o CPF ou CNPJ: se for CNPJ, a lupa busca e preenche os dados da empresa sozinha. E o WhatsApp, que é por onde vão os comprovantes, as cobranças e o parabéns no aniversário.',
       marcar: [
         { alvo: { placeholder: 'CPF ou CNPJ', dentro: 'dialog' }, legenda: 'CPF ou CNPJ' },
-        { alvo: { rotulo: 'Buscar CNPJ', dentro: 'dialog' }, legenda: 'Busca o CNPJ' },
-      ],
-    },
-    {
-      titulo: 'WhatsApp e e-mail',
-      texto: 'Preencha o WhatsApp do cliente. Ele é usado para enviar comprovantes, cobranças e mensagens de aniversário.',
-      marcar: [
         { alvo: { placeholder: '(principal)', dentro: 'dialog' }, legenda: 'WhatsApp' },
-        { alvo: { campo: 'E-mail', dentro: 'dialog' }, legenda: 'E-mail' },
       ],
-      dica: 'Preencha também o Aniversário: o sistema avisa quando chegar o dia.',
     },
     {
-      titulo: 'Endereço pelo CEP',
-      texto: 'Digite o CEP e clique no botão de consultar: rua, bairro, cidade e estado são preenchidos sozinhos. Depois complete o número.',
-      marcar: [{ alvo: { titulo: 'Consultar CEP', dentro: 'dialog' } }],
+      antes: [
+        { tipo: 'preencher', alvo: { campo: 'CEP', dentro: 'dialog' }, valor: '38140000' },
+        { tipo: 'preencher', alvo: { campo: 'Rua', dentro: 'dialog' }, valor: 'Rua das Flores' },
+        { tipo: 'preencher', alvo: { campo: 'Número', dentro: 'dialog' }, valor: '120' },
+        { tipo: 'preencher', alvo: { campo: 'Bairro', dentro: 'dialog' }, valor: 'Centro' },
+        { tipo: 'preencher', alvo: { campo: 'Cidade', dentro: 'dialog' }, valor: 'Prata' },
+        { tipo: 'preencher', alvo: { campo: 'Estado', dentro: 'dialog' }, valor: 'MG' },
+      ],
+      titulo: 'Endereço',
+      texto: 'Agora o endereço: o CEP, a rua, o número, o bairro e a cidade. Com o CEP, a lupa do lado já preenche a rua e a cidade sozinha.',
+      marcar: [
+        { alvo: { campo: 'CEP', dentro: 'dialog' }, legenda: 'CEP' },
+        { alvo: { campo: 'Cidade', dentro: 'dialog' }, legenda: 'Endereço' },
+      ],
     },
     {
-      titulo: 'Clique em "Cadastrar"',
-      texto: 'Confira os dados e clique em "Cadastrar". Pronto: o cliente já aparece na lista e pode ser usado nas vendas.',
-      marcar: [{ alvo: { papel: 'button', nome: 'Cadastrar', exato: true, dentro: 'dialog' } }],
+      titulo: 'Clique em Cadastrar',
+      texto: 'Confere e clica em Cadastrar. Pronto, a cliente está salva.',
+      marcar: [{ alvo: { papel: 'button', nome: 'Cadastrar', exato: true, dentro: 'dialog' }, legenda: 'Cadastrar' }],
+      depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Cadastrar', exato: true, dentro: 'dialog' }, espera: 4000 }],
+    },
+    {
+      antes: [{ tipo: 'preencher', alvo: { placeholder: 'Buscar nome, CPF/CNPJ ou telefone' }, valor: 'Joana Exemplo', espera: 3500 }],
+      titulo: 'A cliente já está na lista',
+      texto: 'E ela já aparece na lista, pronta pra usar nas vendas, nas ordens de serviço e no crediário.',
+      marcar: [{ alvo: { texto: 'Joana Exemplo', exato: true }, legenda: 'Cliente salva' }],
       dica: 'Para alterar depois, clique no lápis (Editar) na linha do cliente.',
     },
   ],
