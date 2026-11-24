@@ -80,6 +80,11 @@ module.exports = {
         { alvo: { papel: 'button', nome: /NFC-e · Não emitida/, dentro: 'dialog' }, legenda: 'Cupom' },
         { alvo: { papel: 'button', nome: /NF-e · Não emitida/, dentro: 'dialog' }, legenda: 'Nota' },
       ],
+      // Sai do PDV (tela cheia, sem o menu lateral) para o próximo passo mostrar o caminho Comercial › Vendas.
+      depois: [
+        { tipo: 'tecla', tecla: 'Escape', espera: 1200 },
+        { tipo: 'clicar', alvo: { papel: 'button', nome: /Menu principal/ }, seguro: true, espera: 4000 },
+      ],
     },
     {
       ir: '/vendas',
