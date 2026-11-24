@@ -58,7 +58,7 @@ module.exports = {
         { tipo: 'esperar', alvo: { papel: 'button', nome: /Próximo: pagamento/ }, espera: 1500 },
       ],
       titulo: 'Entrada manual já preenchida',
-      texto: 'Clicando em dar entrada sem nota, abre a Entrada manual já com os produtos, as quantidades e os preços. Você não digita nada de novo.',
+      texto: 'Clicando em dar entrada sem nota, abre a Entrada manual já com o fornecedor, os produtos, as quantidades e os preços. Você não digita nada de novo.',
       marcar: [{ alvo: { papel: 'button', nome: /Próximo: pagamento/ }, legenda: 'Próximo' }],
     },
     {
