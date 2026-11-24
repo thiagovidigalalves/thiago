@@ -2,6 +2,7 @@
 # Grava e publica (Thiaguinho) os vídeos explicativos de todos os roteiros que ainda não têm vídeo.
 # Uso: bash tutoriais/gravar-todos.sh [ids...]   (sem ids = todos os que faltam)
 cd "$(dirname "$0")/.."
+# REGRA DO DONO (24/11/2026): só rode isto quando o próprio dono pedir os vídeos (gasta crédito do ElevenLabs).
 ids="$*"
 [ -z "$ids" ] && ids=$(node -e "const C=require('./tutoriais/capturar.js');const fs=require('fs');console.log(C.carregarRoteiros([]).map(r=>r.id).filter(id=>!fs.existsSync('ajuda/videos/'+id+'.mp4')).join(' '))")
 for id in $ids; do
