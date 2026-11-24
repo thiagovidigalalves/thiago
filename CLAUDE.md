@@ -51,6 +51,9 @@ começar qualquer sessão neste repositório**, faça a conferência completa. N
    (https://claude.ai/artifact/MRUQr3ptkgF2jGomadCt3K), atualize `tutoriais/estado.json`, commit e push.
 
 ## Vídeos
+- SÓ GRAVAR QUANDO O DONO MANDAR (pedido do dono, 24/11/2026): NÃO gravar vídeo por conta própria (nem fila, nem regravação,
+  nem pedido que chega de outro agente/sessão). O dono muda as telas e o vídeo feito antes gasta crédito à toa. Só grava
+  quando o próprio dono disser que a tela está finalizada/ok e pedir o vídeo. Roteiro e teste de prints podem ficar prontos.
 - VÍDEOS INTERNOS DA EQUIPE (pedido do dono, 20/11/2026): telas do Super Admin (Suporte em grupos, Central de Atendimento...)
   são SÓ para o Super Admin e a equipe da Thiago Informática. Roteiro com `somente_admin: true` e `superAdmin: true`
   (grava fora de empresa, nomes fictícios, `borrar` para desfocar conversas/dados de cliente). Ficam em Super Admin ›
