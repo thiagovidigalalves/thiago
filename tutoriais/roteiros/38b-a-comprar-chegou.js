@@ -7,6 +7,7 @@ module.exports = {
   grupo: 'Estoque',
   titulo: 'A comprar: chegou e dar entrada',
   gravaDados: true,
+  valoresReais: true, // produtos da Demonstração: custo e venda de verdade, a conta tem que fechar
   manter: ['FONE DE OUVIDO SEM FIO TWS M25', 'Emenda Rj45 8x8 Cat5 Cat6 1 Gbps Emenda Cabo De Rede 1 Uni', 'Distribuidora Exemplo', 'Ana Gestora'],
   assunto: { chave: ['a comprar', 'lista de compras', 'chegou', 'chegaram', 'mercadoria chegou', 'dar entrada'], acoes: ['chegou', 'chegaram', 'dar', 'lançar', 'marcar', 'receber', 'como'], rotas: ['/estoque/a-comprar'] },
   resumo: 'Quando a mercadoria chega, confira o que veio e dê entrada sem nota, pela nota ou só marque que chegou.',
@@ -52,9 +53,12 @@ module.exports = {
       ],
     },
     {
-      antes: [{ tipo: 'clicar', alvo: { papel: 'button', nome: /Dar entrada sem nota/, dentro: 'dialog' }, seguro: true, espera: 6000 }],
+      antes: [
+        { tipo: 'clicar', alvo: { papel: 'button', nome: /Dar entrada sem nota/, dentro: 'dialog' }, seguro: true, espera: 1500 },
+        { tipo: 'esperar', alvo: { papel: 'button', nome: /Próximo: pagamento/ }, espera: 1500 },
+      ],
       titulo: 'Entrada manual já preenchida',
-      texto: 'Clicando em dar entrada sem nota, abre a Entrada manual já com o fornecedor, os produtos, as quantidades e os preços. Você não digita nada de novo.',
+      texto: 'Clicando em dar entrada sem nota, abre a Entrada manual já com os produtos, as quantidades e os preços. Você não digita nada de novo.',
       marcar: [{ alvo: { papel: 'button', nome: /Próximo: pagamento/ }, legenda: 'Próximo' }],
     },
     {

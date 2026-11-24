@@ -311,6 +311,8 @@ async function executar(page, acao, roteiro) {
   if (!acao) return;
   if (acao.soSemGravar && process.env.TUTORIAL_SEM_GRAVAR !== '1') return; // só quando regrava sem salvar (ex.: fechar a janela)
   if (acao.tipo === 'tecla') { await page.keyboard.press(acao.tecla); await page.waitForTimeout(acao.espera || 900); return; }
+  // `esperar`: tela que demora a abrir; espera o alvo aparecer (até 40 s) antes de seguir.
+  if (acao.tipo === 'esperar') { await achar(page, acao.alvo).waitFor({ state: 'visible', timeout: 40000 }).catch(() => console.log('   (não apareceu a tempo)')); await page.waitForTimeout(acao.espera || 500); return; }
   const el = achar(page, acao.alvo);
   if (acao.clicar !== undefined || acao.tipo === 'clicar') {
     const texto = (await el.innerText().catch(() => '')) + ' ' + (await el.getAttribute('aria-label').catch(() => '') || '');

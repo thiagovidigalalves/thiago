@@ -278,7 +278,7 @@ async function naEmpresaCerta(page) {
 /** Ação do roteiro mostrada no vídeo: o cursor vai até o alvo, clique com som e onda; campo é digitado letra a letra. */
 async function executarVisivel(page, a, r, som, clique) {
   if (a.soSemGravar && process.env.TUTORIAL_SEM_GRAVAR !== '1') return;
-  if (a.tipo === 'tecla' || !a.alvo) return C.executar(page, a, r);
+  if (a.tipo === 'tecla' || a.tipo === 'esperar' || !a.alvo) return C.executar(page, a, r);
   const c = await centro(page, a.alvo).catch(() => null);
   if (c) await moverCursor(page, c[0], c[1]);
   if (a.tipo === 'clicar' || a.tipo === 'escolher' || a.tipo === 'preencher') { som(clique, 0.9); await onda(page); }
