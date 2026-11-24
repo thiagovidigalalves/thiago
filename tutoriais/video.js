@@ -370,7 +370,7 @@ async function gravar(r, s) {
     const cacheMenu = fs.existsSync(CACHE_MENU) ? JSON.parse(fs.readFileSync(CACHE_MENU, 'utf8')) : {};
     const menus = []; let descobriu = false;
     for (const p of r.passos) {
-      if (r.precisaLogin === false || !p.ir || r.semMenu) { menus.push(null); continue; }
+      if (r.precisaLogin === false || !p.ir || r.semMenu || p.semMenu) { menus.push(null); continue; } // semMenu no passo: vem de tela sem menu lateral (ex.: PDV)
       const rota = p.ir.split('?')[0];
       if (!(rota in cacheMenu)) { const dica = caminhoDoMenu(p.texto); cacheMenu[rota] = await descobrirMenu(browser, p.ir, (dica && dica[0]) || r.grupo); descobriu = true; }
       menus.push(cacheMenu[rota]);

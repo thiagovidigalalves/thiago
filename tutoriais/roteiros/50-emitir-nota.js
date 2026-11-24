@@ -28,6 +28,7 @@ module.exports = {
         { tipo: 'clicar', alvo: { papel: 'button', nome: /Nova venda/ }, seguro: true, espera: 1800 },
         { tipo: 'tecla', tecla: 'F10', espera: 2000 },
         { tipo: 'preencher', alvo: { placeholder: 'Nome, telefone, CPF/CNPJ ou endereço...', dentro: 'dialog' }, valor: 'Joana Exemplo', espera: 3500 },
+        { tipo: 'esperar', alvo: { papel: 'button', nome: /^Joana Exemplo/, dentro: 'dialog' }, espera: 300 },
         { tipo: 'clicar', alvo: { papel: 'button', nome: /^Joana Exemplo/, dentro: 'dialog' }, seguro: true, espera: 2000 },
       ],
       titulo: 'Escolha o cliente (F10)',
@@ -80,24 +81,23 @@ module.exports = {
         { alvo: { papel: 'button', nome: /NFC-e · Não emitida/, dentro: 'dialog' }, legenda: 'Cupom' },
         { alvo: { papel: 'button', nome: /NF-e · Não emitida/, dentro: 'dialog' }, legenda: 'Nota' },
       ],
-      // Sai do PDV (tela cheia, sem o menu lateral) para o próximo passo mostrar o caminho Comercial › Vendas.
-      depois: [
-        { tipo: 'tecla', tecla: 'Escape', espera: 1200 },
-        { tipo: 'clicar', alvo: { papel: 'button', nome: /Menu principal/ }, seguro: true, espera: 4000 },
-      ],
     },
     {
       ir: '/vendas',
       espera: 10000,
+      semMenu: true, // vem do PDV, que é tela cheia sem o menu lateral: abre direto com a cortina de passo
       titulo: 'Ou em Vendas',
-      texto: 'E dá também em Comercial, Vendas. Na linha da venda tem os botões NF-e e NFC-e.',
+      texto: 'E dá também fora do caixa, em Comercial, Vendas. Na linha da venda tem os botões NF-e e NFC-e.',
       marcar: [
         { alvo: { papel: 'button', nome: 'NF-e', exato: true }, legenda: 'NF-e' },
         { alvo: { papel: 'button', nome: 'NFC-e', exato: true }, legenda: 'NFC-e' },
       ],
     },
     {
-      antes: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'NF-e', exato: true }, seguro: true, espera: 3000 }],
+      antes: [
+        { tipo: 'clicar', alvo: { papel: 'button', nome: 'NF-e', exato: true }, seguro: true, espera: 1000 },
+        { tipo: 'esperar', alvo: { papel: 'button', nome: 'Continuar emissão', dentro: 'dialog' }, espera: 500 },
+      ],
       titulo: 'Clique e continue',
       texto: 'Clicou, aparece a venda: é só clicar em Continuar emissão e pronto.',
       marcar: [{ alvo: { papel: 'button', nome: 'Continuar emissão', dentro: 'dialog' }, legenda: 'Continuar emissão' }],
