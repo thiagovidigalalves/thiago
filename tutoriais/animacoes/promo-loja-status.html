@@ -296,12 +296,12 @@
 </section>
 
 <section class="cena" id="c11">
-  <div class="titulo"><div class="tag"><i></i>Em breve</div><h2>O <em>site</em> da sua loja.</h2></div>
+  <div class="titulo"><div class="tag"><i></i>Site da loja</div><h2>O cliente <em>compra</em> pelo site.</h2></div>
   <div class="navegador"><div class="barra"><i></i><i></i><i></i><div class="url">🔒 sualoja.com.br</div></div>
-    <div class="capa">Loja Exemplo<small>Compre pelo site e retire na loja</small></div>
+    <div class="capa">Loja Exemplo<small>Compre pelo site: pague no Pix ou no cartão</small></div>
     <div class="grade-p"><div class="prod" style="animation-delay:.9s"><b>👟</b>Tênis Run<em>R$ 249,90</em></div><div class="prod" style="animation-delay:1.1s"><b>👕</b>Camiseta<em>R$ 59,90</em></div><div class="prod" style="animation-delay:1.3s"><b>🎧</b>Fone TWS<em>R$ 80,00</em></div></div>
   </div>
-  <div class="selo rosa" id="s11" style="left:240px;top:1500px">🔗 Ligado no sistema</div>
+  <div class="selo verde" id="s11" style="left:110px;top:1330px">⚡ Pix na hora</div><div class="selo azul" id="s11b" style="left:560px;top:1330px">💳 Cartão</div><div class="selo ouro" id="s11c" style="left:200px;top:1500px">📖 Ou só o catálogo</div>
 </section>
 
 <section class="cena" id="c12"><div class="cam">
@@ -370,10 +370,10 @@
     "E ele avalia o atendimento, a loja e até o produto. Você fica sabendo na hora o que está bom e o que dá pra melhorar.",
     "O sistema também chama de volta quem sumiu, e manda parabéns no aniversário, com um presente pra ele voltar.",
     "E você acompanha o custo, o lucro e o financeiro da loja, tudo na palma da mão.",
-    "E em breve, o site da sua loja, ligado direto no sistema.",
+    "E tem o site da sua loja, onde o cliente compra: paga na hora no Pix ou no cartão, ou, se você preferir, usa só como catálogo.",
     "THGestor, da Thiago Informática. Mais venda, menos trabalho. Chama a gente e pede a sua demonstração.",
   ];
-  const DUR = [5.80, 6.84, 7.47, 6.92, 4.21, 8.28, 5.96, 7.55, 6.19, 5.33, 4.28, 7.16];
+  const DUR = [5.80, 6.84, 7.47, 6.92, 4.21, 8.28, 5.96, 7.55, 6.19, 5.33, 8.36, 7.16];
   const EXTRA = { 4: 1.4 }; // a cena da cliente ganha tempo para a reação
   const ini = [3.2]; for (let k = 1; k < DUR.length; k++) ini.push(+(ini[k - 1] + DUR[k - 1] + 0.55 + (EXTRA[k - 1] || 0)).toFixed(2));
   const CENAS = [['c0', 0], ...ini.map((t, k) => ['c' + (k + 1), t - 0.15])];
@@ -392,7 +392,7 @@
     7: [[.8, 'zap'], [2.0, 'pop', .4], [2.4, 'pop', .4], [2.8, 'pop', .4], [3.6, 'sino', .6]],
     8: [[1.4, 'zap'], [2.8, 'zap']],
     9: [[1.0, 'grafico', .7]],
-    10: [[.9, 'pop', .5], [1.1, 'pop', .5], [1.3, 'pop', .5], [2.4, 'brilho', .6]],
+    10: [[.9, 'pop', .5], [1.1, 'pop', .5], [1.3, 'pop', .5], [3.2, 'moeda', .9], [4.2, 'pop', .6], [6.2, 'brilho', .6]],
     11: [[0, 'impacto', .9], [.2, 'sino', .8]],
   };
   window.SONS = [{ t: 0.2, som: 'impacto', vol: .9 }, { t: 1.0, som: 'brilho', vol: .8 }, { t: 1.8, som: 'sino', vol: .5 }];
@@ -452,7 +452,7 @@
     c8: [[600, () => on('m8a')], [1900, () => acender('e1', 0)], [2500, () => acender('e2', 0)], [3100, () => acender('e3', 0)], [3600, () => { const c = $('carla'); c.style.opacity = 1; c.style.transform = 'none'; on('carla', 'feliz'); confete('c8', 540, 1300, 40); }]],
     c9: [[200, () => $('rec').classList.add('on')], [800, () => on('t9', 'zoom')], [1400, () => on('n9a')], [2800, () => on('n9b')]],
     c10: [[700, () => on('t10', 'zoom')], [2200, () => on('s10')]],
-    c11: [[100, () => $('rec').classList.remove('on')], [2400, () => on('s11')]],
+    c11: [[100, () => $('rec').classList.remove('on')], [3200, () => on('s11')], [4200, () => on('s11b')], [6200, () => on('s11c')]],
   };
 
   window.comecar = () => {
