@@ -18,6 +18,7 @@ const PROPAGANDAS = {
   'promo-loja-status': { titulo: 'Propaganda para lojas (status, 1 min 30 s)', palavras: ['propaganda', 'propaganda loja', 'propaganda das lojas', 'vantagens', 'status loja'] },
   'promo-whatsapp-status': { titulo: 'Propaganda das ferramentas de WhatsApp (status, 1 min)', palavras: ['propaganda whatsapp', 'propaganda do whatsapp', 'cliente que sumiu', 'avaliação', 'aniversário'] },
   'promo-autoescola-status': { titulo: 'Propaganda do TH Autoescola (status, 1 min 24 s)', palavras: ['propaganda autoescola', 'th autoescola', 'autoescola', 'propaganda da autoescola'] },
+  'promo-adapta-status': { titulo: 'Propaganda: o sistema se adapta à sua empresa (status, 1 min)', palavras: ['propaganda', 'sistema se adapta', 'sob medida', 'suporte', 'propaganda suporte'] },
   'promo-status': { titulo: 'Propaganda do THGestor (status, 1 min)', palavras: ['propaganda', 'propaganda do sistema', 'apresentação', 'thgestor'] },
 };
 
