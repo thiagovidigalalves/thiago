@@ -17,6 +17,7 @@ const API = `https://base44.app/api/apps/${APP}`;
 const PROPAGANDAS = {
   'promo-loja-status': { titulo: 'Propaganda para lojas (status, 1 min 30 s)', palavras: ['propaganda', 'propaganda loja', 'propaganda das lojas', 'vantagens', 'status loja'] },
   'promo-whatsapp-status': { titulo: 'Propaganda das ferramentas de WhatsApp (status, 1 min)', palavras: ['propaganda whatsapp', 'propaganda do whatsapp', 'cliente que sumiu', 'avaliação', 'aniversário'] },
+  'promo-autoescola-status': { titulo: 'Propaganda do TH Autoescola (status, 1 min 24 s)', palavras: ['propaganda autoescola', 'th autoescola', 'autoescola', 'propaganda da autoescola'] },
   'promo-status': { titulo: 'Propaganda do THGestor (status, 1 min)', palavras: ['propaganda', 'propaganda do sistema', 'apresentação', 'thgestor'] },
 };
 
