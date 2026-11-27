@@ -58,6 +58,8 @@ function garantirSons() {
   const sons = await page.evaluate(() => window.SONS || null);
   const musicaPagina = await page.evaluate(() => window.MUSICA || null);
   const volMusica = await page.evaluate(() => window.VOL_MUSICA || 0.18);
+  // window.DUCK: a música abaixa sozinha enquanto a voz fala e sobe nas pausas (sidechain), para música animada.
+  const duck = await page.evaluate(() => !!window.DUCK).catch(() => false);
   const inicio = (Date.now() - t0) / 1000;
   await page.evaluate(() => window.comecar && window.comecar());
   if (capa != null) {
@@ -72,7 +74,7 @@ function garantirSons() {
 
   // Efeitos padrão da vinheta, se a página não definir os seus.
   const lista = sons || [{ t: 0.25, som: 'transicao' }, { t: 1.05, som: 'impacto' }, { t: 1.55, som: 'brilho' }, { t: 2.6, som: 'pop' }];
-  const entradas = [], filtros = [], rotulos = [];
+  const entradas = [], filtros = [], rotulos = [], vozes = [];
   let nIn = 0;
   for (const s of lista) {
     let arq = s.som ? path.join(SONS, s.som + '.mp3') : null;
@@ -80,17 +82,21 @@ function garantirSons() {
     if (!arq || !fs.existsSync(arq)) continue;
     const k = ++nIn, ms = Math.round(s.t * 1000);
     entradas.push('-i', arq);
-    filtros.push(`[${k}:a]adelay=${ms}|${ms},volume=${s.vol ?? 1}[s${k}]`); rotulos.push(`[s${k}]`);
+    filtros.push(`[${k}:a]adelay=${ms}|${ms},volume=${s.vol ?? 1}[s${k}]`); (s.fala && duck ? vozes : rotulos).push(`[s${k}]`);
   }
   const musica = [musicaPagina && musicaPagina + '.mp3', 'musica.mp3', 'musica.wav'].filter(Boolean).map(f => path.join(SONS, f)).find(f => fs.existsSync(f));
   if (musica && lista.some(s => s.fala)) {
     const k = ++nIn; entradas.push('-stream_loop', '-1', '-i', musica);
-    filtros.push(`[${k}:a]volume=${volMusica},atrim=0:${dur},afade=t=out:st=${Math.max(0, dur - 1.5)}:d=1.5[mus]`); rotulos.push('[mus]');
-  }
+    filtros.push(`[${k}:a]volume=${volMusica},atrim=0:${dur},afade=t=out:st=${Math.max(0, dur - 1.5)}:d=1.5[mus]`);
+    if (duck && vozes.length) {
+      filtros.push(`${vozes.join('')}amix=inputs=${vozes.length}:normalize=0,asplit[vz1][vz2a]`, `[vz2a]apad[vz2]`, `[mus][vz2]sidechaincompress=threshold=0.015:ratio=8:attack=25:release=450[musd]`);
+      rotulos.push('[vz1]', '[musd]');
+    } else rotulos.push('[mus]');
+  } else rotulos.push(...vozes);
   const saida = path.join(SAIDA, `${saidaNome}.mp4`);
   const args = ['-y', '-v', 'error', '-ss', inicio.toFixed(2), '-i', bruto, ...entradas];
   if (rotulos.length) {
-    filtros.push(`${rotulos.join('')}amix=inputs=${rotulos.length}:normalize=0,apad[a]`);
+    filtros.push(`${rotulos.join('')}amix=inputs=${rotulos.length}:normalize=0${duck ? ',alimiter=limit=0.7:level=false,loudnorm=I=-14:TP=-1.5:LRA=9' : ''},apad[a]`); // padrão novo (com DUCK): volume final nivelado
     args.push('-filter_complex', filtros.join(';'), '-map', '0:v', '-map', '[a]', '-c:a', 'aac', '-b:a', '160k');
   }
   args.push('-t', String(dur), '-r', '30', '-c:v', 'libx264', '-preset', 'medium', '-crf', '20', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', saida);

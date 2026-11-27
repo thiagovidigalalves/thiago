@@ -72,6 +72,12 @@ começar qualquer sessão neste repositório**, faça a conferência completa. N
   Cadastros acontece na hora em que ela diz "Cadastros" (nada de clicar primeiro e falar depois). O `video.js` pega o tempo
   de cada palavra pelo alinhamento do ElevenLabs (`alinhar` em `video-voz.js`, cache `-alinha.json`) e espera a palavra para
   clicar no menu e nos botões citados na fala. Salvar que demora: `aguardarFechar: true` (a espera é cortada).
+- EFEITOS SONOROS (pedido do dono, 27/11/2026): NADA de efeito que "sopra" (whoosh de ar/ruído). Os arquivos de
+  `tutoriais/audio/` transicao, toque, fx-whoosh e fx-riser foram trocados por efeitos musicais (ElevenLabs, sem ar/ruído);
+  os antigos ficaram em `tutoriais/audio/antigos/` (não usar). Ao criar efeito novo, descreva "tonal, no whoosh, no wind, no air".
+- MÚSICA ANIMADA (teste pedido pelo dono, 27/11/2026, na propaganda promo-adapta-status): música do ElevenLabs Music
+  (`audio/musica-empolgante*.mp3`), com `window.DUCK = true` no animar.js (a música abaixa quando a voz fala) e volume final
+  nivelado (-14 LUFS). Se o dono aprovar, vira o padrão de todas as propagandas.
 - JEITO DE FALAR (aprovado pelo dono, guardado como padrão de TODOS os vídeos): voz profissional `eleven_v4`,
   velocidade 1.0, stability 0.4, similarity 0.8, style 0.25 (`tutoriais/video-voz.js`); frases curtas de conversa,
   como o Thiago explicando para um cliente ("Aqui tem...", "é só...", "pra você"), nada de texto lido de manual.
