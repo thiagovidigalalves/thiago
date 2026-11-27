@@ -320,9 +320,11 @@ async function camera(page, ponto, z = ZOOM) {
     const fora = new Set(['__cortina', '__cursor', '__legenda']);
     const els = [...document.body.children].filter(e => !fora.has(e.id) && !e.classList.contains('__onda') && e.tagName !== 'SCRIPT' && e.tagName !== 'STYLE');
     if (!ponto) {
-      for (const e of els) if (e.dataset.cam) { e.style.translate = '0px 0px'; e.style.scale = '1'; setTimeout(() => { e.style.removeProperty('translate'); e.style.removeProperty('scale'); e.style.removeProperty('transform-origin'); e.style.removeProperty('transition'); delete e.dataset.cam; }, 750); }
+      for (const e of els) if (e.dataset.cam) { e.style.translate = '0px 0px'; e.style.scale = '1'; setTimeout(() => { e.style.removeProperty('translate'); e.style.removeProperty('scale'); e.style.removeProperty('transform-origin'); e.style.removeProperty('transition'); if (e.dataset.camAlt) e.style.removeProperty('min-height'); delete e.dataset.cam; delete e.dataset.camAlt; }, 750); }
       return;
     }
+    // Página rolada: o que é fixo na tela passaria a andar junto com a página aproximada. Não aproxima.
+    if (window.scrollY > 2) return;
     // Centraliza o alvo (um pouco acima do meio, por causa da legenda) sem mostrar borda vazia.
     const qx = W / 2, qy = H / 2 - 40;
     const tx = Math.min(0, Math.max(W * (1 - z), qx - z * ponto[0]));
@@ -330,6 +332,8 @@ async function camera(page, ponto, z = ZOOM) {
     for (const e of els) {
       if (!e.dataset.cam) { e.style.removeProperty('scale'); e.style.removeProperty('translate'); }
       const r = e.getBoundingClientRect();
+      // Com transform, o elemento vira a "tela" dos filhos fixos (PDV, barras): com 0 px de altura eles se espremem.
+      if (!e.dataset.cam && r.height < H && getComputedStyle(e).position !== 'fixed') { e.style.minHeight = H + 'px'; e.dataset.camAlt = '1'; }
       e.dataset.cam = '1';
       e.style.transformOrigin = `${-r.left}px ${-r.top}px`;
       e.style.transition = 'translate .75s cubic-bezier(.4,0,.2,1), scale .75s cubic-bezier(.4,0,.2,1)';
