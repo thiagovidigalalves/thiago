@@ -103,13 +103,13 @@ module.exports = {
         { tipo: 'tecla', tecla: 'F9', espera: 2500 },
         { tipo: 'preencher', alvo: { css: 'input[data-payment-amount]' }, valor: '30', espera: 600 },
         { tipo: 'clicar', alvo: { papel: 'button', nome: 'Dinheiro', dentro: 'dialog' }, seguro: true, espera: 1500 },
-        { tipo: 'clicar', alvo: { papel: 'button', nome: 'Pix', dentro: 'dialog' }, seguro: true, espera: 1500 },
+        { tipo: 'clicar', alvo: { papel: 'button', nome: /PIX(?! SICOOB)/, dentro: 'dialog' }, seguro: true, espera: 1500 },
       ],
       titulo: 'Dividir: dinheiro e Pix',
       texto: 'Dá pra dividir o pagamento. Nessa venda o cliente pagou trinta reais em Dinheiro, e o resto no Pix. Os pagamentos aparecem aqui do lado. Enter, e pronto.',
       marcar: [
         { alvo: { texto: 'Pagamentos da venda', exato: true, dentro: 'dialog' }, legenda: 'R$ 30 em dinheiro' },
-        { alvo: { papel: 'button', nome: /Pix/i, dentro: 'dialog' }, legenda: 'O resto no Pix' },
+        { alvo: { papel: 'button', nome: /PIX(?! SICOOB)/, dentro: 'dialog' }, legenda: 'O resto no Pix' },
       ],
       depois: [
         { tipo: 'tecla', tecla: 'Enter', espera: 5000 },

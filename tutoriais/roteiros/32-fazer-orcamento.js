@@ -105,11 +105,11 @@ module.exports = {
     {
       antes: [
         { tipo: 'tecla', tecla: 'F9', espera: 2500 },
-        { tipo: 'clicar', alvo: { papel: 'button', nome: 'Pix', dentro: 'dialog' }, seguro: true, espera: 1500 },
+        { tipo: 'clicar', alvo: { papel: 'button', nome: /PIX(?! SICOOB)/, dentro: 'dialog' }, seguro: true, espera: 1500 },
       ],
       titulo: 'Receba e finalize',
       texto: 'Aperta F9, escolhe a forma, aqui foi Pix, e Enter. Venda sem nota: tecla três, e Não imprimir.',
-      marcar: [{ alvo: { papel: 'button', nome: /Pix/i, dentro: 'dialog' }, legenda: 'Pix' }],
+      marcar: [{ alvo: { papel: 'button', nome: /PIX(?! SICOOB)/, dentro: 'dialog' }, legenda: 'Pix' }],
       depois: [
         { tipo: 'tecla', tecla: 'Enter', espera: 5000 },
         { tipo: 'tecla', tecla: '3', espera: 2500 },
