@@ -199,6 +199,15 @@ function quandoDiz(fala, palavra, pos = 0) {
   return i < 0 ? null : { t: tempoDaLetra(fala, i), fim: i + palavra.length };
 }
 /** Em que segundo a fala diz cada nome do caminho do menu (o clique acontece junto com a palavra). */
+// O app manda a raiz de subdomínio desconhecido para o catálogo da loja (/loja/<sub>): volta pro início do sistema
+// por dentro (pushState + popstate, que o roteador escuta), sem recarregar a página.
+async function inicioDoSistema(page) {
+  await page.waitForTimeout(800);
+  if (!/\/loja\//.test(page.url())) return;
+  await page.evaluate(() => { const q = location.search; history.pushState({}, '', '/' + q); dispatchEvent(new PopStateEvent('popstate')); }).catch(() => {});
+  await page.waitForTimeout(3000);
+}
+
 function temposDoMenu(fala, caminho, inicio) {
   let pos = 0, ult = inicio + 0.3; const out = [];
   for (const nome of caminho) {
@@ -381,6 +390,7 @@ async function gravar(r, s) {
     console.log('   menu: ' + menus.map((m, k) => r.passos[k].ir ? `${k + 1}: ${m ? m.join(' › ') : 'abre direto'}` : '').filter(Boolean).join(' | '));
     const primeira = menu1 ? '/' : (r.passos.find(p => p.ir)?.ir || '/');
     await page.goto(C.URL_BASE + (r.precisaLogin === false ? primeira : C.comEmpresa(primeira)), { waitUntil: 'load' }).catch(() => {});
+    await inicioDoSistema(page);
     await cortina(page, true, r.titulo, r.resumo || '');
     // Nomes reais da empresa -> fictícios (a cortina cobre a tela enquanto carrega).
     if (r.precisaLogin !== false) await C.instalarNomes(context, page, await C.carregarNomesReais(page));

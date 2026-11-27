@@ -10,7 +10,7 @@ module.exports = {
   titulo: 'Entrada manual de mercadoria, passo a passo',
   gravaDados: true,
   valoresReais: true, // custo e preço do produto novo: a conta tem que fechar
-  manter: ['Distribuidora Exemplo', 'Carregador Turbo USB-C 20W', 'FONE DE OUVIDO SEM FIO TWS M25', '25153507', '25,00', '59,90', '85044090', '8504.40.90', '85.04.40.90', '2105300', '21.053.00', '5102', '6102', '5405', '6404'], // NCM/CEST/CFOP de verdade (são do produto, não de cliente)
+  manter: ['Distribuidora Exemplo', 'Carregador Turbo USB-C 20W', 'FONE DE OUVIDO SEM FIO TWS M25', '25153507', '25,00', '59,90', '85044090', '8504.40.90', '85.04.40.90', '2105300', '21.053.00', '85044021', '8504.40.21', '2103900', '21.039.00', '5102', '6102', '5405', '6404'], // NCM/CEST/CFOP de verdade (são do produto, não de cliente)
   assunto: { chave: ['entrada manual', 'entrada de mercadoria', 'entrada sem nota', 'entrada de nota manual', 'compra', 'mercadoria chegou', 'tributação', 'ncm'], acoes: ['lançar', 'dar', 'fazer', 'cadastrar', 'buscar', 'como', 'entrada'], rotas: ['/estoque/entrada-manual'] },
   resumo: 'Lance uma compra sem nota do começo ao fim: fornecedor, produto novo com tributação, quantidades, pagamento e custos.',
   fala: 'Oi! Aqui é o Thiago, da Thiago Informática. Neste vídeo eu vou fazer uma entrada manual de mercadoria, do começo ao fim, bem devagar: inclusive cadastrar um produto novo e buscar a tributação dele. Bora lá!',
@@ -152,10 +152,10 @@ module.exports = {
       dica: 'Não terminou? Use "Salvar em aberto" e continue depois.',
     },
     {
-      antes: [{ tipo: 'esperar', alvo: { texto: 'Concluída', exato: true }, espera: 800 }],
+      antes: [{ tipo: 'esperar', alvo: { css: ':not(option):text-is("Concluída") >> visible=true' }, espera: 800 }],
       titulo: 'Pronto, entrada concluída',
       texto: 'Pronto! A entrada já aparece aqui no histórico, concluída. Clicando nela, dá pra imprimir as etiquetas dos produtos que chegaram.',
-      marcar: [{ alvo: { texto: 'Concluída', exato: true }, legenda: 'Concluída' }],
+      marcar: [{ alvo: { css: ':not(option):text-is("Concluída") >> visible=true' }, legenda: 'Concluída' }],
     },
   ],
 };
