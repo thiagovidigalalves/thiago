@@ -311,6 +311,8 @@ async function limparMarcas(page) {
 async function executar(page, acao, roteiro) {
   if (!acao) return;
   if (acao.soSemGravar && process.env.TUTORIAL_SEM_GRAVAR !== '1') return; // só quando regrava sem salvar (ex.: fechar a janela)
+  // `opcional`: só faz se o alvo estiver na tela (ex.: "Não imprimir" que só aparece depois da pergunta da nota).
+  if (acao.opcional && acao.alvo && !(await achar(page, acao.alvo).waitFor({ state: 'visible', timeout: 2500 }).then(() => true).catch(() => false))) return;
   if (acao.tipo === 'tecla') { await page.keyboard.press(acao.tecla); await page.waitForTimeout(acao.espera || 900); return; }
   // `esperar`: tela que demora a abrir; espera o alvo aparecer (até 40 s) antes de seguir.
   if (acao.tipo === 'esperar') { await achar(page, acao.alvo).waitFor({ state: 'visible', timeout: 40000 }).catch(() => console.log('   (não apareceu a tempo)')); await page.waitForTimeout(acao.espera || 500); return; }

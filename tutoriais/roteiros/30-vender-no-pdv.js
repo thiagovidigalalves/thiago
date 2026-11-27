@@ -64,12 +64,12 @@ module.exports = {
       depois: [{ tipo: 'tecla', tecla: 'Enter', espera: 5000 }],
     },
     {
-      titulo: 'Sem nota e sem papel',
-      texto: 'Venda gravada! Agora ele pergunta o documento. Nota fiscal tem um vídeo só dela. Aqui eu aperto três, venda sem nota, e depois Não imprimir.',
-      marcar: [{ alvo: { papel: 'button', nome: /sem documento fiscal/, dentro: 'dialog' }, legenda: '3 · Sem nota' }],
+      titulo: 'Comprovante',
+      texto: 'Venda gravada! Agora ele pergunta do comprovante: imprimir em A4, na bobina, não imprimir, ou mandar no WhatsApp do cliente. Aqui eu aperto três, Não imprimir. Se a sua loja emite nota, antes ele pergunta o documento: tem um vídeo só disso.',
+      marcar: [{ alvo: { papel: 'button', nome: /Não imprimir/ }, legenda: '3 · Não imprimir' }],
       depois: [
         { tipo: 'tecla', tecla: '3', espera: 2500 },
-        { tipo: 'clicar', alvo: { papel: 'button', nome: /Não imprimir/ }, seguro: true, espera: 2500 },
+        { tipo: 'clicar', alvo: { papel: 'button', nome: /Não imprimir/ }, seguro: true, opcional: true, espera: 2500 },
       ],
       atencao: 'As teclas 1 e 2 emitem a nota fiscal na hora. Para venda sem nota, é a 3.',
     },
@@ -91,7 +91,7 @@ module.exports = {
       depois: [
         { tipo: 'tecla', tecla: 'Enter', espera: 5000 },
         { tipo: 'tecla', tecla: '3', espera: 2500 },
-        { tipo: 'clicar', alvo: { papel: 'button', nome: /Não imprimir/ }, seguro: true, espera: 2500 },
+        { tipo: 'clicar', alvo: { papel: 'button', nome: /Não imprimir/ }, seguro: true, opcional: true, espera: 2500 },
       ],
       dica: 'Cada forma tem uma letra de atalho (aparece no botão): no cartão de crédito, cada toque na letra soma uma parcela.',
     },
@@ -114,7 +114,7 @@ module.exports = {
       depois: [
         { tipo: 'tecla', tecla: 'Enter', espera: 5000 },
         { tipo: 'tecla', tecla: '3', espera: 2500 },
-        { tipo: 'clicar', alvo: { papel: 'button', nome: /Não imprimir/ }, seguro: true, espera: 2500 },
+        { tipo: 'clicar', alvo: { papel: 'button', nome: /Não imprimir/ }, seguro: true, opcional: true, espera: 2500 },
       ],
     },
     {
@@ -144,7 +144,7 @@ module.exports = {
       depois: [
         { tipo: 'tecla', tecla: 'Enter', espera: 5000 },
         { tipo: 'tecla', tecla: '3', espera: 2500 },
-        { tipo: 'clicar', alvo: { papel: 'button', nome: /Não imprimir/ }, seguro: true, espera: 2500 },
+        { tipo: 'clicar', alvo: { papel: 'button', nome: /Não imprimir/ }, seguro: true, opcional: true, espera: 2500 },
       ],
       dica: 'As parcelas do crediário vão sozinhas para Financeiro › Contas a Receber, no nome do cliente.',
     },

@@ -288,6 +288,7 @@ async function naEmpresaCerta(page) {
 async function executarVisivel(page, a, r, som, clique) {
   if (a.soSemGravar && process.env.TUTORIAL_SEM_GRAVAR !== '1') return;
   if (a.tipo === 'tecla' || a.tipo === 'esperar' || !a.alvo) return C.executar(page, a, r);
+  if (a.opcional && !(await C.achar(page, a.alvo).waitFor({ state: 'visible', timeout: 2500 }).then(() => true).catch(() => false))) return;
   let c = await centro(page, a.alvo).catch(() => null);
   const comCamera = c && a.camera !== false;
   if (comCamera) { await camera(page, c); c = (await centro(page, a.alvo).catch(() => null)) || c; }

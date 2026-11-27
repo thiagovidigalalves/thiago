@@ -87,7 +87,7 @@ module.exports = {
       ],
       depois: [
         { tipo: 'tecla', tecla: 'Enter', espera: 5000 },
-        { tipo: 'clicar', alvo: { papel: 'button', nome: /Não imprimir/ }, seguro: true, espera: 2500 },
+        { tipo: 'clicar', alvo: { papel: 'button', nome: /Não imprimir/ }, seguro: true, opcional: true, espera: 2500 },
       ],
       dica: 'Se o produto novo for mais caro, o cliente paga só a diferença, em qualquer forma de pagamento.',
     },
@@ -114,7 +114,7 @@ module.exports = {
       marcar: [{ alvo: { papel: 'button', nome: /Confirmar devolução/, dentro: 'dialog' }, legenda: 'Confirmar devolução' }],
       depois: [
         { tipo: 'tecla', tecla: 'Enter', espera: 5000 },
-        { tipo: 'clicar', alvo: { papel: 'button', nome: /Não imprimir/ }, seguro: true, espera: 2500 },
+        { tipo: 'clicar', alvo: { papel: 'button', nome: /Não imprimir/ }, seguro: true, opcional: true, espera: 2500 },
       ],
     },
     {

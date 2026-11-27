@@ -138,7 +138,7 @@ module.exports = {
       depois: [
         { tipo: 'tecla', tecla: 'Enter', espera: 5000 },
         { tipo: 'tecla', tecla: '3', espera: 2500 },
-        { tipo: 'clicar', alvo: { papel: 'button', nome: /Não imprimir/ }, seguro: true, espera: 2500 },
+        { tipo: 'clicar', alvo: { papel: 'button', nome: /Não imprimir/ }, seguro: true, opcional: true, espera: 2500 },
       ],
     },
     {
