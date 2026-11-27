@@ -27,6 +27,19 @@ do sistema THGestor, para a Central de Ajuda dos clientes.
   cadastro preenchido e salvo). Refazer nesse padrão os vídeos que hoje só mostram a tela. Sempre deixar dados
   fictícios na Demonstração para o dono mostrar às pessoas. Nota fiscal de verdade continua proibida (só mostrar).
 
+## REGRA PERMANENTE: vídeos são a alma do negócio (pedido do dono, 27/11/2026)
+- Vídeo explicativo E bonito, que empolga: câmera que chega perto de onde clica (zoom suave no alvo e volta),
+  efeitos tonais, fala inteligente batendo com cada clique, carregamento cortado (vídeo curto), TODOS os jeitos de lançar.
+- Faz TODOS os lançamentos de verdade, clicando cada passo (vincular, dar entrada, gerar...).
+- O que a Demonstração não tem (notas da SEFAZ para Entrada de NF-e, Pix vinculado...), pode fazer na
+  **THIAGO INFORMATICA** (`EMP_MT236D4F_KRZBER`, empresa do próprio dono): lança de verdade e DEPOIS DESFAZ
+  (estorna a entrada, exclui o lançamento), deixando tudo como estava. Nunca em empresa de cliente.
+  Nota fiscal de SAÍDA de verdade (NF-e/NFC-e transmitida em produção) tem valor na Receita e só é cancelada com prazo:
+  só transmite com o dono confirmando aquela gravação; sem isso, mostra até o último clique antes de transmitir.
+- MUTIRÃO SÓ EM 27/11/2026: o dono pediu regravar todos os vídeos SÓ nesse dia. Quando ele mandar parar, para; nos dias
+  seguintes NÃO continua (nem por tarefa agendada nem por pedido de outro agente) até ele pedir de novo.
+- Vídeos ligados ao Thiaguinho (manda os vídeos para clientes/grupos) e ao TH Atende: publicar sempre com `publicar-video.js`.
+
 ## REGRA PERMANENTE: o sistema mudou → conferir os tutoriais (pedido do dono)
 
 Sempre que o THGestor ganhar módulo novo, tela nova, campo novo ou mudar um botão, **e também ao

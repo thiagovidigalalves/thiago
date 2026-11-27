@@ -288,20 +288,55 @@ async function naEmpresaCerta(page) {
 async function executarVisivel(page, a, r, som, clique) {
   if (a.soSemGravar && process.env.TUTORIAL_SEM_GRAVAR !== '1') return;
   if (a.tipo === 'tecla' || a.tipo === 'esperar' || !a.alvo) return C.executar(page, a, r);
-  const c = await centro(page, a.alvo).catch(() => null);
-  if (c) await moverCursor(page, c[0], c[1]);
-  if (a.tipo === 'clicar' || a.tipo === 'escolher' || a.tipo === 'preencher') { som(clique, 0.9); await onda(page); }
-  if (a.tipo === 'preencher' && c) {
-    try {
-      const el = C.achar(page, a.alvo);
-      await el.click({ force: true }).catch(() => {});
-      await el.fill('');
-      await el.pressSequentially(String(a.valor || ''), { delay: 55 });
-      await espera(a.espera || 600);
-      return;
-    } catch { /* cai no jeito normal */ }
+  let c = await centro(page, a.alvo).catch(() => null);
+  const comCamera = c && a.camera !== false;
+  if (comCamera) { await camera(page, c); c = (await centro(page, a.alvo).catch(() => null)) || c; }
+  try {
+    if (c) await moverCursor(page, c[0], c[1]);
+    if (a.tipo === 'clicar' || a.tipo === 'escolher' || a.tipo === 'preencher') { som(clique, 0.9); await onda(page); }
+    if (a.tipo === 'preencher' && c) {
+      try {
+        const el = C.achar(page, a.alvo);
+        await el.click({ force: true }).catch(() => {});
+        await el.fill('');
+        await el.pressSequentially(String(a.valor || ''), { delay: 55 });
+        await espera(a.espera || 600);
+        return;
+      } catch { /* cai no jeito normal */ }
+    }
+    return await C.executar(page, a, r);
+  } finally {
+    if (comCamera) await camera(page, null);
   }
-  return C.executar(page, a, r);
+}
+
+// CÂMERA (pedido do dono, 27/11/2026): chega perto de onde vai clicar, centraliza o alvo e volta.
+// Escala os filhos do <body> (a tela do sistema, janelas e marcações) com `translate`/`scale` individuais, que somam
+// com o transform que a janela já tem; a legenda, o cursor e a cortina ficam de fora (não aumentam).
+const ZOOM = Number(process.env.TUTORIAL_ZOOM || 1.45);
+async function camera(page, ponto, z = ZOOM) {
+  if (process.env.TUTORIAL_SEM_CAMERA === '1') return;
+  await page.evaluate(([ponto, z, W, H]) => {
+    const fora = new Set(['__cortina', '__cursor', '__legenda']);
+    const els = [...document.body.children].filter(e => !fora.has(e.id) && !e.classList.contains('__onda') && e.tagName !== 'SCRIPT' && e.tagName !== 'STYLE');
+    if (!ponto) {
+      for (const e of els) if (e.dataset.cam) { e.style.translate = '0px 0px'; e.style.scale = '1'; setTimeout(() => { e.style.removeProperty('translate'); e.style.removeProperty('scale'); e.style.removeProperty('transform-origin'); e.style.removeProperty('transition'); delete e.dataset.cam; }, 750); }
+      return;
+    }
+    // Centraliza o alvo (um pouco acima do meio, por causa da legenda) sem mostrar borda vazia.
+    const qx = W / 2, qy = H / 2 - 40;
+    const tx = Math.min(0, Math.max(W * (1 - z), qx - z * ponto[0]));
+    const ty = Math.min(0, Math.max(H * (1 - z), qy - z * ponto[1]));
+    for (const e of els) {
+      if (!e.dataset.cam) { e.style.removeProperty('scale'); e.style.removeProperty('translate'); }
+      const r = e.getBoundingClientRect();
+      e.dataset.cam = '1';
+      e.style.transformOrigin = `${-r.left}px ${-r.top}px`;
+      e.style.transition = 'translate .75s cubic-bezier(.4,0,.2,1), scale .75s cubic-bezier(.4,0,.2,1)';
+      e.style.translate = `${tx}px ${ty}px`; e.style.scale = String(z);
+    }
+  }, [ponto, z, W, H]).catch(() => {});
+  await espera(780);
 }
 
 async function centro(page, alvo) {
