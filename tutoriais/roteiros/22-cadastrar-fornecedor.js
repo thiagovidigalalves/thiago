@@ -1,5 +1,5 @@
 // Cadastro de fornecedor feito DE VERDADE na Demonstração (pedido do dono, 21/11/2026): fornecedor fictício
-// "Distribuidora Exemplo", sem telefone, salva e aparece na lista.
+// "Atacado Exemplo Sul", sem telefone, salva e aparece na lista.
 module.exports = {
   id: 'cadastrar-fornecedor',
   ordem: 22,
@@ -7,7 +7,7 @@ module.exports = {
   titulo: 'Cadastrar um fornecedor',
   gravaDados: true,
   aceitarConfirmacao: true,
-  manter: ['Distribuidora Exemplo'],
+  manter: ['Atacado Exemplo Sul'],
   assunto: { chave: ['fornecedor', 'fornecedores'], acoes: ['cadastrar', 'cadastro', 'novo', 'incluir', 'adicionar', 'criar', 'como'], rotas: ['/cadastros/fornecedores'] },
   resumo: 'Cadastre quem vende mercadoria para a sua loja.',
   fala: 'Oi! Aqui é o Thiago, da Thiago Informática. Neste vídeo eu vou cadastrar um fornecedor de verdade. Bora lá!',
@@ -29,9 +29,9 @@ module.exports = {
       ],
     },
     {
-      antes: [{ tipo: 'preencher', alvo: { campo: 'Nome', dentro: 'dialog' }, valor: 'Distribuidora Exemplo' }],
+      antes: [{ tipo: 'preencher', alvo: { campo: 'Nome', dentro: 'dialog' }, valor: 'Atacado Exemplo Sul' }],
       titulo: 'O nome e o contato',
-      texto: 'O nome é o único obrigatório. Aqui eu digitei Distribuidora Exemplo. Dá pra colocar também o telefone, o WhatsApp e o e-mail do vendedor.',
+      texto: 'O nome é o único obrigatório. Aqui eu digitei Atacado Exemplo Sul. Dá pra colocar também o telefone, o WhatsApp e o e-mail do vendedor.',
       marcar: [{ alvo: { campo: 'Nome', dentro: 'dialog' }, legenda: 'Nome' }],
     },
     {
@@ -41,10 +41,10 @@ module.exports = {
       depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Cadastrar', exato: true, dentro: 'dialog' }, aguardarFechar: true, espera: 2500 }],
     },
     {
-      antes: [{ tipo: 'preencher', alvo: { placeholder: 'Buscar fornecedor' }, valor: 'Distribuidora Exemplo', espera: 3500 }],
+      antes: [{ tipo: 'preencher', alvo: { placeholder: 'Buscar fornecedor' }, valor: 'Atacado Exemplo Sul', espera: 3500 }],
       titulo: 'O fornecedor já está na lista',
       texto: 'Ele já aparece na lista, pronto pra usar na entrada de mercadoria e no contas a pagar.',
-      marcar: [{ alvo: { texto: 'Distribuidora Exemplo', exato: true }, legenda: 'Fornecedor salvo' }],
+      marcar: [{ alvo: { texto: 'Atacado Exemplo Sul', exato: true }, legenda: 'Fornecedor salvo' }],
     },
   ],
 };
