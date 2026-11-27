@@ -446,7 +446,9 @@ async function gravar(r, s) {
         const nomeAlvo = a.tipo === 'clicar' && a.alvo && typeof a.alvo.nome === 'string' ? a.alvo.nome : null;
         const q = nomeAlvo ? quandoDiz(fala, nomeAlvo, posFala) : null;
         if (q) { posFala = q.fim; const falta = inicio + q.t - 0.6 - agora(); if (falta > 0) await espera(Math.min(6, falta) * 1000); }
-        await executarVisivel(page, a, r, som, s.clique);
+        // Espera de tela (IA pesquisando, salvando): o tempo parado depois da fala é cortado do vídeo.
+        if (a.tipo === 'esperar') await cortarEspera(() => C.executar(page, a, r), fimDaFala(inicio, fala), 0.8);
+        else await executarVisivel(page, a, r, som, s.clique);
       }
       await C.prepararTela(page);
       await espera(400);
