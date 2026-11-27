@@ -8,7 +8,7 @@ module.exports = {
   titulo: 'Serviços, status e equipamentos (para a OS)',
   gravaDados: true,
   valoresReais: true, // R$ 80 e 10% do começo ao fim
-  manter: ['Limpeza interna', '80', '80,00', 'Aguardando aprovação', 'Joana Exemplo', 'Notebook Lenovo IdeaPad 3', 'Série EX12345'],
+  manter: ['Limpeza interna', '80,00', 'Aguardando aprovação', 'Joana Exemplo', 'Notebook Lenovo IdeaPad 3', 'Série EX12345'],
   assunto: { chave: ['servico', 'servicos', 'status da os', 'equipamento', 'veiculo', 'comissao do servico'], acoes: ['cadastrar', 'criar', 'novo', 'colocar', 'como'], rotas: ['/cadastros/servicos', '/cadastros/veiculos'] },
   resumo: 'Cadastre os serviços com preço e comissão, os status da OS e os equipamentos dos clientes.',
   fala: 'Oi! Aqui é o Thiago, da Thiago Informática. Neste vídeo eu vou cadastrar de verdade um serviço, um status de OS e o equipamento de uma cliente. Bora lá!',

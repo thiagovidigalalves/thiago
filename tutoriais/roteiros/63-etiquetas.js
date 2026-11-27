@@ -55,11 +55,11 @@ module.exports = {
     {
       antes: [
         { tipo: 'preencher', alvo: { css: `input[aria-label="Quantidade de etiquetas ${EMENDA}"]` }, valor: '4', espera: 900 },
-        { tipo: 'clicar', alvo: { papel: 'button', nome: /Ver selecionados/ }, seguro: true, espera: 1500 },
+        { tipo: 'clicar', alvo: { papel: 'button', nome: 'Limpar busca' }, seguro: true, espera: 1500 }, // sem busca, a lista mostra os selecionados
         { tipo: 'preencher', alvo: { css: `input[aria-label="Quantidade de etiquetas ${FONE}"]` }, valor: '3', espera: 900 },
       ],
       titulo: 'Quantas etiquetas de cada',
-      texto: 'Na coluna Quantidade de etiquetas, digita quantas quer de cada produto. Em Ver selecionados você confere tudo que já marcou.',
+      texto: 'Na coluna Quantidade de etiquetas, digita quantas quer de cada produto. Clicando em Limpar busca, a lista mostra tudo que você já marcou.',
       marcar: [
         { alvo: { css: `input[aria-label="Quantidade de etiquetas ${FONE}"]` }, legenda: 'Quantidade' },
         { alvo: { css: '[role="status"]' }, legenda: 'Total' },

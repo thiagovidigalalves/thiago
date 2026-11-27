@@ -500,16 +500,25 @@ async function gravar(r, s) {
       // Página recarregou sozinha no meio do passo (ex.: limite de acessos, tela que recarrega): tira a cortina.
       await cortina(page, false);
       // Mouse até o primeiro alvo, depois as bolinhas.
+      let zoomMarca = false;
       const marcas = (p.marcar || []).map((m, j) => ({ ...m, numero: p.marcar.length > 1 ? `${n}${String.fromCharCode(97 + j)}` : n }));
       if (marcas.length) {
         const c1 = await centro(page, marcas[0].alvo).catch(() => null);
         if (c1) await moverCursor(page, c1[0], c1[1]);
         const caixas = await C.marcar(page, marcas).catch(e => { console.log(`   (passo ${n}: não achei o alvo — ${String(e.message).split('\n')[0]})`); return []; });
         // Botão marcado lá embaixo: a legenda sobe para não cobrir.
-        const embaixo = caixas.some(c => c.y + c.height > H - 190);
+        let embaixo = caixas.some(c => c.y + c.height > H - 190);
+        // Câmera: chega perto do que foi marcado enquanto a voz explica (se tudo couber na tela aproximada).
+        if (caixas.length && p.camera !== false) {
+          const x0 = Math.min(...caixas.map(c => c.x)), y0 = Math.min(...caixas.map(c => c.y));
+          const x1 = Math.max(...caixas.map(c => c.x + c.width)), y1 = Math.max(...caixas.map(c => c.y + c.height));
+          const z = Math.min(ZOOM, (W * 0.8) / Math.max(1, x1 - x0), (H * 0.55) / Math.max(1, y1 - y0));
+          if (z >= 1.15) { await camera(page, [(x0 + x1) / 2, (y0 + y1) / 2], z); zoomMarca = true; embaixo = false; }
+        }
         await page.evaluate(t => document.getElementById('__legenda')?.classList.toggle('topo', t), embaixo).catch(() => {});
       }
       await espera(Math.max(900, (fala.dur + 0.6 - (agora() - inicio)) * 1000));
+      if (zoomMarca) { await camera(page, null); zoomMarca = false; }
       await tirarMarcas(page);
       // Ações do passo (ex.: clicar em "Novo cliente"), com mouse e som de clique.
       for (const a of p.depois || []) {
