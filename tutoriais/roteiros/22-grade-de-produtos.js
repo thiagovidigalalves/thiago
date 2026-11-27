@@ -24,7 +24,7 @@ module.exports = {
       ir: '/cadastros/grades',
       espera: 5000,
       titulo: 'Abra as Grades',
-      texto: 'No menu, clica em Cadastros, Grades. Aqui ficam as cores e as numerações. As mais usadas já vêm prontas: preto, branco, nude, jeans e muitas outras.',
+      texto: 'No menu, clica em Cadastros, Produtos, Grades. Aqui ficam as cores e as numerações. As mais usadas já vêm prontas: preto, branco, nude, jeans e muitas outras.',
       marcar: [{ alvo: { texto: 'Cores', exato: true }, legenda: 'Cores prontas' }],
     },
     {

@@ -22,7 +22,7 @@ module.exports = {
       ir: '/fiscal/devolucao-fornecedor',
       espera: 6000,
       titulo: 'Abra a Devolução ao fornecedor',
-      texto: 'No menu, clica em Fiscal, Devolução ao fornecedor. Dá pra começar pela nota de entrada, buscando o fornecedor, o número ou a chave, ou pelo Importar XML. Aqui eu vou montar do zero, em Nova devolução.',
+      texto: 'No menu, clica em Fiscal, Emitir, Devolução ao fornecedor. Dá pra começar pela nota de entrada, buscando o fornecedor, o número ou a chave, ou pelo Importar XML. Aqui eu vou montar do zero, em Nova devolução.',
       marcar: [
         { alvo: { papel: 'combobox', nome: 'Busque fornecedor, número ou chave' }, legenda: 'Pela nota de entrada' },
         { alvo: { papel: 'button', nome: 'Importar XML' }, legenda: 'Pelo XML' },
