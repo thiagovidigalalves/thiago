@@ -3,6 +3,10 @@
 // da própria entrada (Carregador Turbo USB-C 20W), com a tributação buscada pela "Tributação IA" e conferida na aba
 // Fiscal (e o que fazer se a busca não achar). Um produto que já existe entra pelo código. Pagamento no Pix, custos,
 // e a entrada é gerada (estoque sobe e o pagamento vai para o contas a pagar).
+// Tela nova (27/11/2026): o campo de produto tem a quantidade do lado e o botão "Lançar ↵"
+// (produto → Enter → quantidade → Enter lança e volta para o produto).
+// Nome do produto novo: troque o NOVO a cada gravação (o cadastro não aceita dois produtos com o mesmo nome).
+const NOVO = 'Carregador Turbo USB-C 20W';
 module.exports = {
   id: 'entrada-manual',
   ordem: 61,
@@ -10,7 +14,7 @@ module.exports = {
   titulo: 'Entrada manual de mercadoria, passo a passo',
   gravaDados: true,
   valoresReais: true, // custo e preço do produto novo: a conta tem que fechar
-  manter: ['Distribuidora Exemplo', 'Carregador Turbo USB-C 20W', 'FONE DE OUVIDO SEM FIO TWS M25', '25153507', '25,00', '59,90', '85044090', '8504.40.90', '85.04.40.90', '2105300', '21.053.00', '85044021', '8504.40.21', '2103900', '21.039.00', '5102', '6102', '5405', '6404'], // NCM/CEST/CFOP de verdade (são do produto, não de cliente)
+  manter: ['Distribuidora Exemplo', NOVO, 'FONE DE OUVIDO SEM FIO TWS M25', '25153507', '25,00', '59,90', '85044090', '8504.40.90', '85.04.40.90', '2105300', '21.053.00', '85044021', '8504.40.21', '2103900', '21.039.00', '5102', '6102', '5405', '6404'], // NCM/CEST/CFOP de verdade (são do produto, não de cliente)
   assunto: { chave: ['entrada manual', 'entrada de mercadoria', 'entrada sem nota', 'entrada de nota manual', 'compra', 'mercadoria chegou', 'tributação', 'ncm'], acoes: ['lançar', 'dar', 'fazer', 'cadastrar', 'buscar', 'como', 'entrada'], rotas: ['/estoque/entrada-manual'] },
   resumo: 'Lance uma compra sem nota do começo ao fim: fornecedor, produto novo com tributação, quantidades, pagamento e custos.',
   fala: 'Oi! Aqui é o Thiago, da Thiago Informática. Neste vídeo eu vou fazer uma entrada manual de mercadoria, do começo ao fim, bem devagar: inclusive cadastrar um produto novo e buscar a tributação dele. Bora lá!',
@@ -47,7 +51,7 @@ module.exports = {
       ],
     },
     {
-      antes: [{ tipo: 'preencher', alvo: { placeholder: 'Nome, código ou barras; Enter seleciona' }, valor: 'Carregador Turbo USB-C 20W', espera: 1500 }],
+      antes: [{ tipo: 'preencher', alvo: { placeholder: 'Produto: nome, código ou bipe · Enter' }, valor: NOVO, espera: 1500 }],
       titulo: 'Produto que ainda não tem cadastro',
       texto: 'Agora os produtos. Digita o nome, o código, ou bipa o código de barras. Se o produto já tem cadastro, ele aparece na lista e é só dar Enter. Esse carregador ainda não tem: então clica em Cadastrar novo produto.',
       marcar: [{ alvo: { papel: 'button', nome: /Cadastrar novo produto/ }, legenda: 'Cadastrar novo produto' }],
@@ -101,24 +105,35 @@ module.exports = {
       depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Cadastrar', exato: true, dentro: 'dialog' }, aguardarFechar: true, espera: 2000 }],
     },
     {
-      antes: [{ tipo: 'preencher', alvo: { css: 'label:has-text("Quantidade") input' }, valor: '10', espera: 900 }],
-      titulo: 'Quantidade e custo',
-      texto: 'Agora coloca a quantidade que chegou, aqui foram dez, e confere o custo de cada um. Se o produto vem em caixa, em Unidades por pacote você diz quantas vêm em cada caixa, e o estoque sobe certinho.',
+      antes: [{ tipo: 'preencher', alvo: { css: 'input[data-qtd-rapida]' }, valor: '10', espera: 900 }],
+      titulo: 'Quantidade e Lançar',
+      texto: 'O produto já volta escolhido, e o cursor vai pro campo de quantidade, do lado. Digita quantos chegaram, aqui foram dez, e clica em Lançar. Ele entra na lista de Produtos lançados.',
       marcar: [
-        { alvo: { css: 'label:has-text("Quantidade") input' }, legenda: 'Quantidade' },
+        { alvo: { css: 'input[data-qtd-rapida]' }, legenda: 'Quantidade' },
+        { alvo: { papel: 'button', nome: /^Lançar/ }, legenda: 'Lançar' },
+      ],
+      depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: /^Lançar/ }, espera: 1500 }],
+    },
+    {
+      titulo: 'Confira na lista',
+      texto: 'Na lista, confere o custo de cada um. Se o produto vem em caixa, em Unidades por pacote você diz quantas vêm em cada caixa, e o estoque sobe certinho.',
+      marcar: [
+        { alvo: { css: 'div.divide-y label:has-text("Quantidade") input' }, legenda: 'Quantidade' },
         { alvo: { css: 'label:has-text("Unid. por pacote") input' }, legenda: 'Por caixa' },
         { alvo: { css: 'label:has-text("Custo unitário") input' }, legenda: 'Custo' },
       ],
     },
     {
       antes: [
-        { tipo: 'preencher', alvo: { placeholder: 'Nome, código ou barras; Enter seleciona' }, valor: '25153507', espera: 1500 },
+        { tipo: 'preencher', alvo: { placeholder: 'Produto: nome, código ou bipe · Enter' }, valor: '25153507', espera: 1500 },
+        { tipo: 'tecla', tecla: 'Enter', espera: 1200 },
+        { tipo: 'preencher', alvo: { css: 'input[data-qtd-rapida]' }, valor: '5', espera: 900 },
         { tipo: 'tecla', tecla: 'Enter', espera: 1500 },
-        { tipo: 'preencher', alvo: { css: 'label:has-text("Quantidade") input' }, valor: '5', espera: 900 },
       ],
-      titulo: 'Produto que já tem cadastro',
-      texto: 'Produto que já tem cadastro é mais rápido: bipa ou digita o código, aperta Enter, e põe a quantidade. Repete pra cada produto da compra.',
-      marcar: [{ alvo: { texto: 'FONE DE OUVIDO SEM FIO TWS M25', exato: true }, legenda: 'Já cadastrado' }],
+      titulo: 'Produto que já tem cadastro: só no teclado',
+      texto: 'Produto que já tem cadastro é mais rápido, sem mouse: bipa ou digita o código, Enter, a quantidade, e Enter de novo. Ele lança e já volta pro produto, pronto pro próximo.',
+      marcar: [{ alvo: { texto: 'FONE DE OUVIDO SEM FIO TWS M25', exato: true }, legenda: 'Lançado' }],
+      dica: 'Atalho: produto → Enter → quantidade → Enter. Repita para cada produto da compra.',
     },
     {
       antes: [{ tipo: 'clicar', alvo: { papel: 'button', nome: /Próximo: pagamento/ }, seguro: true, espera: 2000 }],
