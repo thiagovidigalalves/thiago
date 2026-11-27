@@ -29,6 +29,7 @@ const SESSAO = path.join(__dirname, '.sessao.json');
 const URL_BASE = (process.env.TUTORIAL_URL || 'https://thgestor.thiagoinformatica.com.br').replace(/\/$/, '');
 const BOTOES_PERIGOSOS = /salvar|gravar|cadastrar|excluir|apagar|remover|inativar|finalizar|emitir|emiss[aã]o|enviar|confirmar|cancelar venda|cancelar nota|estornar|inutilizar|pagar|baixar|transmitir|faturar|lan[cç]ar|faltam r\$|gerar|manifestar|arquivar|importar|reabrir|estornar|aplicar margem|substitui|restaurar|conectar|cancelar fila|pausar|encerrar|definir padr|imprimir teste|devolver|transformar em venda/i;
 // Dentro de uma janela (dialog), estes também gravam dados:
+const EMPRESA_THIAGO = 'EMP_MT236D4F_KRZBER'; // THIAGO INFORMATICA (do dono): só com `gravaNaThiago` e desfazendo no fim
 const EMPRESA_DEMO = 'EMP_DEMOTHGE_STOR01'; // TH Gestor · Demonstração: a única onde o robô pode salvar dados
 const BOTOES_PERIGOSOS_JANELA = /abrir caixa|fechar caixa|continuar|ok$|sim$/i;
 
@@ -320,7 +321,10 @@ async function executar(page, acao, roteiro) {
     // `seguro: true` = botão que só abre uma janela de conferência (não grava nada sozinho).
     // `gravaDados: true` (pedido do dono, 20/11/2026): na empresa de DEMONSTRAÇÃO o robô salva de verdade, com dados
     // fictícios, pra o vídeo ficar completo. Em qualquer outra empresa continua só marcando.
-    const podeGravar = roteiro.gravaDados && (process.env.TUTORIAL_VER_EMPRESA || '') === EMPRESA_DEMO && process.env.TUTORIAL_SEM_GRAVAR !== '1'; // TUTORIAL_SEM_GRAVAR=1: só prints, sem lançar de novo
+    const empAtual = process.env.TUTORIAL_VER_EMPRESA || '';
+    // `gravaNaThiago` (pedido do dono, 27/11/2026): o que a Demonstração não tem (notas da SEFAZ, Pix vinculado) lança na
+    // THIAGO INFORMATICA, empresa do próprio dono, e o roteiro DESFAZ no fim (estorno). Nunca em empresa de cliente.
+    const podeGravar = roteiro.gravaDados && (empAtual === EMPRESA_DEMO || (roteiro.gravaNaThiago && empAtual === EMPRESA_THIAGO)) && process.env.TUTORIAL_SEM_GRAVAR !== '1'; // TUTORIAL_SEM_GRAVAR=1: só prints, sem lançar de novo
     if (roteiro.gravaDados && !podeGravar && process.env.TUTORIAL_SEM_GRAVAR !== '1') console.log(`   (segurança) gravaDados só vale na empresa de demonstração (${EMPRESA_DEMO}).`);
     if (!acao.seguro && (BOTOES_PERIGOSOS.test(texto) || (naJanela && BOTOES_PERIGOSOS_JANELA.test(texto.trim()))) && !podeGravar) {
       console.log(`   (segurança) não cliquei em "${texto.trim()}" — só marquei.`);
