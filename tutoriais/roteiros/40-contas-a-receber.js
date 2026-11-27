@@ -2,17 +2,20 @@
 // "Mariana Exemplo" (sem telefone: nada vai para WhatsApp), dá baixa no caixa pelo F1 Recebimentos (dinheiro)
 // e mostra a conta como paga. O PDV é aberto pelo menu com a empresa certa (o botão "Receber no caixa" abre o PDV
 // sem o ?empresa= do Super Admin, por isso a baixa é mostrada pelo F1).
+// 27/11/2026: acrescentados os outros jeitos de lançar: parcelado (Joana Exemplo, 3x, 1ª parcela já vencida, que
+// alimenta a Central de cobrança) e "Já foi recebido agora" (lança já pago, com a forma). O "Receber com Pix" depende
+// do Pix do banco vinculado (a Demonstração não tem): só é marcado.
 module.exports = {
   id: 'contas-a-receber',
   ordem: 40,
   grupo: 'Financeiro',
-  titulo: 'Contas a receber: lançar e dar baixa',
+  titulo: 'Contas a receber: lançar, parcelar e dar baixa',
   gravaDados: true,
   valoresReais: true, // R$ 150 do começo ao fim
-  manter: ['Mariana Exemplo', 'Conserto de notebook', '150'],
+  manter: ['Mariana Exemplo', 'Joana Exemplo', 'Conserto de notebook', 'Notebook usado parcelado', 'Formatação com backup', '150,00', '900,00', '300,00', '120,00'],
   assunto: {"chave": ["receber", "recebimento", "fiado", "crediario", "crediário", "baixa"], "acoes": ["lançar", "lanço", "baixa", "baixar", "receber", "registrar", "cadastrar", "dar", "quitar", "pagou"]}, // como o Thiaguinho acha o vídeo pela pergunta
   resumo: 'Lance o que o cliente vai te pagar e dê baixa no caixa quando ele pagar.',
-  fala: 'Oi! Aqui é o Thiago, da Thiago Informática. Neste vídeo eu vou lançar uma conta a receber de verdade e depois dar baixa quando a cliente vier pagar. Bora lá!', // abertura do vídeo, no jeito de falar do Thiago
+  fala: 'Oi! Aqui é o Thiago, da Thiago Informática. Neste vídeo eu vou lançar contas a receber de verdade: uma simples, uma parcelada e uma que já foi paga, e depois dar baixa quando a cliente vier pagar. Bora lá!', // abertura do vídeo, no jeito de falar do Thiago
   passos: [
     {
       ir: '/financeiro/contas-receber',
@@ -47,8 +50,63 @@ module.exports = {
     {
       antes: [{ tipo: 'preencher', alvo: { placeholder: 'Nome do cliente' }, valor: 'Mariana Exemplo', espera: 4000 }],
       titulo: 'A conta já está lançada',
-      texto: 'Pronto, a conta está aqui, em aberto. Quando o cliente vier pagar, a baixa é feita no caixa.',
+      texto: 'Pronto, a conta está aqui, em aberto. Quando o cliente vier pagar, a baixa é feita no caixa. Mas antes, olha os outros jeitos de lançar.',
       marcar: [{ alvo: { css: 'tbody tr:has-text("Mariana Exemplo")' }, legenda: 'Em aberto' }],
+    },
+    {
+      antes: [
+        { tipo: 'clicar', alvo: { papel: 'button', nome: 'Nova conta' }, seguro: true, espera: 1800 },
+        { tipo: 'preencher', alvo: { placeholder: 'Digite o nome do cliente...', dentro: 'dialog' }, valor: 'Joana Exemplo', espera: 2500 },
+        { tipo: 'clicar', alvo: { texto: 'Joana Exemplo', exato: true, dentro: 'dialog' }, seguro: true, espera: 1200 },
+        { tipo: 'preencher', alvo: { css: 'div.space-y-1:has(label:text-is("Descrição")) input', dentro: 'dialog' }, valor: 'Notebook usado parcelado' },
+        { tipo: 'preencher', alvo: { campo: 'Quantidade de parcelas', dentro: 'dialog' }, valor: '3' },
+        { tipo: 'preencher', alvo: { campo: 'Vencimento', dentro: 'dialog' }, valor: '2026-11-10' },
+        { tipo: 'preencher', alvo: { css: 'div.space-y-1:has(label:has-text("Valor total")) input', dentro: 'dialog' }, valor: '900' },
+        { tipo: 'clicar', alvo: { css: 'div.space-y-1:has(label:text-is("Descrição")) input', dentro: 'dialog' }, seguro: true, espera: 800 },
+      ],
+      titulo: 'Conta parcelada',
+      texto: 'Agora uma parcelada: Nova conta, a cliente, a descrição, e em Quantidade de parcelas coloca três. Coloca o valor total e o vencimento da primeira. Ele divide sozinho: três de trezentos, uma por mês.',
+      marcar: [
+        { alvo: { campo: 'Quantidade de parcelas', dentro: 'dialog' }, legenda: '3 parcelas' },
+        { alvo: { css: 'div.space-y-1:has(label:has-text("Valor total")) input', dentro: 'dialog' }, legenda: 'R$ 900' },
+        { alvo: { texto: /^Parcelado:/, dentro: 'dialog' }, legenda: '3x de R$ 300' },
+      ],
+      depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Salvar', exato: true, dentro: 'dialog' }, aguardarFechar: true, espera: 4000 }],
+      dica: 'Boleto, crediário ou carnê: informe o valor total e o sistema divide nas parcelas.',
+    },
+    {
+      antes: [{ tipo: 'preencher', alvo: { placeholder: 'Nome do cliente' }, valor: 'Joana Exemplo', espera: 4000 }],
+      titulo: 'As três parcelas',
+      texto: 'Pronto: três contas, uma pra cada mês. A primeira já venceu, por isso fica vermelha, e já aparece na Central de cobrança.',
+      marcar: [{ alvo: { css: 'tbody tr:has-text("Notebook usado parcelado")' }, legenda: 'Parcela 1/3' }],
+    },
+    {
+      antes: [
+        { tipo: 'clicar', alvo: { papel: 'button', nome: 'Nova conta' }, seguro: true, espera: 1800 },
+        { tipo: 'preencher', alvo: { placeholder: 'Digite o nome do cliente...', dentro: 'dialog' }, valor: 'Mariana Exemplo', espera: 2500 },
+        { tipo: 'clicar', alvo: { texto: 'Mariana Exemplo', exato: true, dentro: 'dialog' }, seguro: true, espera: 1200 },
+        { tipo: 'preencher', alvo: { css: 'div.space-y-1:has(label:text-is("Descrição")) input', dentro: 'dialog' }, valor: 'Formatação com backup' },
+        { tipo: 'preencher', alvo: { css: 'div.space-y-1:has(label:has-text("Valor total")) input', dentro: 'dialog' }, valor: '120' },
+        { tipo: 'clicar', alvo: { papel: 'button', nome: /Já foi recebido agora/, dentro: 'dialog' }, seguro: true, espera: 1000 },
+        { tipo: 'clicar', alvo: { papel: 'combobox', nome: 'Selecione a forma usada no pagamento', dentro: 'dialog' }, seguro: true, espera: 1000 },
+        { tipo: 'clicar', alvo: { papel: 'option', nome: /^Dinheiro/ }, seguro: true, espera: 1000 },
+      ],
+      titulo: 'Já recebeu na hora?',
+      texto: 'E se a cliente já pagou na hora? Lança a conta e liga Já foi recebido agora. Escolhe a forma de pagamento, aqui dinheiro, e salva. A conta já entra paga.',
+      marcar: [
+        { alvo: { papel: 'button', nome: /Já foi recebido agora/, dentro: 'dialog' }, legenda: 'Já recebido' },
+        { alvo: { papel: 'combobox', nome: /Dinheiro|Selecione a forma/, dentro: 'dialog' }, legenda: 'Forma' },
+      ],
+      depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Salvar', exato: true, dentro: 'dialog' }, aguardarFechar: true, espera: 4000 }],
+    },
+    {
+      antes: [{ tipo: 'preencher', alvo: { placeholder: 'Nome do cliente' }, valor: 'Mariana Exemplo', espera: 4000 }],
+      titulo: 'Receber no caixa ou no Pix',
+      texto: 'Na linha da conta em aberto tem dois botões: o verde, Receber no caixa, e o do QR Code, Receber com Pix, que manda o Pix pro cliente e dá baixa sozinho quando ele paga. O Pix precisa do banco ligado ao sistema.',
+      marcar: [
+        { alvo: { css: 'tbody tr:has-text("Conserto de notebook") button[title="Receber no caixa (PDV)"]' }, legenda: 'Receber no caixa' },
+        { alvo: { css: 'tbody tr:has-text("Conserto de notebook") button[title^="Receber com Pix"]' }, legenda: 'Receber com Pix' },
+      ],
     },
     {
       ir: '/pdv',
@@ -59,7 +117,7 @@ module.exports = {
         { tipo: 'clicar', alvo: { papel: 'button', nome: /^Mariana Exemplo/, dentro: 'dialog' }, seguro: true, espera: 3000 },
       ],
       titulo: 'Recebimentos no caixa',
-      texto: 'No caixa, aperta F1, Recebimentos, e busca o cliente. Aparece tudo o que ele deve.',
+      texto: 'Agora a baixa. No caixa, aperta F1, Recebimentos, e busca o cliente. Aparece tudo o que ele deve.',
       marcar: [{ alvo: { texto: 'Conserto de notebook', exato: true, dentro: 'dialog' }, legenda: 'A conta dele' }],
     },
     {
@@ -90,9 +148,8 @@ module.exports = {
         { tipo: 'preencher', alvo: { placeholder: 'Nome do cliente' }, valor: 'Mariana Exemplo', espera: 4000 },
       ],
       titulo: 'A conta ficou paga',
-      texto: 'E voltando em Contas a Receber, na aba Pagas, a conta já aparece paga, e o dinheiro entrou no caixa do dia.',
+      texto: 'E voltando em Contas a Receber, na aba Pagas, as duas contas da Mariana já aparecem pagas, e o dinheiro entrou no caixa do dia.',
       marcar: [{ alvo: { css: 'tbody tr:has-text("Mariana Exemplo")' }, legenda: 'Paga' }],
-      dica: 'Recebeu na hora, junto com o lançamento? Ligue "Já foi recebido agora" e informe a forma de pagamento.',
     },
   ],
 };
