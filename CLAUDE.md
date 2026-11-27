@@ -3,6 +3,7 @@
 Este repositório guarda os **tutoriais passo a passo** (com prints marcados por bolinhas numeradas)
 do sistema THGestor, para a Central de Ajuda dos clientes.
 
+- Endereço do sistema: **https://thgestor.thiagoinformatica.com.br** (pedido do dono, 27/11/2026: NÃO usar mais o melhorsistema).
 - Para criar/atualizar tutoriais, siga `.claude/agents/tutorial.md` (agente `tutorial`).
 - Roteiros: `tutoriais/roteiros/*.js` · Captura: `node tutoriais/capturar.js [id]` · Central: `node tutoriais/gerar-ajuda.js`
 - Saída: `ajuda/index.html` + `ajuda/img/<id>/passo-N.png`.

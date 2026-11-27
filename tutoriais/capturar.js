@@ -7,7 +7,7 @@
  *   node tutoriais/capturar.js clientes pdv    -> captura só esses roteiros
  *
  * Variáveis de ambiente:
- *   TUTORIAL_URL    endereço do sistema (padrão: https://melhorsistema.thiagoinformatica.com.br)
+ *   TUTORIAL_URL    endereço do sistema (padrão: https://thgestor.thiagoinformatica.com.br)
  *   TUTORIAL_EMAIL  e-mail de um usuário de DEMONSTRAÇÃO (nunca use empresa de cliente real)
  *   TUTORIAL_SENHA  senha desse usuário
  *   (ou login de funcionário: TUTORIAL_EMPRESA = código/CNPJ da empresa demo, TUTORIAL_USUARIO e TUTORIAL_SENHA)
@@ -26,7 +26,7 @@ const PASTA_ROTEIROS = path.join(__dirname, 'roteiros');
 // TUTORIAL_SAIDA: captura numa pasta separada (usado pelo conferir.js para comparar antes de trocar).
 const PASTA_IMG = process.env.TUTORIAL_SAIDA ? path.resolve(process.env.TUTORIAL_SAIDA) : path.join(RAIZ, 'ajuda', 'img');
 const SESSAO = path.join(__dirname, '.sessao.json');
-const URL_BASE = (process.env.TUTORIAL_URL || 'https://melhorsistema.thiagoinformatica.com.br').replace(/\/$/, '');
+const URL_BASE = (process.env.TUTORIAL_URL || 'https://thgestor.thiagoinformatica.com.br').replace(/\/$/, '');
 const BOTOES_PERIGOSOS = /salvar|gravar|cadastrar|excluir|apagar|remover|inativar|finalizar|emitir|emiss[aã]o|enviar|confirmar|cancelar venda|cancelar nota|estornar|inutilizar|pagar|baixar|transmitir|faturar|lan[cç]ar|faltam r\$|gerar|manifestar|arquivar|importar|reabrir|estornar|aplicar margem|substitui|restaurar|conectar|cancelar fila|pausar|encerrar|definir padr|imprimir teste|devolver|transformar em venda/i;
 // Dentro de uma janela (dialog), estes também gravam dados:
 const EMPRESA_DEMO = 'EMP_DEMOTHGE_STOR01'; // TH Gestor · Demonstração: a única onde o robô pode salvar dados

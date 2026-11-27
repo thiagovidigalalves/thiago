@@ -20,7 +20,7 @@ const { chromium } = require('playwright');
 
 const AQUI = __dirname, RAIZ = path.resolve(AQUI, '..');
 const PASTA = path.join(AQUI, '.conferencia');
-const URL_BASE = (process.env.TUTORIAL_URL || 'https://melhorsistema.thiagoinformatica.com.br').replace(/\/$/, '');
+const URL_BASE = (process.env.TUTORIAL_URL || 'https://thgestor.thiagoinformatica.com.br').replace(/\/$/, '');
 const SESSAO = path.join(AQUI, '.sessao.json');
 const aplicar = process.argv.includes('--aplicar');
 
