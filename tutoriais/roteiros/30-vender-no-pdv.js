@@ -64,9 +64,9 @@ module.exports = {
       depois: [{ tipo: 'tecla', tecla: 'Enter', espera: 5000 }],
     },
     {
-      titulo: 'Comprovante',
-      texto: 'Venda gravada! Agora ele pergunta do comprovante: imprimir em A4, na bobina, não imprimir, ou mandar no WhatsApp do cliente. Aqui eu aperto três, Não imprimir. Se a sua loja emite nota, antes ele pergunta o documento: tem um vídeo só disso.',
-      marcar: [{ alvo: { papel: 'button', nome: /Não imprimir/ }, legenda: '3 · Não imprimir' }],
+      titulo: 'Sem nota e sem papel',
+      texto: 'Venda gravada! Agora ele pergunta o documento: cupom fiscal, nota fiscal, ou venda normal, sem nota. A nota tem um vídeo só dela. Aqui eu aperto três. Depois vem o comprovante: Não imprimir.',
+      marcar: [{ alvo: { texto: /sem documento fiscal/ }, legenda: '3 · Sem nota' }],
       depois: [
         { tipo: 'tecla', tecla: '3', espera: 2500 },
         { tipo: 'clicar', alvo: { papel: 'button', nome: /Não imprimir/ }, seguro: true, opcional: true, espera: 2500 },
