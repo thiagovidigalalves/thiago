@@ -95,7 +95,7 @@ module.exports = {
     },
     {
       antes: [
-        { tipo: 'clicar', alvo: { papel: 'button', nome: /Em aberto/ }, seguro: true, espera: 2500 },
+        { tipo: 'clicar', alvo: { papel: 'button', nome: 'Em aberto/atraso', exato: true }, seguro: true, espera: 2500 },
         { tipo: 'preencher', alvo: { placeholder: 'Nome' }, valor: 'Distribuidora Exemplo', espera: 4000 },
       ],
       titulo: 'Os três boletos lançados',
