@@ -27,7 +27,7 @@ const PASTA_ROTEIROS = path.join(__dirname, 'roteiros');
 const PASTA_IMG = process.env.TUTORIAL_SAIDA ? path.resolve(process.env.TUTORIAL_SAIDA) : path.join(RAIZ, 'ajuda', 'img');
 const SESSAO = path.join(__dirname, '.sessao.json');
 const URL_BASE = (process.env.TUTORIAL_URL || 'https://thgestor.thiagoinformatica.com.br').replace(/\/$/, '');
-const BOTOES_PERIGOSOS = /salvar|gravar|cadastrar|excluir|apagar|remover|inativar|finalizar|emitir|emiss[aã]o|enviar|confirmar|cancelar venda|cancelar nota|estornar|inutilizar|pagar|baixar|transmitir|faturar|lan[cç]ar|faltam r\$|gerar|manifestar|arquivar|importar|reabrir|estornar|aplicar margem|substitui|restaurar|conectar|cancelar fila|pausar|encerrar|definir padr|imprimir teste|devolver|transformar em venda/i;
+const BOTOES_PERIGOSOS = /\bligar|desligar|ativar|desativar|salvar|gravar|cadastrar|excluir|apagar|remover|inativar|finalizar|emitir|emiss[aã]o|enviar|confirmar|cancelar venda|cancelar nota|estornar|inutilizar|pagar|baixar|transmitir|faturar|lan[cç]ar|faltam r\$|gerar|manifestar|arquivar|importar|reabrir|estornar|aplicar margem|substitui|restaurar|conectar|cancelar fila|pausar|encerrar|definir padr|imprimir teste|devolver|transformar em venda/i;
 // Dentro de uma janela (dialog), estes também gravam dados:
 const EMPRESA_THIAGO = 'EMP_MT236D4F_KRZBER'; // THIAGO INFORMATICA (do dono): só com `gravaNaThiago` e desfazendo no fim
 const EMPRESA_DEMO = 'EMP_DEMOTHGE_STOR01'; // TH Gestor · Demonstração: a única onde o robô pode salvar dados

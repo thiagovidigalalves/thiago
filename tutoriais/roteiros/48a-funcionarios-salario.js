@@ -56,12 +56,12 @@ module.exports = {
     },
     {
       titulo: 'Salve: vira conta a pagar todo mês',
-      texto: 'Clica em Salvar pagamento do funcionário. O salário e a bonificação viram conta no Contas a pagar, sempre doze meses pra frente, e entram no DRE do mês em que vencem. Mudou o valor ou o dia? Vale só daqui pra frente; o que já foi pago não muda.',
+      texto: 'Clica em Salvar, lá embaixo. O salário e a bonificação viram conta no Contas a pagar, sempre doze meses pra frente, e entram no DRE do mês em que vencem. Mudou o valor ou o dia? Vale só daqui pra frente; o que já foi pago não muda.',
       marcar: [
         { alvo: { texto: /Todo mês: salário/, dentro: 'dialog' }, legenda: '12 meses no Contas a pagar' },
-        { alvo: { papel: 'button', nome: 'Salvar pagamento do funcionário', dentro: 'dialog' }, legenda: 'Salvar' },
+        { alvo: { papel: 'button', nome: 'Salvar', exato: true, dentro: 'dialog' }, legenda: 'Salvar' },
       ],
-      depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Salvar pagamento do funcionário', dentro: 'dialog' }, espera: 3000 }],
+      depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Salvar', exato: true, dentro: 'dialog' }, espera: 3000 }],
     },
     {
       ir: '/funcionarios/configuracoes',
