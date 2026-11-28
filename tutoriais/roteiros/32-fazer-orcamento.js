@@ -35,9 +35,9 @@ module.exports = {
     },
     {
       antes: [
-        { tipo: 'preencher', alvo: { placeholder: 'Buscar produto por nome ou código', dentro: 'dialog' }, valor: 'FONE DE OUVIDO', espera: 1500 },
-        { tipo: 'esperar', alvo: { css: 'button:has(span:text-is("FONE DE OUVIDO SEM FIO TWS M25"))', dentro: 'dialog' }, espera: 300 },
-        { tipo: 'clicar', alvo: { css: 'button:has(span:text-is("FONE DE OUVIDO SEM FIO TWS M25"))', dentro: 'dialog' }, seguro: true, espera: 1200 },
+        { tipo: 'preencher', alvo: { placeholder: 'Buscar produto por nome ou código', dentro: 'dialog' }, valor: 'TWS M25', espera: 1500 },
+        { tipo: 'esperar', alvo: { css: 'button:has-text("TWS M25"):not(.orc-cadastrar-rapido)', dentro: 'dialog' }, espera: 300 },
+        { tipo: 'clicar', alvo: { css: 'button:has-text("TWS M25"):not(.orc-cadastrar-rapido)', dentro: 'dialog' }, seguro: true, espera: 1200 },
         { tipo: 'preencher', alvo: { placeholder: 'Buscar produto por nome ou código', dentro: 'dialog' }, valor: 'Emenda Rj45', espera: 1500 },
         { tipo: 'esperar', alvo: { css: 'button:has(span:text-matches("^Emenda Rj45"))', dentro: 'dialog' }, espera: 300 },
         { tipo: 'clicar', alvo: { css: 'button:has(span:text-matches("^Emenda Rj45"))', dentro: 'dialog' }, seguro: true, espera: 1200 },

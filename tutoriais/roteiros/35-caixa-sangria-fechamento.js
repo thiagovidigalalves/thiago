@@ -64,7 +64,7 @@ module.exports = {
       antes: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Resumo do caixa' }, seguro: true, espera: 4000 }],
       titulo: 'Confira o resumo',
       texto: 'No Resumo do caixa aparece quanto vendeu em cada forma, e a sangria e o suprimento que eu acabei de fazer. Aqui você sabe quanto tem que ter na gaveta.',
-      marcar: [{ alvo: { texto: 'Dinheiro para o cofre', dentro: 'dialog' }, legenda: 'Sangria' }],
+      marcar: [{ alvo: { texto: 'Sangria', exato: true, dentro: 'dialog' }, legenda: 'Sangria' }, { alvo: { texto: 'Suprimento', exato: true, dentro: 'dialog' }, legenda: 'Suprimento' }],
       depois: [{ tipo: 'tecla', tecla: 'Escape', espera: 1500 }],
     },
     {

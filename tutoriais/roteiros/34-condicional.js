@@ -115,9 +115,12 @@ module.exports = {
       ir: '/comercial/condicional',
       espera: 7000,
       semMenu: true, // vem do PDV, que é tela cheia sem o menu lateral
-      antes: [{ tipo: 'preencher', alvo: { placeholder: 'Cliente, vendedor ou número' }, valor: 'Joana Exemplo', espera: 3000 }],
+      antes: [
+        { tipo: 'clicar', alvo: { papel: 'button', nome: 'Viraram venda', exato: true }, seguro: true, espera: 1500 },
+        { tipo: 'preencher', alvo: { placeholder: 'Cliente, vendedor ou número' }, valor: 'Joana Exemplo', espera: 3000 },
+      ],
       titulo: 'Situação atualizada',
-      texto: 'E lá em Condicional, ela aparece com a situação atualizada. Os filtros mostram quem ainda está com peças na rua e quem passou do prazo.',
+      texto: 'E lá em Condicional, no filtro Viraram venda, ela aparece certinho. Os outros filtros mostram quem ainda está com peças na rua e quem passou do prazo.',
       marcar: [{ alvo: { css: 'button:has-text("Joana Exemplo")' }, legenda: 'Situação' }],
       dica: 'Os filtros "Na rua" e "Vencidas" mostram quem está com produtos e quem passou do prazo.',
     },

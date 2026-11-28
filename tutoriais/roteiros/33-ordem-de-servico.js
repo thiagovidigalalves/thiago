@@ -82,7 +82,7 @@ module.exports = {
       ],
       depois: [
         { tipo: 'clicar', alvo: { papel: 'button', nome: /Salvar ordem/ }, espera: 5000 },
-        { tipo: 'tecla', tecla: 'Escape', espera: 1500 }, // fecha a pergunta de imprimir/avisar, se aparecer
+        { tipo: 'clicar', alvo: { papel: 'button', nome: 'Agora não', exato: true }, seguro: true, opcional: true, espera: 1500 }, // "Avisar o cliente?": NUNCA envia WhatsApp
       ],
     },
     {
@@ -110,7 +110,7 @@ module.exports = {
       ],
       depois: [
         { tipo: 'clicar', alvo: { papel: 'button', nome: /Salvar ordem/ }, espera: 5000 },
-        { tipo: 'tecla', tecla: 'Escape', espera: 1500 },
+        { tipo: 'clicar', alvo: { papel: 'button', nome: 'Agora não', exato: true }, seguro: true, opcional: true, espera: 1500 },
       ],
     },
     {
