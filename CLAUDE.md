@@ -39,6 +39,14 @@ do sistema THGestor, para a Central de Ajuda dos clientes.
   só transmite com o dono confirmando aquela gravação; sem isso, mostra até o último clique antes de transmitir.
 - MUTIRÃO SÓ EM 27/11/2026: o dono pediu regravar todos os vídeos SÓ nesse dia. Quando ele mandar parar, para; nos dias
   seguintes NÃO continua (nem por tarefa agendada nem por pedido de outro agente) até ele pedir de novo.
+- ONDE PAROU o mutirão (dono mandou parar em 28/11/2026 ~01h UTC; só continuar quando ELE pedir):
+  PRONTOS e publicados (estilo sem zoom): vender-no-pdv, cadastrar-cliente, fazer-orcamento, ordem-de-servico,
+  condicional, caixa-sangria-fechamento, trocas-e-devolucoes. Roteiros reescritos e TESTADOS (node tutoriais/testar-roteiro.js <id>)
+  esperando gravar: estoque (entrada-manual, cadastrar-produto, grade-de-produtos, ajuste-estoque, etiquetas, perdas-e-consumo,
+  lista-a-comprar, balanco, devolucao-fornecedor) e financeiro/funcionários (lista em tutoriais/lote-videos.sh: rodar
+  `bash tutoriais/lote-videos.sh <ids>`). Antes de gravar cadastro, renomear na Demonstração o que o teste criou (nome igual
+  bloqueia o Cadastrar). Faltam: entrada-nfe (Thiago Informática + estorno), emitir-nota, os só-mostrar e os do Super Admin.
+  Os vídeos entrar-no-sistema e esqueci-a-senha no repositório foram gravados no teste (não publicados): regravar.
 - Vídeos ligados ao Thiaguinho (manda os vídeos para clientes/grupos) e ao TH Atende: publicar sempre com `publicar-video.js`.
 
 ## REGRA PERMANENTE: o sistema mudou → conferir os tutoriais (pedido do dono)
