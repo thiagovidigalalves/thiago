@@ -42,8 +42,8 @@ module.exports = {
     },
     {
       titulo: 'Como recebe a comissão',
-      texto: 'E em Como recebe a comissão você escolhe se ela soma no salário, ou se o salário é o mínimo garantido e a comissão só entra no que passar dele.',
-      marcar: [{ alvo: { css: 'label:has-text("Como recebe a comissão") select', dentro: 'dialog' }, legenda: 'Comissão' }],
+      texto: 'E aqui você escolhe como recebe a comissão: se ela soma no salário, ou se o salário é o mínimo garantido e a comissão só entra no que passar dele.',
+      marcar: [{ alvo: { papel: 'button', nome: /^Salário \+ comissão/, dentro: 'dialog' }, legenda: 'Soma' }, { alvo: { papel: 'button', nome: /^Salário é o mínimo/, dentro: 'dialog' }, legenda: 'Mínimo garantido' }],
     },
     {
       titulo: 'Bonificação do mês',

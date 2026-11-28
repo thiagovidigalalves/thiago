@@ -15,6 +15,7 @@ module.exports = {
     {
       ir: '/funcionarios/advertencias',
       espera: 6000,
+      antes: [{ tipo: 'esperar', alvo: { papel: 'button', nome: 'Nova advertência / falta' }, limite: 60000, espera: 500 }],
       titulo: 'Advertências e faltas',
       texto: 'Em Funcionários, Advertências, cada cartão mostra as bolinhas das advertências do mês e quanto a bonificação já caiu.',
       marcar: [{ alvo: { papel: 'button', nome: 'Nova advertência / falta' }, legenda: 'Nova' }],
