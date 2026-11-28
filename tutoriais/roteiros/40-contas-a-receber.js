@@ -100,7 +100,7 @@ module.exports = {
       depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: 'Salvar', exato: true, dentro: 'dialog' }, aguardarFechar: true, espera: 4000 }],
     },
     {
-      antes: [{ tipo: 'preencher', alvo: { placeholder: 'Nome do cliente' }, valor: 'Mariana Exemplo', espera: 4000 }],
+      antes: [{ tipo: 'preencher', alvo: { placeholder: 'Nome do cliente' }, valor: 'Mariana Exemplo', espera: 4000 }, { tipo: 'esperar', alvo: { css: "tbody tr:has-text(\"Conserto de notebook\") button[title=\"Receber no caixa (PDV)\"]" }, limite: 60000, espera: 500 }],
       titulo: 'Receber no caixa ou no Pix',
       texto: 'Na linha da conta em aberto tem dois botões: o verde, Receber no caixa, e o do QR Code, Receber com Pix, que manda o Pix pro cliente e dá baixa sozinho quando ele paga. O Pix precisa do banco ligado ao sistema.',
       marcar: [

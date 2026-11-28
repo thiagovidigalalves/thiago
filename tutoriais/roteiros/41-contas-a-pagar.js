@@ -50,7 +50,7 @@ module.exports = {
       dica: 'Conta que se repete todo mês, como aluguel e internet? Cadastre em Financeiro › Recorrências e ela é lançada sozinha.',
     },
     {
-      antes: [{ tipo: 'preencher', alvo: { placeholder: 'Nome' }, valor: 'Companhia de Energia Exemplo', espera: 4000 }],
+      antes: [{ tipo: 'preencher', alvo: { placeholder: 'Nome' }, valor: 'Companhia de Energia Exemplo', espera: 4000 }, { tipo: 'esperar', alvo: { css: "tbody tr:has-text(\"Companhia de Energia Exemplo\")" }, limite: 60000, espera: 500 }],
       titulo: 'A conta já está lançada',
       texto: 'Pronto, a conta está aqui, esperando o pagamento. Ela também já entra no fluxo de caixa e no DRE.',
       marcar: [{ alvo: { css: 'tbody tr:has-text("Companhia de Energia Exemplo")' }, legenda: 'Em aberto' }],
