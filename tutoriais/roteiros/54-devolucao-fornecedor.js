@@ -56,7 +56,7 @@ module.exports = {
     {
       antes: [
         { tipo: 'clicar', alvo: { papel: 'combobox', nome: 'Buscar produto cadastrado' }, seguro: true, espera: 800 },
-        { tipo: 'preencher', alvo: { placeholder: 'Digite para buscar...' }, valor: 'FONE DE OUVIDO', espera: 1000 },
+        { tipo: 'preencher', alvo: { placeholder: 'Digite para buscar...' }, valor: 'TWS M25', espera: 1000 },
         { tipo: 'clicar', alvo: { papel: 'option', nome: new RegExp(FONE) }, seguro: true, espera: 900 },
         { tipo: 'clicar', alvo: { papel: 'button', nome: 'Adicionar', exato: true }, seguro: true, espera: 1500 },
       ],

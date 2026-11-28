@@ -42,7 +42,7 @@ module.exports = {
     },
     {
       antes: [
-        { tipo: 'preencher', alvo: busca, valor: 'FONE DE OUVIDO', espera: 1500 },
+        { tipo: 'preencher', alvo: busca, valor: 'TWS M25', espera: 1500 },
         { tipo: 'clicar', alvo: { papel: 'button', nome: new RegExp(FONE), dentro: 'dialog' }, seguro: true, espera: 1000 },
         { tipo: 'preencher', alvo: { css: `input[aria-label="Quantidade de ${FONE}"]`, dentro: 'dialog' }, valor: '1', espera: 900 },
       ],
@@ -58,7 +58,7 @@ module.exports = {
       titulo: 'Confira e confirme',
       texto: 'Clica em Conferir movimentação: aparece o resumo, com o custo de cada item. Tá certo? Clica em Confirmar baixa pelo custo.',
       marcar: [{ alvo: { papel: 'button', nome: /Confirmar baixa pelo custo/, dentro: 'dialog' }, legenda: 'Confirmar' }],
-      depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: /Confirmar baixa pelo custo/, dentro: 'dialog' }, aguardarFechar: true, espera: 2500 }],
+      depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: /Confirmar baixa pelo custo/, dentro: 'dialog' }, aguardarFechar: true, espera: 2500 }, { tipo: 'clicar', alvo: { papel: 'button', nome: 'Fechar', exato: true, dentro: 'dialog' }, seguro: true, opcional: true, espera: 1200 }],
     },
     {
       titulo: 'A perda já está na lista',
@@ -88,7 +88,7 @@ module.exports = {
       titulo: 'Produto, conferir e confirmar',
       texto: 'Busca o produto, coloca a quantidade, duas, e clica em Conferir movimentação. Depois, Confirmar baixa pelo custo.',
       marcar: [{ alvo: { papel: 'button', nome: /Confirmar baixa pelo custo/, dentro: 'dialog' }, legenda: 'Confirmar' }],
-      depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: /Confirmar baixa pelo custo/, dentro: 'dialog' }, aguardarFechar: true, espera: 2500 }],
+      depois: [{ tipo: 'clicar', alvo: { papel: 'button', nome: /Confirmar baixa pelo custo/, dentro: 'dialog' }, aguardarFechar: true, espera: 2500 }, { tipo: 'clicar', alvo: { papel: 'button', nome: 'Fechar', exato: true, dentro: 'dialog' }, seguro: true, opcional: true, espera: 1200 }],
     },
     {
       titulo: 'As duas baixas lançadas',

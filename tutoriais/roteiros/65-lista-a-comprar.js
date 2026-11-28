@@ -28,7 +28,7 @@ module.exports = {
     },
     {
       antes: [
-        { tipo: 'preencher', alvo: produto, valor: 'FONE DE OUVIDO', espera: 1500 },
+        { tipo: 'preencher', alvo: produto, valor: 'TWS M25', espera: 1500 },
         { tipo: 'clicar', alvo: { papel: 'button', nome: new RegExp('^' + FONE) }, seguro: true, espera: 900 },
         { tipo: 'preencher', alvo: { css: 'input[aria-label="Quantidade"]' }, valor: '5', espera: 500 },
         { tipo: 'preencher', alvo: { placeholder: 'Observação (ex.: cliente esperando)' }, valor: 'Cliente esperando', espera: 500 },
