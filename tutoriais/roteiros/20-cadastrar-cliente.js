@@ -29,8 +29,12 @@ module.exports = {
       marcar: [{ alvo: { campo: 'Nome', dentro: 'dialog' }, legenda: 'Nome' }],
     },
     {
+      antes: [
+        { tipo: 'preencher', alvo: { placeholder: 'CPF ou CNPJ', dentro: 'dialog' }, valor: '52998224725', espera: 500 },
+        { tipo: 'preencher', alvo: { css: 'div:has(> label:text-is("E-mail")) input', dentro: 'dialog' }, valor: 'paula@exemplo.com.br', espera: 500 },
+      ],
       titulo: 'CPF, WhatsApp e e-mail',
-      texto: 'Coloca o CPF ou CNPJ: se for CNPJ, a lupa busca e preenche os dados da empresa sozinha. E o WhatsApp, que é por onde vão os comprovantes, as cobranças e o parabéns no aniversário.',
+      texto: 'Coloca o CPF ou CNPJ: se for CNPJ, a lupa busca e preenche os dados da empresa sozinha. O e-mail. E o WhatsApp do cliente, que é por onde vão os comprovantes, as cobranças e o parabéns no aniversário.',
       marcar: [
         { alvo: { placeholder: 'CPF ou CNPJ', dentro: 'dialog' }, legenda: 'CPF ou CNPJ' },
         { alvo: { placeholder: '(principal)', dentro: 'dialog' }, legenda: 'WhatsApp' },

@@ -290,8 +290,10 @@ async function executarVisivel(page, a, r, som, clique) {
   if (a.tipo === 'tecla' || a.tipo === 'esperar' || !a.alvo) return C.executar(page, a, r);
   if (a.opcional && !(await C.achar(page, a.alvo).waitFor({ state: 'visible', timeout: 2500 }).then(() => true).catch(() => false))) return;
   let c = await centro(page, a.alvo).catch(() => null);
-  const comCamera = c && a.camera !== false;
+  const comCamera = c && a.camera !== false && process.env.TUTORIAL_CAMERA === '1';
   if (comCamera) { await camera(page, c); c = (await centro(page, a.alvo).catch(() => null)) || c; }
+  const caixa = c && a.foco !== false ? await C.achar(page, a.alvo).boundingBox().catch(() => null) : null;
+  if (caixa && caixa.width < W * 0.9 && caixa.height < H * 0.7) await foco(page, caixa);
   try {
     if (c) await moverCursor(page, c[0], c[1]);
     if (a.tipo === 'clicar' || a.tipo === 'escolher' || a.tipo === 'preencher') { som(clique, 0.9); await onda(page); }
@@ -305,8 +307,11 @@ async function executarVisivel(page, a, r, som, clique) {
         return;
       } catch { /* cai no jeito normal */ }
     }
+    // Clique: o foco some logo depois (não fica na tela seguinte).
+    await page.evaluate(() => setTimeout(() => { const f = document.getElementById('__foco'); if (f) f.style.opacity = '0'; }, 350)).catch(() => {});
     return await C.executar(page, a, r);
   } finally {
+    await foco(page, null);
     if (comCamera) await camera(page, null);
   }
 }
@@ -316,7 +321,7 @@ async function executarVisivel(page, a, r, som, clique) {
 // com o transform que a janela já tem; a legenda, o cursor e a cortina ficam de fora (não aumentam).
 const ZOOM = Number(process.env.TUTORIAL_ZOOM || 1.45);
 async function camera(page, ponto, z = ZOOM) {
-  if (process.env.TUTORIAL_SEM_CAMERA === '1') return;
+  if (process.env.TUTORIAL_CAMERA !== '1') return; // ZOOM DESLIGADO (dono, 27/11/2026: "bugou os vídeos")
   await page.evaluate(([ponto, z, W, H]) => {
     const fora = new Set(['__cortina', '__cursor', '__legenda']);
     const els = [...document.body.children].filter(e => !fora.has(e.id) && !e.classList.contains('__onda') && e.tagName !== 'SCRIPT' && e.tagName !== 'STYLE');
@@ -342,6 +347,20 @@ async function camera(page, ponto, z = ZOOM) {
     }
   }, [ponto, z, W, H]).catch(() => {});
   await espera(780);
+}
+
+// FOCO (pedido do dono, 27/11/2026, no lugar do zoom): a tela não mexe; o resto escurece de leve e o alvo fica
+// iluminado com borda branca e brilho azul, enquanto o mouse chega e clica (com o som e a ondinha).
+async function foco(page, caixa) {
+  await page.evaluate(([c]) => {
+    let f = document.getElementById('__foco');
+    if (!f) { f = document.createElement('div'); f.id = '__foco'; document.body.appendChild(f);
+      f.style.cssText = 'position:fixed;z-index:2147483644;pointer-events:none;border-radius:12px;opacity:0;transition:opacity .3s ease,left .35s ease,top .35s ease,width .35s ease,height .35s ease;' +
+        'box-shadow:0 0 0 3px rgba(255,255,255,.95),0 0 22px 6px rgba(59,130,246,.55),0 0 0 200vmax rgba(8,15,40,.32)'; }
+    if (!c) { f.style.opacity = '0'; return; }
+    const m = 6; Object.assign(f.style, { left: (c.x - m) + 'px', top: (c.y - m) + 'px', width: (c.width + 2 * m) + 'px', height: (c.height + 2 * m) + 'px' });
+    requestAnimationFrame(() => { f.style.opacity = '1'; });
+  }, [caixa]).catch(() => {});
 }
 
 async function centro(page, alvo) {
@@ -514,7 +533,7 @@ async function gravar(r, s) {
         // Botão marcado lá embaixo: a legenda sobe para não cobrir.
         let embaixo = caixas.some(c => c.y + c.height > H - 190);
         // Câmera: chega perto do que foi marcado enquanto a voz explica (se tudo couber na tela aproximada).
-        if (caixas.length && p.camera !== false) {
+        if (caixas.length && p.camera !== false && process.env.TUTORIAL_CAMERA === '1') {
           const x0 = Math.min(...caixas.map(c => c.x)), y0 = Math.min(...caixas.map(c => c.y));
           const x1 = Math.max(...caixas.map(c => c.x + c.width)), y1 = Math.max(...caixas.map(c => c.y + c.height));
           const z = Math.min(ZOOM, (W * 0.8) / Math.max(1, x1 - x0), (H * 0.55) / Math.max(1, y1 - y0));

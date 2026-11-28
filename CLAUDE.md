@@ -28,7 +28,8 @@ do sistema THGestor, para a Central de Ajuda dos clientes.
   fictícios na Demonstração para o dono mostrar às pessoas. Nota fiscal de verdade continua proibida (só mostrar).
 
 ## REGRA PERMANENTE: vídeos são a alma do negócio (pedido do dono, 27/11/2026)
-- Vídeo explicativo E bonito, que empolga: câmera que chega perto de onde clica (zoom suave no alvo e volta),
+- Vídeo explicativo, profissional e claro: NADA DE ZOOM (o dono reprovou: "bugou os vídeos"). No clique, FOCO: a tela
+  não mexe, o resto escurece de leve e o alvo fica iluminado (borda branca + brilho), com som de clique e ondinha;
   efeitos tonais, fala inteligente batendo com cada clique, carregamento cortado (vídeo curto), TODOS os jeitos de lançar.
 - Faz TODOS os lançamentos de verdade, clicando cada passo (vincular, dar entrada, gerar...).
 - O que a Demonstração não tem (notas da SEFAZ para Entrada de NF-e, Pix vinculado...), pode fazer na
