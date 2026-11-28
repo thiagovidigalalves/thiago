@@ -64,7 +64,7 @@ function scriptDaPagina(logoDataUri) {
       #__cortina span{opacity:.8;font-weight:500;max-width:820px;text-align:center}
       #__cortina.saindo{opacity:0}
       #__cortina:not(.saindo) ~ #__cursor{opacity:0}
-      #__legenda{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:2147483645;display:flex;gap:14px;align-items:flex-start;
+      #__legenda{pointer-events:none;position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:2147483645;display:flex;gap:14px;align-items:flex-start;
         width:min(1100px,92vw);background:rgba(10,18,45,.92);color:#fff;border-radius:16px;padding:14px 18px;box-shadow:0 10px 30px rgba(0,0,0,.35);
         font:500 18px/1.4 system-ui,sans-serif;transition:opacity .3s,transform .3s}
       #__legenda.oculta{opacity:0;transform:translate(-50%,20px)}

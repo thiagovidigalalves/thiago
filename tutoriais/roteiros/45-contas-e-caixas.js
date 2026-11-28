@@ -17,6 +17,7 @@ module.exports = {
     {
       ir: '/financeiro/contas',
       espera: 6000,
+      antes: [{ tipo: 'esperar', alvo: { papel: 'button', nome: 'Ver detalhes' }, limite: 90000, espera: 800 }],
       titulo: 'Saldo de cada conta',
       texto: 'No menu, clica em Financeiro, Banco e organização, Contas. Cada cartão é uma conta, banco, cofre, com o saldo, as entradas e as saídas do período.',
       marcar: [{ alvo: { papel: 'button', nome: 'Ver detalhes' }, legenda: 'Ver detalhes' }],
@@ -54,6 +55,7 @@ module.exports = {
     },
     {
       antes: [
+        { tipo: 'esperar', alvo: { papel: 'button', nome: 'Ver detalhes' }, limite: 90000, espera: 500 },
         { tipo: 'clicar', alvo: { papel: 'button', nome: 'Ver detalhes' }, seguro: true, espera: 2500 },
         { tipo: 'esperar', alvo: { texto: 'Depósito do caixa no banco', dentro: 'dialog' }, espera: 800 },
       ],
